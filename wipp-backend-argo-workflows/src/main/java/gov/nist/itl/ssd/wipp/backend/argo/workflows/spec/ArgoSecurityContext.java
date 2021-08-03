@@ -17,14 +17,14 @@ package gov.nist.itl.ssd.wipp.backend.argo.workflows.spec;
  */
 public class ArgoSecurityContext {
 
-	private final int runAsUser = 1000;
-	private final int runAsGroup = 1000;
+	private final String runAsUser = System.getenv().getOrDefault("RUN_WORKFLOWS_AS_USER", "1000");
+	private final String runAsGroup = System.getenv().getOrDefault("RUN_WORKFLOWS_AS_GROUP", "1000");
 	
-	public int getRunAsUser() {
+	public String getRunAsUser() {
 		return runAsUser;
 	}
 
-	public int getRunAsGroup() {
+	public String getRunAsGroup() {
 		return runAsGroup;
 	}
 }
