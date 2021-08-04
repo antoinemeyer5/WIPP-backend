@@ -11,17 +11,14 @@ fi
 
 if [[ -z $SPRING_DATA_MONGODB_PORT ]]; then
   echo "No SPRING_DATA_MONGODB_PORT env var set, using default value."
-  exit 1
 fi
 
 if [[ -z $KUBE_WIPPDATA_PVC ]]; then
   echo "No KUBE_WIPPDATA_PVC env var set, using default value."
-  exit 1
 fi
 
 if [[ -z $OME_CONVERTER_THREADS ]]; then
   echo "No OME_CONVERTER_THREADS env var set, using default value."
-  exit 1
 fi
 
 if [[ -n ${ELASTIC_APM_SERVER_URLS} && -n ${ELASTIC_APM_SERVICE_NAME} ]]; then
