@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [[ -z $KEYCLOAK_AUTH_URL ]]; then
+if [[ -z $KEYCLOAK_AUTHSERVERURL ]]; then
   echo "Error: missing KEYCLOAK_AUTH_URL env var, exiting."
   exit 1
 fi
