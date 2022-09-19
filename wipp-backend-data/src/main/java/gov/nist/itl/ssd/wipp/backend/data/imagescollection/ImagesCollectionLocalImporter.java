@@ -59,11 +59,9 @@ public class ImagesCollectionLocalImporter {
             imageHandler.addAllInDbFromFolder(imagesCollection.getId(), localImportFolder.getPath());
             List<Image> images = imageRepository.findByImagesCollection(imagesCollection.getId());
 
-            // Copy images to collection temp folder and start conversion
+            // Start conversion (without source image deletion)
             for(Image image : images) {
-                FileUtils.copyFileToDirectory(new File(localImportFolder, image.getFileName()),
-                        imageHandler.getTempFilesFolder(imagesCollection.getId()));
-                imageConversionService.submitImageToExtractor(image);
+                imageConversionService.submitImageToExtractor(image, localImportFolder, false);
             }
 
             // Import metadata files

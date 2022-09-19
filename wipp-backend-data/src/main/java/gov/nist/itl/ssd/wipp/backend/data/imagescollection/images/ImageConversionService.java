@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
@@ -22,8 +23,11 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 
+import gov.nist.itl.ssd.wipp.backend.core.utils.SecurityUtils;
+import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollection;
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
@@ -61,9 +65,23 @@ public class ImageConversionService extends FileUploadBase{
 		omeConverterExecutor = Executors.newFixedThreadPool(
 				appConfig.getOmeConverterThreads());
 
+		// Load security context for system operations
+		SecurityUtils.runAsSystem();
+
 		// Resume any interrupted conversion
 		imageRepository.findByImporting(true)
-		.forEach(this::submitImageToExtractor);
+                .forEach(image -> {
+                    Optional<ImagesCollection> coll = imagesCollectionRepository.findById(image.getImagesCollection());
+					if (coll.isPresent() && ImagesCollection.ImagesCollectionImportMethod.BACKEND_IMPORT.equals(
+							coll.get().getImportMethod())) {
+						File sourceDir = new File(appConfig.getLocalImportFolder(), coll.get().getSourceBackendImport());
+						this.submitImageToExtractor(image, sourceDir, false);
+					} else {
+						this.submitImageToExtractor(image);
+					}
+                });
+		// Clear security context after system operations
+		SecurityContextHolder.clearContext();
 	}
 
 	@Override
@@ -73,10 +91,10 @@ public class ImageConversionService extends FileUploadBase{
 	
 	public void submitImageToExtractor(Image image) {
 		File tempUploadDir = getTempUploadDir(image.getImagesCollection());
-		this.submitImageToExtractor(image, tempUploadDir);
+		this.submitImageToExtractor(image, tempUploadDir, true);
 	}
 
-	public void submitImageToExtractor(Image image, File sourceDir) {
+	public void submitImageToExtractor(Image image, File sourceDir, boolean deleteSourceImage) {
 		String collectionId = image.getImagesCollection();
 		File tempUploadDir = sourceDir;
 		File uploadDir = getUploadDir(image.getImagesCollection());
@@ -97,17 +115,19 @@ public class ImageConversionService extends FileUploadBase{
 		Path outputPath = new File(uploadDir, outputFileName).toPath();
 
 		omeConverterExecutor.submit(() -> doSubmit(
-				collectionId, image, outputFileName, tempPath, outputPath));
+				collectionId, image, outputFileName, tempPath, outputPath, deleteSourceImage));
 	}
 
 	public void doSubmit(String collectionId, Image image, String outputFileName,
-			Path tempPath, Path outputPath) {
+			Path tempPath, Path outputPath, boolean deleteSourceImage) {
 		try {
 			LOG.log(Level.INFO,
 					"Starting extracting image {0} of collection {1}",
 					new Object[]{image.getFileName(), collectionId});
 			convertToTiledOmeTiff(tempPath, outputPath);
-			Files.delete(tempPath);
+			if (deleteSourceImage) {
+				Files.delete(tempPath);
+			}
 			image.setFileName(outputFileName);
 			image.setFileSize(getPathSize(outputPath));
 			image.setImporting(false);
