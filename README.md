@@ -10,7 +10,7 @@ Requirements for development environment setup.
 * Maven version compatible with Java 8
 
 ### Database
-* MongoDB 3.6
+* MongoDB (Supported versions: 3.6 to 4.4)
 
 ### Identity and Access Management
 * Keycloak 11.0.2
@@ -39,6 +39,14 @@ Please follow the instructions for version 2.3.0 [here](https://github.com/argop
     * `storage` of `capacity` is set to 100Gi by default, this value can be modified in `hostPath-wippdata-volume.yaml` and `hostPath-wippdata-pvc.yaml`
     * run `hostPath-deploy.sh` to setup the WIPP data PV and PVC
 
+**Local backend import option**  
+Default root folder configuration for the local backend import of images collections is:
+* `${user.home}/WIPP-plugins/local-import` in `dev` profile and
+* `/data/WIPP-plugins/local-import` in `prod` profile
+
+This default configuration can be changed in `wipp-backend-application/pom.xml` (property `storage.local.import`) when running locally or in the deployment 
+manifest when running in a Kubernetes cluster (an additional volume needs to be mounted if the new location is not in the WIPP root data folder).
+
 ## Compiling
 ```shell
 mvn clean install
@@ -51,7 +59,7 @@ mvn spring-boot:run
 - The WIPP REST API will be launched with the `dev` profile and available at http://localhost:8080/api  
 
 - Swagger API documentation will be available at:
- - http://localhost:8080/swagger-ui.html (Swagger UI) and,
+ - http://localhost:8080/swagger-ui/index.html (Swagger UI) and,
  - http://localhost:8080/v2/api-docs (OpenAPI spec)
 
 ## Docker packaging

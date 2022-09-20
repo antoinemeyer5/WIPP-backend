@@ -84,7 +84,10 @@ public class CoreConfig {
     private String notebooksFolder;
     
     @Value("${storage.generic.datas}")
-    private String genericDatasFolder;
+    private String genericDataCollectionsFolder;
+    
+    @Value("${storage.generic.datas.upload.tmp}")
+    private String genericDataCollectionsUploadTmpFolder;
 
     @Value("${storage.notebooks.tmp}")
     private String notebooksTmpFolder;
@@ -97,6 +100,9 @@ public class CoreConfig {
 
     @Value("${storage.temp.jobs}")
     private String jobsTempFolder;
+
+    @Value("${storage.local.import}")
+    private String localImportFolder;
 
     @Value("${ome.converter.threads:2}")
     private int omeConverterThreads;
@@ -168,8 +174,12 @@ public class CoreConfig {
 		return notebooksTmpFolder;
 	}
 	
-    public String getGenericDatasFolder() {
-		return genericDatasFolder;
+    public String getGenericDataCollectionsFolder() {
+		return genericDataCollectionsFolder;
+	}
+    
+    public String getGenericDataCollectionsUploadTmpFolder() {
+		return genericDataCollectionsUploadTmpFolder;
 	}
 
     public String getWorkflowBinary() {
@@ -210,6 +220,10 @@ public class CoreConfig {
 
     public String getJobsTempFolder() {
         return jobsTempFolder;
+    }
+
+    public String getLocalImportFolder() {
+        return localImportFolder;
     }
     
     public int getFetchingPixelsMax() {
