@@ -51,6 +51,14 @@ public abstract class FileHandler {
         addAllInDb(imagesCollectionId);
     }
 
+    public void importFolderCopy(String imagesCollectionId, File folder)
+            throws IOException {
+        File imagesFolder = getFilesFolder(imagesCollectionId);
+        imagesFolder.getParentFile().mkdirs();
+        FileUtils.copyDirectory(folder, imagesFolder);
+        addAllInDb(imagesCollectionId);
+    }
+
     /**
      * Copy all the files from the images collection "fromId" to the images
      * collection "toId".

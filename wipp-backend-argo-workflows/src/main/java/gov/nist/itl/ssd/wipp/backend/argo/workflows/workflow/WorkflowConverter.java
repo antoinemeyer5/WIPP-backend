@@ -16,13 +16,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
 import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
-
-import gov.nist.itl.ssd.wipp.backend.argo.workflows.plugin.Plugin;
-import gov.nist.itl.ssd.wipp.backend.argo.workflows.plugin.PluginIO;
+import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
+import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginIO;
 import gov.nist.itl.ssd.wipp.backend.argo.workflows.spec.*;
 import gov.nist.itl.ssd.wipp.backend.argo.workflows.spec.slurmjob.ArgoTemplatePluginSlurmJob;
 import gov.nist.itl.ssd.wipp.backend.argo.workflows.spec.slurmjob.ArgoTemplatePluginSlurmJobSpec;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
+import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginResourceRequirements;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataHandler;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataHandlerService;
 import gov.nist.itl.ssd.wipp.backend.core.model.job.Job;
@@ -100,6 +100,7 @@ public class WorkflowConverter {
             String containerId,
             List<String> command,
             List<String> parameters,
+            PluginResourceRequirements resourceRequirements,
             String jobId
     ) {
         ArgoTemplatePluginContainer container = new ArgoTemplatePluginContainer();
@@ -115,13 +116,10 @@ public class WorkflowConverter {
             argoPluginContainerArgs.add("--" + parameter);
             argoPluginContainerArgs.add("{{inputs.parameters." + parameter + "}}");
         }
-
         container.setArgs(argoPluginContainerArgs);
 
-
-        ArrayList<Map<String, Object>> volumeMounts = new ArrayList<>();
-
         // Setup the volume mounts for the input data
+        ArrayList<Map<String, Object>> volumeMounts = new ArrayList<>();
         HashMap<String, Object> inputDataVolumeMount = new HashMap<>();
         inputDataVolumeMount.put("mountPath", coreConfig.getContainerInputsMountPath());
         inputDataVolumeMount.put("name", wippDataVolumeName);
@@ -137,6 +135,13 @@ public class WorkflowConverter {
         volumeMounts.add(outputDataVolumeMount);
         container.setVolumeMounts(volumeMounts);
 
+        // Add resource requirements if any
+        if(coreConfig.isWorkflowPluginHardwareRequirementsEnabled() && resourceRequirements != null) {
+            ArgoTemplatePluginContainerResources argoTemplatePluginContainerResources =
+                    new ArgoTemplatePluginContainerResources(resourceRequirements);
+            container.setResources(argoTemplatePluginContainerResources);
+        }
+
         return container;
     }
 
@@ -146,11 +151,18 @@ public class WorkflowConverter {
 
         argoTemplatePlugin.setInputs(this.generateTemplatePluginInputs(plugin, parameters));
 
+        // Add nodeSelector from hardware requirements
+        if(coreConfig.isWorkflowPluginHardwareRequirementsEnabled()) {
+            argoTemplatePlugin.setNodeSelector(plugin.getResourceRequirements());
+        }
+
+        // Generate container spec
         argoTemplatePlugin.setContainer(
                 this.generateTemplatePluginContainer(
                         plugin.getContainerId(),
                         plugin.getBaseCommand(),
                         parameters,
+                        plugin.getResourceRequirements(),
                         jobId
                 )
         );
