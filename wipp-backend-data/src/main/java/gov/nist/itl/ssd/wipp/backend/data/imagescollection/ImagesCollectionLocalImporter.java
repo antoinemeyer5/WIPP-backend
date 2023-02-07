@@ -69,7 +69,7 @@ public class ImagesCollectionLocalImporter {
             // Import metadata files
             File metadataFolder = new File(localImportFolder, "metadata_files");
             if(metadataFolder.exists()) {
-                metadataHandler.importFolder(imagesCollection.getId(), metadataFolder);
+                metadataHandler.importFolderCopy(imagesCollection.getId(), metadataFolder);
             }
 
         } catch (IOException ex) {
