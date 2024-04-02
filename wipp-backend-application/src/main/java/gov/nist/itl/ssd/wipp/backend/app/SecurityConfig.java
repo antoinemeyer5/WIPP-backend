@@ -1,51 +1,42 @@
 package gov.nist.itl.ssd.wipp.backend.app;
 
-import java.util.*;
-
 import com.jayway.jsonpath.JsonPath;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
-import org.springframework.security.config.Customizer;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
-
-
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.oauth2.core.oidc.user.OidcUserAuthority;
-import org.springframework.security.oauth2.core.user.OAuth2UserAuthority;
-import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.access.expression.WebExpressionAuthorizationManager;
 import org.springframework.security.web.authentication.session.NullAuthenticatedSessionStrategy;
 import org.springframework.security.web.authentication.session.SessionAuthenticationStrategy;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
  * Keycloak/Spring security configuration
+ *
+ * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @Configuration
 @EnableWebSecurity
@@ -54,24 +45,6 @@ import java.util.stream.Collectors;
         jsr250Enabled = true)
 public class SecurityConfig
 {
-
-	private static final String GROUPS = "groups";
-	private static final String REALM_ACCESS_CLAIM = "realm_access";
-	private static final String ROLES_CLAIM = "roles";
-
-    /**
-     * Register the KeycloakAuthenticationProvider with the authentication manager.
-     * SimpleAuthorityMapper is used to make sure roles are not prefixed with ROLE_
-     */
- //   @Autowired
-//    public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-//    	KeycloakAuthenticationProvider keycloakAuthenticationProvider
-//        = keycloakAuthenticationProvider();
-//       keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(
-//         new SimpleAuthorityMapper());
-//       auth.authenticationProvider(keycloakAuthenticationProvider);
-//    }
-	
     /**
      * Use Spring Security expressions in Spring Data queries
      * @return
