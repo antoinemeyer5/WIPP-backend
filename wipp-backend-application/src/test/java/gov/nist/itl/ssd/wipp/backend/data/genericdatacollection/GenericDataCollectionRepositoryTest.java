@@ -11,17 +11,11 @@
  */
 package gov.nist.itl.ssd.wipp.backend.data.genericdatacollection;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
+import gov.nist.itl.ssd.wipp.backend.Application;
+import gov.nist.itl.ssd.wipp.backend.app.SecurityConfig;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -30,16 +24,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
 
-import gov.nist.itl.ssd.wipp.backend.Application;
-import gov.nist.itl.ssd.wipp.backend.app.SecurityConfig;
-import gov.nist.itl.ssd.wipp.backend.data.genericdatacollection.GenericDataCollection;
-import gov.nist.itl.ssd.wipp.backend.data.genericdatacollection.GenericDataCollectionRepository;
-//import gov.nist.itl.ssd.wipp.backend.securityutils.WithMockKeycloakUser;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Collection of tests for {@link GenericDataCollectionRepository} exposed methods
@@ -49,28 +37,19 @@ import gov.nist.itl.ssd.wipp.backend.data.genericdatacollection.GenericDataColle
  * @author Mylene Simon <mylene.simon at nist.gov>
  *
  */
-@ExtendWith(SpringExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@SpringBootTest(classes = { Application.class, SecurityConfig.class }, 
-				properties = { "spring.data.mongodb.port=0" })
+@SpringBootTest(
+		classes = { Application.class, SecurityConfig.class },
+		properties = { "spring.data.mongodb.port=0", "de.flapdoodle.mongodb.embedded.version=6.0.5"}
+)
 public class GenericDataCollectionRepositoryTest {
-
-	@Autowired WebApplicationContext context;
-	@Autowired FilterChainProxy filterChain;
-
-	MockMvc mvc;
 	
 	@Autowired
 	GenericDataCollectionRepository genericDataCollectionRepository;
 	
 	GenericDataCollection publicGenDataA, publicGenDataB, privateGenDataA, privateGenDataB;
 	
-	@BeforeAll
+	@BeforeEach
 	public void setUp() {
-		this.mvc = webAppContextSetup(context)
-				.apply(springSecurity())
-				.addFilters(filterChain)
-				.build();
 		
 		// Clear embedded database
 		genericDataCollectionRepository.deleteAll();

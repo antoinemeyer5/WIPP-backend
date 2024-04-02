@@ -4,19 +4,13 @@ import gov.nist.itl.ssd.wipp.backend.Application;
 import gov.nist.itl.ssd.wipp.backend.app.SecurityConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginRepository;
-
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -42,11 +36,10 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * @author Mylene Simon <mylene.simon at nist.gov>
  *
  */
-@ExtendWith(SpringExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ContextConfiguration
-@SpringBootTest(classes = { Application.class, SecurityConfig.class },
-        properties = { "spring.data.mongodb.port=0" })
+@SpringBootTest(
+        classes = { Application.class, SecurityConfig.class },
+        properties = { "spring.data.mongodb.port=0", "de.flapdoodle.mongodb.embedded.version=6.0.5"}
+)
 public class PluginRepositoryRestTest {
 
     static final String PAYLOAD = "{\"name\": \"org/test-plugin\", \"version\": \"2.0.0\"}";
@@ -61,7 +54,7 @@ public class PluginRepositoryRestTest {
 
     Plugin plugin;
 
-    @BeforeAll
+    @BeforeEach
     public void setUp() {
         mvc = webAppContextSetup(context)
                 .apply(springSecurity())
@@ -221,7 +214,7 @@ public class PluginRepositoryRestTest {
 
         mvc.perform(delete("/api/plugins/" + plugin.getId())
                         .accept(MediaTypes.HAL_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -230,7 +223,7 @@ public class PluginRepositoryRestTest {
 
         mvc.perform(delete("/api/plugins/" + plugin.getId())
                         .accept(MediaTypes.HAL_JSON))
-                .andExpect(status().isNoContent());
+                .andExpect(status().isOk());
     }
 
 }

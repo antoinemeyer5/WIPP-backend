@@ -13,17 +13,13 @@ package gov.nist.itl.ssd.wipp.backend.data.imagescollection;
 
 import gov.nist.itl.ssd.wipp.backend.Application;
 import gov.nist.itl.ssd.wipp.backend.app.SecurityConfig;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
@@ -46,16 +42,15 @@ import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppC
  * 	<li>GET, PUT, PATCH and DELETE for the Item Resource (/{collectionName}/{itemId})</li>
  * 	<li>GET for the Search Resource (/{collectionName}/search/findBy...)</li>
  * </ul>
- * Uses embedded MongoDB database and mock Keycloak users
+ * Uses embedded MongoDB database and mock users
  * 
  * @author Mylene Simon <mylene.simon at nist.gov>
  *
  */
-@ExtendWith(SpringExtension.class)
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@ContextConfiguration
-@SpringBootTest(classes = { Application.class, SecurityConfig.class }, 
-				properties = { "spring.data.mongodb.port=0" })
+@SpringBootTest(
+		classes = { Application.class, SecurityConfig.class },
+		properties = { "spring.data.mongodb.port=0", "de.flapdoodle.mongodb.embedded.version=6.0.5"}
+)
 public class ImagesCollectionRepositoryRestTest {
 
 	static final String PAYLOAD = "{\"name\": \"test-coll\"}";
@@ -69,7 +64,7 @@ public class ImagesCollectionRepositoryRestTest {
 	
 	ImagesCollection publicCollA, publicCollB, privateCollA, privateCollB;
 	
-	@BeforeAll
+	@BeforeEach
 	public void setUp() {
 		mvc = webAppContextSetup(context)
 				.apply(springSecurity())
