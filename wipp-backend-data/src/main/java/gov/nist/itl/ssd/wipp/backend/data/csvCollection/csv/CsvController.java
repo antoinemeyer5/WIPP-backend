@@ -17,7 +17,9 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
 import gov.nist.itl.ssd.wipp.backend.data.csvCollection.CsvCollection;
 import gov.nist.itl.ssd.wipp.backend.data.csvCollection.CsvCollectionRepository;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -64,8 +66,8 @@ public class CsvController {
     @PreAuthorize("hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, false)")
     public HttpEntity<PagedModel<EntityModel<Csv>>> getFilesPage(
             @PathVariable("csvCollectionId") String csvCollectionId,
-            @PageableDefault Pageable pageable,
-            PagedResourcesAssembler<Csv> assembler) {
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<Csv> assembler) {
         Page<Csv> files = csvRepository.findByCsvCollection(
                 csvCollectionId, pageable);
         PagedModel<EntityModel<Csv>> resources

@@ -22,10 +22,12 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -83,8 +85,8 @@ public class PyramidAnnotationTimeSliceController {
 	public HttpEntity<PagedModel<EntityModel<PyramidAnnotationTimeSlice>>>
 	getTimeSlicesPage(
 			@PathVariable("pyramidAnnotationId") String pyramidAnnotationId,
-			@PageableDefault Pageable pageable,
-			PagedResourcesAssembler<PyramidAnnotationTimeSlice> assembler) {
+			@ParameterObject @PageableDefault Pageable pageable,
+			@Parameter(hidden = true) PagedResourcesAssembler<PyramidAnnotationTimeSlice> assembler) {
 
 		Page<PyramidAnnotationTimeSlice> page = getPage(
 				pyramidAnnotationRepository.getTimeSlices(pyramidAnnotationId),

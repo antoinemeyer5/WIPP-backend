@@ -11,37 +11,8 @@
  */
 package gov.nist.itl.ssd.wipp.backend.data.visualization;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.PrintWriter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
-
-import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.servlet.http.HttpServletResponse;
-
-import org.apache.commons.io.IOUtils;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.rest.webmvc.ResourceNotFoundException;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataDownloadToken;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataDownloadTokenRepository;
@@ -53,6 +24,23 @@ import gov.nist.itl.ssd.wipp.backend.data.pyramid.PyramidRepository;
 import gov.nist.itl.ssd.wipp.backend.data.pyramid.timeslices.PyramidTimeSlice;
 import gov.nist.itl.ssd.wipp.backend.data.pyramid.timeslices.PyramidTimeSliceRepository;
 import gov.nist.itl.ssd.wipp.backend.data.visualization.manifest.Manifest;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
+import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 /**
  * Controller for downloading visualization, returns a ZIP folder with pyramids + manifest
@@ -60,7 +48,7 @@ import gov.nist.itl.ssd.wipp.backend.data.visualization.manifest.Manifest;
  * @author Mylene Simon <mylene.simon at nist.gov>
  *
  */
-@Controller
+@RestController
 @Tag(name="Visualization Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/visualizations/{visualizationId}/download")
 public class VisualizationDownloadController {

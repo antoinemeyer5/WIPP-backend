@@ -6,11 +6,11 @@ The API follows the HATEOAS architecture using the HAL format.
 Requirements for development environment setup.
 
 ### Java environment
-* Java JDK 8 (1.8)
-* Maven version compatible with Java 8
+* Java JDK 21
+* Maven version compatible with Java 21
 
 ### Database
-* MongoDB (Supported versions: 3.6 to 4.4)
+* MongoDB (Supported versions: 3.6 to 7.0)
 
 ### Identity and Access Management
 * Keycloak 11.0.2
@@ -23,14 +23,13 @@ Docker run command:
 
 ### Kubernetes cluster
 * For development purposes, a single-node cluster can be easily installed using [Minikube](https://github.com/kubernetes/minikube) or [Docker for Mac on macOS](https://docs.docker.com/docker-for-mac/#kubernetes)
-* We are using [Argo workflows](https://argoproj.github.io/argo/) to manage workflows on a Kubernetes cluster, please install the Argo UI and Controller using the following commands:
+* We are using [Argo Workflows](https://argo-workflows.readthedocs.io/en/latest/) to manage workflows on a Kubernetes cluster, 
+a minimal installation of the Argo Server and Controller can be set up using the following commands:
 ```shell
-kubectl create namespace argo
-kubectl apply -n argo -f https://raw.githubusercontent.com/argoproj/argo/v2.3.0/manifests/install.yaml
+kubectl apply -f https://github.com/argoproj/argo-workflows/releases/download/v3.5.5/quick-start-minimal.yaml
 ```
-Please follow the instructions for version 2.3.0 [here](https://github.com/argoproj/argo/blob/release-2.4/demo.md) to:
+Please follow the instructions for version 3.5.5 [here](https://github.com/argoproj/argo-workflows/releases/tag/v3.5.5) to:
  - install the Argo binary
- - configure the service account to run workflows
 
 ### Data storage
 * Create a `WIPP-plugins` folder in your home directory for data storage (`dev` Maven profile is expecting the data folder location to be `$HOME/WIPP-plugins`)
@@ -59,13 +58,11 @@ mvn spring-boot:run
 - The WIPP REST API will be launched with the `dev` profile and available at http://localhost:8080/api  
 
 - Swagger API documentation will be available at:
- - http://localhost:8080/swagger-ui/index.html (Swagger UI) and,
- - http://localhost:8080/v2/api-docs (OpenAPI spec)
+ - http://localhost:8080/api/swagger-ui/index.html (Swagger UI) and,
+ - http://localhost:8080/api/v3/api-docs (OpenAPI spec)
 
 ## Docker packaging
-The Maven `prod` profile should be used for Docker packaging, even for testing/development purposes:
 ```sh
-mvn clean package -P prod
 docker build --no-cache . -t wipp_backend
 ```
 For a Docker deployment of WIPP on a Kubernetes cluster, scripts and configuration files are available in the [WIPP repository](https://github.com/usnistgov/WIPP/tree/master/deployment).
@@ -87,11 +84,10 @@ The Elastic APM Java agent is integrated into the Docker image as an optional se
 
 ## WIPP Development flow
 We are following the [Gitflow branching model](https://nvie.com/posts/a-successful-git-branching-model/) for the WIPP development.  
-To accommodate the specificities of the Maven version management, we are using the [JGitFlow plugin](https://bitbucket.org/atlassian/jgit-flow/wiki/Home).
 
 ### Contributing
 Please follow the [Contributing guidelines](CONTRIBUTING.md)
 
-## Disclaimer
+## Disclaimer/License
 
-[NIST Disclaimer](LICENSE.md)
+[NIST Disclaimer/License](LICENSE.md)

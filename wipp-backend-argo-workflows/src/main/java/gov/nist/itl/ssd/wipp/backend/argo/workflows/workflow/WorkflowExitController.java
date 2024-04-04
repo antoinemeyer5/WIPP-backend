@@ -11,10 +11,10 @@
  */
 package gov.nist.itl.ssd.wipp.backend.argo.workflows.workflow;
 
+import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginIO;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginRepository;
-import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataHandler;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataHandlerService;
 import gov.nist.itl.ssd.wipp.backend.core.model.job.Job;
@@ -25,17 +25,12 @@ import gov.nist.itl.ssd.wipp.backend.core.model.workflow.WorkflowRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.workflow.WorkflowStatus;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import gov.nist.itl.ssd.wipp.backend.core.utils.SecurityUtils;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
@@ -44,7 +39,7 @@ import java.util.Optional;
 /**
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Controller
+@RestController
 @Tag(name="Workflow Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/workflows/{workflowId}/exit")
 public class WorkflowExitController {

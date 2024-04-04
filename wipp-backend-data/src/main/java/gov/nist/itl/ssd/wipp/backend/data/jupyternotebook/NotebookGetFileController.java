@@ -11,32 +11,26 @@
  */
 package gov.nist.itl.ssd.wipp.backend.data.jupyternotebook;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
-
+import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
+import java.io.*;
+import java.util.Optional;
 
 /**
 *
 * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
 */
-@Controller
+@RestController
 @Tag(name="Notebook Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/notebooks/{notebookId}/getFile")
 public class NotebookGetFileController {

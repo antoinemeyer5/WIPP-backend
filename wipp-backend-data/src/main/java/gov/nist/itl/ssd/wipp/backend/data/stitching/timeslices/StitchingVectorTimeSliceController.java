@@ -25,11 +25,13 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 
 import gov.nist.itl.ssd.wipp.backend.core.utils.SecurityUtils;
 import org.apache.commons.io.IOUtils;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -92,8 +94,8 @@ public class StitchingVectorTimeSliceController {
     public HttpEntity<PagedModel<EntityModel<StitchingVectorTimeSlice>>>
             getTimeSlicesPage(
                     @PathVariable("stitchingVectorId") String stitchingVectorId,
-                    @PageableDefault Pageable pageable,
-                    PagedResourcesAssembler<StitchingVectorTimeSlice> assembler) {
+                    @ParameterObject @PageableDefault Pageable pageable,
+                    @Parameter(hidden = true) PagedResourcesAssembler<StitchingVectorTimeSlice> assembler) {
 
         Page<StitchingVectorTimeSlice> page = getPage(
                 stitchingVectorRepository.getTimeSlices(stitchingVectorId),

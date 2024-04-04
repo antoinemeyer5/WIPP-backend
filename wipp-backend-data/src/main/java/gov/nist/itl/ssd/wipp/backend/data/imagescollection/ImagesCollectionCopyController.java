@@ -15,10 +15,6 @@ import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.images.ImageHandler;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.metadatafiles.MetadataFileHandler;
-
-import java.io.IOException;
-import java.util.Optional;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,18 +23,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.IOException;
+import java.util.Optional;
 
 /**
  *
  * @author Antoine Vandecreme
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Controller
+@RestController
 @Tag(name="ImagesCollection Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/imagesCollections/{imagesCollectionId}/copy")
 public class ImagesCollectionCopyController {

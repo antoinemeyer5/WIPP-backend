@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -54,6 +55,8 @@ public class GenericFileUploadController extends FlowjsController {
 	                    "flowChunkNumber", "flowTotalChunks", "flowChunkSize",
 	                    "flowTotalSize", "flowIdentifier", "flowFilename",
 	                    "flowRelativePath"})
+		@PreAuthorize("isAuthenticated() and "
+				+ "(hasRole('admin') or @genericDataCollectionSecurity.checkAuthorize(#genericDataCollectionId, true))")
 	    public void isChunckUploaded(
 	            @PathVariable("genericDataCollectionId") String genericDataCollectionId,
 	            HttpServletRequest request, HttpServletResponse response)
@@ -70,6 +73,8 @@ public class GenericFileUploadController extends FlowjsController {
 	                    "flowChunkNumber", "flowTotalChunks", "flowChunkSize",
 	                    "flowTotalSize", "flowIdentifier", "flowFilename",
 	                    "flowRelativePath"})
+		@PreAuthorize("isAuthenticated() and "
+				+ "(hasRole('admin') or @genericDataCollectionSecurity.checkAuthorize(#genericDataCollectionId, true))")
 	    public void uploadChunck(
 	            @PathVariable("genericDataCollectionId") String genericDataCollectionId,
 	            HttpServletRequest request,

@@ -24,10 +24,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -74,8 +76,8 @@ public class MetadataFileController {
     @PreAuthorize("hasRole('admin') or @imagesCollectionSecurity.checkAuthorize(#imagesCollectionId, false)")
     public HttpEntity<PagedModel<EntityModel<MetadataFile>>> getFilesPage(
             @PathVariable("imagesCollectionId") String imagesCollectionId,
-            @PageableDefault Pageable pageable,
-            PagedResourcesAssembler<MetadataFile> assembler) {
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<MetadataFile> assembler) {
         Page<MetadataFile> files = metadataFileRepository.findByImagesCollection(
                 imagesCollectionId, pageable);
         PagedModel<EntityModel<MetadataFile>> resources

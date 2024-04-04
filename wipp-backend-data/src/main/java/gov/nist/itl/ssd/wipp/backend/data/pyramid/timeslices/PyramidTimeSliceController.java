@@ -22,7 +22,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -67,8 +69,8 @@ public class PyramidTimeSliceController {
 	    public HttpEntity<PagedModel<EntityModel<PyramidTimeSlice>>>
 	            getTimeSlicesPage(
 	                    @PathVariable("pyramidId") String pyramidId,
-	                    @PageableDefault Pageable pageable,
-	                    PagedResourcesAssembler<PyramidTimeSlice> assembler) {
+						@ParameterObject @PageableDefault Pageable pageable,
+						@Parameter(hidden = true) PagedResourcesAssembler<PyramidTimeSlice> assembler) {
 
 	        Page<PyramidTimeSlice> page = getPage(
 	                pyramidTimeSliceRepository.findAll(pyramidId), pageable);
