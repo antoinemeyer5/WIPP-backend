@@ -66,11 +66,10 @@ public class PyramidTimeSliceController {
 
 	    @RequestMapping(value = "", method = RequestMethod.GET)
 		@PreAuthorize("hasRole('admin') or @pyramidSecurity.checkAuthorize(#pyramidId, false)")
-	    public HttpEntity<PagedModel<EntityModel<PyramidTimeSlice>>>
-	            getTimeSlicesPage(
-	                    @PathVariable("pyramidId") String pyramidId,
-						@ParameterObject @PageableDefault Pageable pageable,
-						@Parameter(hidden = true) PagedResourcesAssembler<PyramidTimeSlice> assembler) {
+	    public HttpEntity<PagedModel<EntityModel<PyramidTimeSlice>>> getTimeSlicesPage(
+	            @PathVariable("pyramidId") String pyramidId,
+	            @ParameterObject @PageableDefault Pageable pageable,
+	            @Parameter(hidden = true) PagedResourcesAssembler<PyramidTimeSlice> assembler) {
 
 	        Page<PyramidTimeSlice> page = getPage(
 	                pyramidTimeSliceRepository.findAll(pyramidId), pageable);
