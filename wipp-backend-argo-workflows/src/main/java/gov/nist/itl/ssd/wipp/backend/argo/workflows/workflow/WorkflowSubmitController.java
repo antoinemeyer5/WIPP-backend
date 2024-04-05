@@ -1,30 +1,28 @@
 package gov.nist.itl.ssd.wipp.backend.argo.workflows.workflow;
 
+import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginRepository;
-import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.job.Job;
 import gov.nist.itl.ssd.wipp.backend.core.model.job.JobRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.workflow.Workflow;
 import gov.nist.itl.ssd.wipp.backend.core.model.workflow.WorkflowRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.workflow.WorkflowStatus;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
-import io.swagger.annotations.Api;
-
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.rest.webmvc.PersistentEntityResourceAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.lang.ProcessBuilder.Redirect;
 import java.util.*;
 import java.util.logging.Level;
@@ -36,8 +34,8 @@ import java.util.logging.Logger;
  * @author Mylene Simon <mylene.simon at nist.gov>
  *
  */
-@Controller
-@Api(tags="Workflow Entity")
+@RestController
+@Tag(name="Workflow Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/workflows/{workflowId}/submit")
 public class WorkflowSubmitController {
     @Autowired
@@ -61,10 +59,11 @@ public class WorkflowSubmitController {
     @RequestMapping(
         value = "",
         method = RequestMethod.POST,
-        produces = { "application/json" }
+        produces = { "application/hal+json" }
     )
-    public ResponseEntity<Workflow> submit(
-        @PathVariable("workflowId") String workflowId
+    public EntityModel<Workflow> submit(
+        @PathVariable("workflowId") String workflowId,
+        final PersistentEntityResourceAssembler assembler
     ) {
         // Retrieve Workflow object
         Optional<Workflow> wippWorkflow = workflowRepository.findById(
@@ -129,7 +128,7 @@ public class WorkflowSubmitController {
 
             // Save the workflow and send the HTTP response
             workflowRepository.save(workflow);
-            return new ResponseEntity<>(workflow, HttpStatus.OK);
+            return EntityModel.of(workflow);
             
         } catch (Exception ex) {
         	workflow.setStatus(WorkflowStatus.ERROR);

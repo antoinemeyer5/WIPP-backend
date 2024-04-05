@@ -16,7 +16,6 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollection;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollectionRepository;
-import io.swagger.annotations.Api;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -25,9 +24,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Optional;
 
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -53,7 +55,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @RestController
-@Api(tags="ImagesCollection Entity")
+@Tag(name="ImagesCollection Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/imagesCollections/{imagesCollectionId}/metadataFiles")
 @ExposesResourceFor(MetadataFile.class)
 public class MetadataFileController {
@@ -74,8 +76,8 @@ public class MetadataFileController {
     @PreAuthorize("hasRole('admin') or @imagesCollectionSecurity.checkAuthorize(#imagesCollectionId, false)")
     public HttpEntity<PagedModel<EntityModel<MetadataFile>>> getFilesPage(
             @PathVariable("imagesCollectionId") String imagesCollectionId,
-            @PageableDefault Pageable pageable,
-            PagedResourcesAssembler<MetadataFile> assembler) {
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<MetadataFile> assembler) {
         Page<MetadataFile> files = metadataFileRepository.findByImagesCollection(
                 imagesCollectionId, pageable);
         PagedModel<EntityModel<MetadataFile>> resources

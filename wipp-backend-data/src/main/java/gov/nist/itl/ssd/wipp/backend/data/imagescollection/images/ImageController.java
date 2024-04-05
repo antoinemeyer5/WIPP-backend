@@ -21,43 +21,30 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ForbiddenException;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollection;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollectionRepository;
-import io.swagger.annotations.Api;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.*;
 import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.hateoas.server.ExposesResourceFor;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.TemplateVariable;
-import org.springframework.hateoas.TemplateVariables;
-import org.springframework.hateoas.UriTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.*;
+import java.util.Optional;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 /**
  *
@@ -65,7 +52,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @RestController
-@Api(tags="ImagesCollection Entity")
+@Tag(name="ImagesCollection Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/imagesCollections/{imagesCollectionId}/images")
 @ExposesResourceFor(Image.class)
 public class ImageController {
@@ -92,8 +79,8 @@ public class ImageController {
     @PreAuthorize("hasRole('admin') or @imagesCollectionSecurity.checkAuthorize(#imagesCollectionId, false)")
     public HttpEntity<PagedModel<EntityModel<Image>>> getFilesPage(
             @PathVariable("imagesCollectionId") String imagesCollectionId,
-            @PageableDefault Pageable pageable,
-            PagedResourcesAssembler<Image> assembler) {
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<Image> assembler) {
         Page<Image> files = imageRepository.findByImagesCollection(
                 imagesCollectionId, pageable);
         PagedModel<EntityModel<Image>> resources = assembler.toModel(files);
@@ -231,8 +218,8 @@ public class ImageController {
     public HttpEntity<PagedModel<EntityModel<Image>>> getFilesMatchingRegexPage(
             @PathVariable("imagesCollectionId") String imagesCollectionId,
             @RequestParam(value="regex") String regex,
-            @PageableDefault Pageable pageable,
-            PagedResourcesAssembler<Image> assembler) {
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<Image> assembler) {
         Page<Image> files = imageRepository.findByImagesCollectionAndFileNameRegex(
                 imagesCollectionId, regex, pageable);
         PagedModel<EntityModel<Image>> resources = assembler.toModel(files);
@@ -286,7 +273,7 @@ public class ImageController {
 		UriTemplate uriTemplate = UriTemplate.of(imagesFilterLink.getHref(),
 				new TemplateVariables(tv));
 
-		Link link = new Link(uriTemplate, "filterByFileNameRegex");
+		Link link = Link.of(uriTemplate, "filterByFileNameRegex");
 
 		resources.add(paginationParameterTemplatesHelper.appendPaginationParameterTemplates(link));
 

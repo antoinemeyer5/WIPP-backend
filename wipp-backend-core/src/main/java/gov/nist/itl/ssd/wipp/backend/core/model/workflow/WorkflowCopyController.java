@@ -18,18 +18,14 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.Job;
 import gov.nist.itl.ssd.wipp.backend.core.model.job.JobRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.job.JobStatus;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -41,8 +37,8 @@ import java.util.regex.Pattern;
  * @author Samia Benjida <samia.benjida at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Controller
-@Api(tags="Workflow Entity")
+@RestController
+@Tag(name="Workflow Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/workflows/{workflowId}/copy")
 public class WorkflowCopyController
 {
