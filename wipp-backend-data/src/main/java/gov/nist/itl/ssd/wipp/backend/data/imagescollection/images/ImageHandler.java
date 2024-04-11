@@ -13,6 +13,7 @@ package gov.nist.itl.ssd.wipp.backend.data.imagescollection.images;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -89,6 +90,14 @@ public class ImageHandler extends FileHandler {
         imageRepository.deleteByImagesCollectionAndFileName(
                 imagesCollectionId, fileName);
         imagesCollectionRepository.updateImagesCaches(imagesCollectionId);
+    }
+
+    public void importFolderForConversion(String imagesCollectionId, File folder)
+            throws IOException {
+        addAllInDbFromFolder(imagesCollectionId, folder.getPath());
+        File imagesFolder = getTempFilesFolder(imagesCollectionId);
+        imagesFolder.getParentFile().mkdirs();
+        Files.move(folder.toPath(), imagesFolder.toPath());
     }
 
     public String getOmeXml(String imagesCollectionId, String fileName)
