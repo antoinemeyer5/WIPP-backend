@@ -31,7 +31,7 @@ public interface ImageRepository extends MongoRepository<Image, String>,
 
     List<Image> findByImagesCollectionAndFileNameRegex(String imagesCollection, String fileName);
 
-    Page<Image> findByImagesCollectionAndFileNameRegex(String imagesCollection, String fileName, Pageable p);
+    Page<Image> findByImagesCollectionAndFileNameRegex(String imagesCollection, String regex, Pageable p);
 
     List<Image> findByImporting(boolean importing);
 

@@ -213,7 +213,7 @@ public class ImageController {
         return imageHandler.getOmeXml(imagesCollectionId, fileName);
     }
 
-    @RequestMapping(value = "filterByFileNameRegex", method = RequestMethod.GET)
+    @RequestMapping(value = "/filterByFileNameRegex", method = RequestMethod.GET)
     @PreAuthorize("hasRole('admin') or @imagesCollectionSecurity.checkAuthorize(#imagesCollectionId, false)")
     public HttpEntity<PagedModel<EntityModel<Image>>> getFilesMatchingRegexPage(
             @PathVariable("imagesCollectionId") String imagesCollectionId,
