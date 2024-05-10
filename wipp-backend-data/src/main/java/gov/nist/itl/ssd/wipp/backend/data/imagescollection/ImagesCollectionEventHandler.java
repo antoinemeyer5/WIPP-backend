@@ -73,8 +73,6 @@ public class ImagesCollectionEventHandler {
 
         // Set the owner to the connected user
         imagesCollection.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-
         
         // Default import method is UPLOADED
         if (imagesCollection.getImportMethod() == null) {
@@ -84,6 +82,11 @@ public class ImagesCollectionEventHandler {
         // Assert source import folder is not empty and exists if import method is BACKEND_IMPORT
         if(imagesCollection.getImportMethod().equals(ImagesCollectionImportMethod.BACKEND_IMPORT)) {
             imagesCollectionLogic.assertCollectionBackendImportSourceNotEmpty(imagesCollection);
+        }
+
+        // Default conversion format is OMETIFF
+        if (imagesCollection.getFormat() == null) {
+            imagesCollection.setFormat(ImagesCollection.ImagesCollectionFormat.OMETIFF);
         }
         
         // Collections from Catalog are locked by default
