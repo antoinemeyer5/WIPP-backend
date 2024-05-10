@@ -15,11 +15,15 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.glencoesoftware.bioformats2raw.Converter;
+import com.glencoesoftware.pyramid.CompressionType;
+import com.glencoesoftware.pyramid.PyramidFromDirectoryWriter;
 import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.io.FilenameUtils;
@@ -33,6 +37,8 @@ import gov.nist.itl.ssd.wipp.backend.data.imagescollection.files.FileUploadBase;
 import loci.common.services.DependencyException;
 import loci.common.services.ServiceException;
 import loci.formats.FormatException;
+import org.springframework.util.FileSystemUtils;
+import picocli.CommandLine;
 
 
 /**
@@ -129,20 +135,51 @@ public class ImageConversionService extends FileUploadBase{
 	}
 	
 	public static void convertToTiledOmeTiff(Path inputFile, Path outputFile) throws DependencyException, FormatException, IOException, ServiceException {
-		TiledOmeTiffConverter tiledOmeTiffConverter = new TiledOmeTiffConverter(
-				inputFile.toString(),
-				outputFile.toString(), 
-				CoreConfig.TILE_SIZE, 
-				CoreConfig.TILE_SIZE);
+//		TiledOmeTiffConverter tiledOmeTiffConverter = new TiledOmeTiffConverter(
+//				inputFile.toString(),
+//				outputFile.toString(),
+//				CoreConfig.TILE_SIZE,
+//				CoreConfig.TILE_SIZE);
+//		try {
+//	    	tiledOmeTiffConverter.init();
+//	    	tiledOmeTiffConverter.readWriteTiles();
+//	    }
+//	    catch(Exception e) {
+//	      throw new IOException("Cannot convert image to OME TIFF.", e);
+//	    }
+//	    finally {
+//	    	tiledOmeTiffConverter.cleanup();
+//	    }
+		String omeTiffOutputName = outputFile.toString();
+		String omeZarrOutputName = omeTiffOutputName.substring(0, omeTiffOutputName.lastIndexOf('.')) + ".zarr";
+
 		try {
-	    	tiledOmeTiffConverter.init();
-	    	tiledOmeTiffConverter.readWriteTiles();
-	    }
-	    catch(Exception e) {
-	      throw new IOException("Cannot convert image to OME TIFF.", e);
-	    }
-	    finally {
-	    	tiledOmeTiffConverter.cleanup();
-	    }
+	    	// First convert to OME NGFF/ZARR pyramid (downsampling step)
+	    	String[] converterArgs = new String[]{
+	    			inputFile.toString(),
+	    			omeZarrOutputName,
+	    			"--tile-height", String.valueOf(CoreConfig.TILE_SIZE),
+	    			"--tile-width", String.valueOf(CoreConfig.TILE_SIZE),
+	    	};
+	    	CommandLine.call(new Converter(), converterArgs);
+
+	    	// Then convert to OME TIFF pyramid
+	    	String[] converterPyrArgs = new String[]{
+	    			omeZarrOutputName,
+	    			outputFile.toString(),
+	    			"--rgb",
+	    			"--compression", "LZW",
+	    	};
+	    	CommandLine.call(new PyramidFromDirectoryWriter(), converterPyrArgs);
+
+		} catch (Exception e) {
+	    	throw new IOException("Cannot convert image to OME TIFF.", e);
+	    } finally {
+	    	// cleanup temporary OME ZARR directory
+	    	Path omeZarrDir = Paths.get(omeZarrOutputName);
+	    	if(Files.exists(omeZarrDir)) {
+	    		FileSystemUtils.deleteRecursively(omeZarrDir);
+	    	}
+		}
 	}
 }

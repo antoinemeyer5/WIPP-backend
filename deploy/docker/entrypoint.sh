@@ -36,4 +36,6 @@ if [[ -n ${ELASTIC_APM_SERVER_URLS} && -n ${ELASTIC_APM_SERVICE_NAME} ]]; then
   export JAVA_TOOL_OPTIONS="$JAVA_TOOL_OPTIONS -Delastic.apm.server_urls=$ELASTIC_APM_SERVER_URLS"
 fi
 
+keytool -importcert -file /etc/ssl/certs/tls.crt -noprompt -alias certificate_alias -storepass changeit -keystore $JAVA_HOME/lib/security/cacerts
+
 java -jar /opt/wipp/wipp-backend.war

@@ -46,24 +46,26 @@ public class BaseUrlManualRefSerializer extends JsonSerializer<String> {
 	public void serialize(String value, JsonGenerator gen, SerializerProvider sp)
 			throws IOException, JsonProcessingException {
 		if (value != null) {
-			Link link = entityLinks.linkToItemResource(
-                    Pyramid.class,
-                    value
-            );
-			
-			if (link != null) {
+			if (value.contains("/")) { // not a pyramid id, serialize as regular string
+				gen.writeString(value);
+			} else {
+				Link link = entityLinks.linkToItemResource(
+						Pyramid.class,
+						value
+				);
+
 				// replace standard link by custom one for pyramids
 				String selfUri = link.getHref();
-		        String pyramidBaseUri = CoreConfig.BASE_URI + "/pyramids/"
-		                + value;
+				String pyramidBaseUri = CoreConfig.BASE_URI + "/pyramids/"
+						+ value;
 
-		        String baseUri = selfUri.replace(pyramidBaseUri,
-		        		CoreConfig.PYRAMIDS_BASE_URI + "/"
-		                + value);
+				String baseUri = selfUri.replace(pyramidBaseUri,
+						CoreConfig.PYRAMIDS_BASE_URI + "/"
+								+ value);
 				gen.writeString(baseUri);
 			}
+
 		}
-		
 	}
 
 }

@@ -39,10 +39,13 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
@@ -228,6 +231,23 @@ public class ImageController {
         return new ResponseEntity<>(resources, HttpStatus.OK);
     }
 
+    @RequestMapping(value = "/filterByFileNameTimePattern", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('admin') or @imagesCollectionSecurity.checkAuthorize(#imagesCollectionId, false)")
+    public HttpEntity<PagedModel<EntityModel<Image>>> getFilesMatchingTimePatternPage(
+            @PathVariable("imagesCollectionId") String imagesCollectionId,
+            @RequestParam(value="timePattern") String timePattern,
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<Image> assembler) {
+
+        String tilePatternRegex = getRegexFromTimePattern(timePattern);
+        Page<Image> files = imageRepository.findByImagesCollectionAndFileNameRegex(
+                imagesCollectionId, tilePatternRegex, pageable);
+        PagedModel<EntityModel<Image>> resources = assembler.toModel(files);
+        resources.forEach(
+                resource -> processResource(imagesCollectionId, resource));
+        return new ResponseEntity<>(resources, HttpStatus.OK);
+    }
+
     protected void processResource(String imagesCollectionId,
             EntityModel<Image> resource) {
         Image file = resource.getContent();
@@ -261,21 +281,39 @@ public class ImageController {
     		PagedModel<EntityModel<Image>> resources,
             PagedResourcesAssembler<Image> assembler) {
 
-    	Link imagesFilterLink = entityLinks.linkForItemResource(
+        // Add filterByFileNameRegex link to collection resource
+    	Link imagesRegexFilterLink = entityLinks.linkForItemResource(
                 ImagesCollection.class, imagesCollectionId)
                 .slash("images")
                 .slash("filterByFileNameRegex")
                 .withRel("filterByFileNameRegex");
 
-		TemplateVariable tv = new TemplateVariable("regex",
+		TemplateVariable regexTv = new TemplateVariable("regex",
 				TemplateVariable.VariableType.REQUEST_PARAM);
 
-		UriTemplate uriTemplate = UriTemplate.of(imagesFilterLink.getHref(),
-				new TemplateVariables(tv));
+		UriTemplate regexFilterUriTemplate = UriTemplate.of(imagesRegexFilterLink.getHref(),
+				new TemplateVariables(regexTv));
 
-		Link link = Link.of(uriTemplate, "filterByFileNameRegex");
+		Link regexFilterLink = Link.of(regexFilterUriTemplate, "filterByFileNameRegex");
 
-		resources.add(paginationParameterTemplatesHelper.appendPaginationParameterTemplates(link));
+		resources.add(paginationParameterTemplatesHelper.appendPaginationParameterTemplates(regexFilterLink));
+
+        // Add filterByFileNameTimePattern link to collection resource
+        Link imagesTimePatternLink = entityLinks.linkForItemResource(
+                        ImagesCollection.class, imagesCollectionId)
+                .slash("images")
+                .slash("filterByFileNameTimePattern")
+                .withRel("filterByFileNameTimePattern");
+
+        TemplateVariable timePatternTv = new TemplateVariable("timePattern",
+                TemplateVariable.VariableType.REQUEST_PARAM);
+
+        UriTemplate timePatternFilterUriTemplate = UriTemplate.of(imagesTimePatternLink.getHref(),
+                new TemplateVariables(timePatternTv));
+
+        Link timePatternFilterLink = Link.of(timePatternFilterUriTemplate, "filterByFileNameTimePattern");
+
+        resources.add(paginationParameterTemplatesHelper.appendPaginationParameterTemplates(timePatternFilterLink));
 
     }
     
@@ -304,4 +342,26 @@ public class ImageController {
         
         return tokenParam;
     }
+
+    // MIST time pattern to regex converter
+    private String getRegexFromTimePattern(String filePattern) {
+        Pattern pattern = Pattern.compile("(.*)(\\{[t]+\\})(.*)");
+        Matcher matcher = pattern.matcher(filePattern);
+
+        // Check if pattern is correct. We expect 3 groups: (*)({ttt})(*)
+        if (!matcher.find() || matcher.groupCount() != 3) {
+            throw new ClientException("Filename time pattern is invalid");
+        }
+
+        // The matcher should find at group: 0 - the entire string,
+        // group 1 = prefix
+        // group 2 = {i}
+        // group 3 = suffix
+        String prefix = matcher.group(1);
+        int iCount = matcher.group(2).length() - 2;
+        String suffix = matcher.group(3);
+
+        return prefix + "\\d{" + iCount + "}" + suffix;
+    }
+
 }

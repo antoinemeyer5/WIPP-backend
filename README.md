@@ -46,6 +46,11 @@ Default root folder configuration for the local backend import of images collect
 This default configuration can be changed in `wipp-backend-application/pom.xml` (property `storage.local.import`) when running locally or in the deployment 
 manifest when running in a Kubernetes cluster (an additional volume needs to be mounted if the new location is not in the WIPP root data folder).
 
+### Data conversion
+* WIPP uses the [bioformats2raw](https://github.com/glencoesoftware/bioformats2raw) and [raw2ometiff](https://github.com/glencoesoftware/raw2ometiff) converters 
+to convert images to tiled pyramidal OME TIFF format, which require Blosc to be installed:
+  * https://github.com/Blosc/c-blosc for compilation and installation instructions
+
 ## Compiling
 ```shell
 mvn clean install

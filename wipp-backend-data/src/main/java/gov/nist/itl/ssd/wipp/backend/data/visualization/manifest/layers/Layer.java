@@ -28,9 +28,13 @@ public class Layer {
 	private String name;
 	
 	//@ManualRef(Pyramid.class)
-	@JsonDeserialize(using = BaseUrlManualRefDeserializer.class)
+	//@JsonDeserialize(using = BaseUrlManualRefDeserializer.class)
 	@JsonSerialize(using = BaseUrlManualRefSerializer.class)
 	private String baseUrl;
+
+	private String imagesCollectionId;
+
+	private String filenamePattern;
 	
 	private boolean singleFrame;
 	
@@ -53,6 +57,8 @@ public class Layer {
 	private Scalebar scalebar;
 	
 	private Fetching fetching;
+
+	private DisplayConfig displayConfig;
 
 	public String getId() {
 		return id;
@@ -77,6 +83,14 @@ public class Layer {
 	public void setBaseUrl(String baseUrl) {
 		this.baseUrl = baseUrl;
 	}
+
+	public String getImagesCollectionId() { return imagesCollectionId; }
+
+	public void setImagesCollectionId(String imagesCollectionId) { this.imagesCollectionId = imagesCollectionId; }
+
+	public String getFilenamePattern() { return filenamePattern; }
+
+	public void setFilenamePattern(String filenamePattern) { this.filenamePattern = filenamePattern; }
 
 	public boolean isSingleFrame() {
 		return singleFrame;
@@ -165,7 +179,9 @@ public class Layer {
 	public void setFetching(Fetching fetching) {
 		this.fetching = fetching;
 	}
-	
-	
+
+	public DisplayConfig getDisplayConfig() { return displayConfig; }
+
+	public void setDisplayConfig(DisplayConfig displayConfig) { this.displayConfig = displayConfig; }
 
 }
