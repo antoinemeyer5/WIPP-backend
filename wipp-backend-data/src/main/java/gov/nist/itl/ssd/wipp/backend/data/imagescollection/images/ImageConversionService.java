@@ -24,10 +24,12 @@ import java.util.logging.Logger;
 import com.glencoesoftware.bioformats2raw.Converter;
 import com.glencoesoftware.pyramid.CompressionType;
 import com.glencoesoftware.pyramid.PyramidFromDirectoryWriter;
+import gov.nist.itl.ssd.wipp.backend.core.utils.SecurityUtils;
 import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
@@ -68,8 +70,10 @@ public class ImageConversionService extends FileUploadBase{
 				appConfig.getOmeConverterThreads());
 
 		// Resume any interrupted conversion
+		SecurityUtils.runAsSystem();
 		imageRepository.findByImporting(true)
 		.forEach(this::submitImageToExtractor);
+		SecurityContextHolder.clearContext();
 	}
 
 	@Override
