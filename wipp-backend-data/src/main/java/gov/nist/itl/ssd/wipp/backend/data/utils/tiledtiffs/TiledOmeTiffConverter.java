@@ -43,19 +43,12 @@ public class TiledOmeTiffConverter {
 
 	private static final Logger LOG = Logger.getLogger(TiledOmeTiffConverter.class.getName());
 
-	private static final int SCALE_FACTOR = 2;
-
 	private ImageReader reader;
 	private OMETiffWriter writer;
-
-	private OMEPyramidStore omexml;
-	private IImageScaler scaler;
 	private String inputFile;
 	private String outputFile;
 	private int tileSizeX;
 	private int tileSizeY;
-
-	private int numResolutions;
 
 	public TiledOmeTiffConverter(String inputFile, String outputFile, int tileSizeX, int tileSizeY) {
 		this.inputFile = inputFile;
@@ -68,43 +61,30 @@ public class TiledOmeTiffConverter {
 		// construct the object that stores OME-XML metadata
 		ServiceFactory factory = new ServiceFactory();
 		OMEXMLService service = factory.getInstance(OMEXMLService.class);
-		//IMetadata omexml = service.createOMEXMLMetadata();
-		omexml = (OMEPyramidStore) service.createOMEXMLMetadata();
+		IMetadata omexml = service.createOMEXMLMetadata();
 
 		// set up the reader 
 		reader = new ImageReader();
 		// force reader to not group in multi-file formats to treat each file individually
 	    reader.setGroupFiles(false);
 		// set metadata 
-		//reader.setOriginalMetadataPopulated(true);
+		reader.setOriginalMetadataPopulated(true);
 		reader.setMetadataStore(omexml);
 		// set input file
 		reader.setId(inputFile);
-
-		//reader = new ChannelMerger(reader);
 
 		// important to delete because OME uses RandomAccessFile
 		Path outputPath = Paths.get(outputFile);
 		outputPath.toFile().delete();
 
-		// set simple image scaler for downscaling
-		scaler = new SimpleImageScaler();
-
 		// set up the writer and associate it with the output file
 		writer = new OMETiffWriter();
 		writer.setMetadataRetrieve(omexml);
-		//writer.setInterleaved(reader.isInterleaved());
+		writer.setInterleaved(reader.isInterleaved());
 
 		// set the tile size height and width for writing
 		this.tileSizeX = writer.setTileSizeX(tileSizeX);
 		this.tileSizeY = writer.setTileSizeY(tileSizeY);
-
-		this.numResolutions = 1;
-		for (int i=1; i<5; i++) {
-			int divScale = (int) Math.pow(SCALE_FACTOR, i);
-			omexml.setResolutionSizeX(new PositiveInteger(reader.getSizeX() / divScale), 0, i);
-			omexml.setResolutionSizeY(new PositiveInteger(reader.getSizeY() / divScale), 0, i);
-		}
 
 		writer.setId(outputFile);
 
@@ -112,7 +92,7 @@ public class TiledOmeTiffConverter {
 		writer.setCompression(CompressionType.LZW.getCompression());
 	}
 
-	// Read the input file as a plain image and write it into a pyramidal OME tiled format
+	// Read the input file as a plain image and write it into a tiled format
 	public void readWriteTiles() throws FormatException, DependencyException, ServiceException, IOException {
 		int bpp = FormatTools.getBytesPerPixel(reader.getPixelType());
 		int tilePlaneSize = tileSizeX * tileSizeY * reader.getRGBChannelCount() * bpp;
@@ -127,19 +107,12 @@ public class TiledOmeTiffConverter {
 			int width = reader.getSizeX();
 			int height = reader.getSizeY();
 
-			LOG.info("Image height: " + height);
-			LOG.info("Image width: " + width);
-	
 			// Determined the number of tiles to read and write
 			int nXTiles = width / tileSizeX;
 			int nYTiles = height / tileSizeY;
 			if (nXTiles * tileSizeX != width) nXTiles++;
 			if (nYTiles * tileSizeY != height) nYTiles++;
 
-			LOG.info("Full res nXTiles: " + nXTiles);
-			LOG.info("Full res nYTiles: " + nYTiles);
-
-			// write full resolution image in tiles
 			for (int y=0; y<nYTiles; y++) {
 				for (int x=0; x<nXTiles; x++) {
 					
@@ -152,51 +125,6 @@ public class TiledOmeTiffConverter {
 					buf = reader.openBytes(image, tileX, tileY, effTileSizeX, effTileSizeY);
 					writer.saveBytes(image, buf, tileX, tileY, effTileSizeX, effTileSizeY);
 				}
-			}
-
-			// write downscaled pyramid resolutions
-			int resolutionInd = 1;
-			for (int i=1; i<5; i++) {
-
-				writer.setResolution(i);
-				int divScale = (int) Math.pow(SCALE_FACTOR, i);
-
-				width /= SCALE_FACTOR;
-				height /= SCALE_FACTOR;
-
-				LOG.info("*** Resolution " + i);
-				LOG.info("divScale " + divScale);
-				LOG.info("Image height: " + height);
-				LOG.info("Image width: " + width);
-
-				// Determined the number of tiles to read and write
-				nXTiles = width / tileSizeX;
-				nYTiles = height / tileSizeY;
-				if (nXTiles * tileSizeX != width) nXTiles++;
-				if (nYTiles * tileSizeY != height) nYTiles++;
-
-				int resScale = (int) Math.pow(SCALE_FACTOR, i);
-
-				for (int y=0; y<nYTiles; y++) {
-					for (int x=0; x<nXTiles; x++) {
-
-						int tileX = x * tileSizeX;
-						int tileY = y * tileSizeY;
-
-						int effTileSizeX = (tileX + tileSizeX) < width ? tileSizeX : width - tileX;
-						int effTileSizeY = (tileY + tileSizeY) < height ? tileSizeY : height - tileY;
-
-						byte[] newBuf = reader.openBytes(image, tileX * resScale, tileY * resScale, effTileSizeX * resScale, effTileSizeY * resScale);
-
-						byte[] downsample = scaler.downsample(newBuf, effTileSizeX * resScale,
-								effTileSizeY * resScale, Math.pow(SCALE_FACTOR, i),
-								FormatTools.getBytesPerPixel(bpp), reader.isLittleEndian(),
-								FormatTools.isFloatingPoint(bpp), reader.getRGBChannelCount(),
-								reader.isInterleaved());
-						writer.saveBytes(image, downsample, tileX, tileY, effTileSizeX, effTileSizeY);
-					}
-				}
-
 			}
 		}
 	}

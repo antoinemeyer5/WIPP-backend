@@ -147,22 +147,8 @@ public class ImageConversionService extends FileUploadBase{
 		}
 	}
 	
-	public static void convertToTiledOmeTiff(Path inputFile, Path outputFile) throws DependencyException, FormatException, IOException, ServiceException {
-//		TiledOmeTiffConverter tiledOmeTiffConverter = new TiledOmeTiffConverter(
-//				inputFile.toString(),
-//				outputFile.toString(),
-//				CoreConfig.TILE_SIZE,
-//				CoreConfig.TILE_SIZE);
-//		try {
-//	    	tiledOmeTiffConverter.init();
-//	    	tiledOmeTiffConverter.readWriteTiles();
-//	    }
-//	    catch(Exception e) {
-//	      throw new IOException("Cannot convert image to OME TIFF.", e);
-//	    }
-//	    finally {
-//	    	tiledOmeTiffConverter.cleanup();
-//	    }
+	public static void convertToTiledOmeTiff(Path inputFile, Path outputFile) throws DependencyException, FormatException,
+			IOException, ServiceException {
 		String omeTiffOutputName = outputFile.toString();
 		String omeZarrOutputName = omeTiffOutputName.substring(0, omeTiffOutputName.lastIndexOf('.')) + ".zarr";
 

@@ -26,9 +26,7 @@ public class Layer {
 	private String id;
 	
 	private String name;
-	
-	//@ManualRef(Pyramid.class)
-	//@JsonDeserialize(using = BaseUrlManualRefDeserializer.class)
+
 	@JsonSerialize(using = BaseUrlManualRefSerializer.class)
 	private String baseUrl;
 
