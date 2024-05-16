@@ -25,6 +25,7 @@ import com.glencoesoftware.bioformats2raw.Converter;
 import com.glencoesoftware.pyramid.CompressionType;
 import com.glencoesoftware.pyramid.PyramidFromDirectoryWriter;
 import gov.nist.itl.ssd.wipp.backend.core.utils.SecurityUtils;
+import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollection;
 import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.io.FilenameUtils;
@@ -88,6 +89,14 @@ public class ImageConversionService extends FileUploadBase{
 
 	public void submitImageToExtractor(Image image, File sourceDir) {
 		String collectionId = image.getImagesCollection();
+		ImagesCollection imgCollection = imagesCollectionRepository.findById(collectionId).orElse(null);
+		// if images collection not found, image should be deleted to avoid inconsistent state
+		if (imgCollection == null) {
+		    LOG.warning("Images Collection not found for image " + image.getFileName()
+			    + " while attempting to convert, deleting.");
+		    imageRepository.delete(image);
+		    return;
+		}
 		File tempUploadDir = sourceDir;
 		File uploadDir = getUploadDir(image.getImagesCollection());
 		uploadDir.mkdirs();
