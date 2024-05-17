@@ -46,10 +46,13 @@ public class VisualizationEventHandler {
         
         // Set the owner to the connected user
         visualization.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        // Set the data source to IIIF (default in versions 3.2 and up)
+        visualization.setIiifDataSource(true);
     }
 	
 	@HandleBeforeSave
-    @PreAuthorize("isAuthenticated() and (hasRole('admin') or #visualization.owner == principal.name)")
+    @PreAuthorize("isAuthenticated() and (hasRole('admin') or #visualization.owner == authentication.name)")
     public void handleBeforeSave(Visualization visualization) {
     	// Assert visualization exists
         Optional<Visualization> result = visualizationRepository.findById(

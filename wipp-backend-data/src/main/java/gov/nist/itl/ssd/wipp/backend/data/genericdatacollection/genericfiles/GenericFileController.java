@@ -5,8 +5,10 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
 import gov.nist.itl.ssd.wipp.backend.data.genericdatacollection.GenericDataCollection;
 import gov.nist.itl.ssd.wipp.backend.data.genericdatacollection.GenericDataCollectionRepository;
-import io.swagger.annotations.Api;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +33,7 @@ import java.util.Optional;
 * @author Mohamed Ouladi <mohamed.ouladi at labshare.org>
 */
 @RestController
-@Api(tags="GenericData Entity")
+@Tag(name="GenericDataCollection Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/genericDataCollections/{genericDataCollectionId}/genericFile")
 @ExposesResourceFor(GenericFile.class)
 public class GenericFileController {
@@ -52,8 +54,8 @@ public class GenericFileController {
     @PreAuthorize("hasRole('admin') or @genericDataCollectionSecurity.checkAuthorize(#genericDataCollectionId, false)")
     public HttpEntity<PagedModel<EntityModel<GenericFile>>> getFilesPage(
             @PathVariable("genericDataCollectionId") String genericDataCollectionId,
-            @PageableDefault Pageable pageable,
-            PagedResourcesAssembler<GenericFile> assembler) {
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<GenericFile> assembler) {
         Page<GenericFile> files = genericFileRepository.findByGenericDataCollection(
         		genericDataCollectionId, pageable);
         PagedModel<EntityModel<GenericFile>> resources

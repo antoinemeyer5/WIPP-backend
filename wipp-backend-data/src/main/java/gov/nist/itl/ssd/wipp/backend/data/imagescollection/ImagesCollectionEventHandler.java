@@ -25,7 +25,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.core.annotation.*;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -73,7 +73,6 @@ public class ImagesCollectionEventHandler {
 
         // Set the owner to the connected user
         imagesCollection.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
-
         
         // Default import method is UPLOADED
         if (imagesCollection.getImportMethod() == null) {
@@ -83,6 +82,11 @@ public class ImagesCollectionEventHandler {
         // Assert source import folder is not empty and exists if import method is BACKEND_IMPORT
         if(imagesCollection.getImportMethod().equals(ImagesCollectionImportMethod.BACKEND_IMPORT)) {
             imagesCollectionLogic.assertCollectionBackendImportSourceNotEmpty(imagesCollection);
+        }
+
+        // Default conversion format is OMETIFF
+        if (imagesCollection.getFormat() == null) {
+            imagesCollection.setFormat(ImagesCollection.ImagesCollectionFormat.OMETIFF);
         }
         
         // Collections from Catalog are locked by default
@@ -99,7 +103,7 @@ public class ImagesCollectionEventHandler {
         }
     }
     @HandleBeforeSave
-    @PreAuthorize("isAuthenticated() and (hasRole('admin') or #imagesCollection.owner == principal.name)")
+    @PreAuthorize("isAuthenticated() and (hasRole('admin') or #imagesCollection.owner == authentication.name)")
     public void handleBeforeSave(ImagesCollection imagesCollection) {
     	// Assert collection exists
         Optional<ImagesCollection> result = imagesCollectionRepository.findById(
@@ -173,7 +177,7 @@ public class ImagesCollectionEventHandler {
 
     @HandleBeforeDelete
     @PreAuthorize("isAuthenticated() and (hasRole('admin') or "
-    		+ "(#imagesCollection.owner == principal.name and #imagesCollection.publiclyShared == false))")
+    		+ "(#imagesCollection.owner == authentication.name and #imagesCollection.publiclyShared == false))")
     public void handleBeforeDelete(ImagesCollection imagesCollection) {
     	// Assert collection exists
     	Optional<ImagesCollection> result = imagesCollectionRepository.findById(
@@ -186,8 +190,8 @@ public class ImagesCollectionEventHandler {
     @HandleAfterDelete
     public void handleAfterDelete(ImagesCollection imagesCollection) {
     	// Delete all images and metadataFiles from deleted collection
-    	imageRepository.deleteAll(imagesCollection.getId(), false);
-    	metadataFileRepository.deleteAll(imagesCollection.getId(), false);
+    	imageRepository.deleteAll(imagesCollection.getId());
+    	metadataFileRepository.deleteAll(imagesCollection.getId());
     	File imagesCollectionFolder = new File (config.getImagesCollectionsFolder(), imagesCollection.getId());
     	try {
     		FileUtils.deleteDirectory(imagesCollectionFolder);

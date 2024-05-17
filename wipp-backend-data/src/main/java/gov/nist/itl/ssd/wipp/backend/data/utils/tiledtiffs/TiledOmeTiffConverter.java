@@ -17,16 +17,19 @@ import java.nio.file.Paths;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import loci.common.image.IImageScaler;
+import loci.common.image.SimpleImageScaler;
 import loci.common.services.DependencyException;
 import loci.common.services.ServiceException;
 import loci.common.services.ServiceFactory;
-import loci.formats.FormatException;
-import loci.formats.ImageReader;
-import loci.formats.FormatTools;
+import loci.formats.*;
 import loci.formats.meta.IMetadata;
+import loci.formats.ome.OMEPyramidStore;
 import loci.formats.out.OMETiffWriter;
 import loci.formats.services.OMEXMLService;
 import loci.formats.codec.CompressionType;
+import ome.xml.model.primitives.PositiveInteger;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Inspired from https://docs.openmicroscopy.org/bio-formats/5.9.1/_downloads/OverlappedTiledWriter.java
@@ -98,18 +101,18 @@ public class TiledOmeTiffConverter {
 		// set the current series to 0
 		reader.setSeries(0);
 	    writer.setSeries(0);	
-	    
+
 	    // convert each image plane in the current series 
 		for (int image=0; image<reader.getImageCount(); image++) {
 			int width = reader.getSizeX();
 			int height = reader.getSizeY();
-	
+
 			// Determined the number of tiles to read and write
 			int nXTiles = width / tileSizeX;
 			int nYTiles = height / tileSizeY;
 			if (nXTiles * tileSizeX != width) nXTiles++;
 			if (nYTiles * tileSizeY != height) nYTiles++;
-	
+
 			for (int y=0; y<nYTiles; y++) {
 				for (int x=0; x<nXTiles; x++) {
 					
@@ -118,7 +121,7 @@ public class TiledOmeTiffConverter {
 					
 					int effTileSizeX = (tileX + tileSizeX) < width ? tileSizeX : width - tileX;
 					int effTileSizeY = (tileY + tileSizeY) < height ? tileSizeY : height - tileY;
-	
+
 					buf = reader.openBytes(image, tileX, tileY, effTileSizeX, effTileSizeY);
 					writer.saveBytes(image, buf, tileX, tileY, effTileSizeX, effTileSizeY);
 				}

@@ -10,10 +10,12 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -25,14 +27,13 @@ import gov.nist.itl.ssd.wipp.backend.data.genericdatacollection.GenericDataColle
 import gov.nist.itl.ssd.wipp.backend.data.genericdatacollection.GenericDataCollectionRepository;
 import gov.nist.itl.ssd.wipp.backend.data.utils.flowjs.FlowFile;
 import gov.nist.itl.ssd.wipp.backend.data.utils.flowjs.FlowjsController;
-import io.swagger.annotations.Api;
 
 /**
 *
 * @author Mohamed Ouladi <mohamed.ouladi at labshare.org>
 */
 @RestController
-@Api(tags="GenericDataCollection Entity")
+@Tag(name="GenericDataCollection Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/genericDataCollections/{genericDataCollectionId}/genericFile")
 public class GenericFileUploadController extends FlowjsController {
 
@@ -54,6 +55,8 @@ public class GenericFileUploadController extends FlowjsController {
 	                    "flowChunkNumber", "flowTotalChunks", "flowChunkSize",
 	                    "flowTotalSize", "flowIdentifier", "flowFilename",
 	                    "flowRelativePath"})
+		@PreAuthorize("isAuthenticated() and "
+				+ "(hasRole('admin') or @genericDataCollectionSecurity.checkAuthorize(#genericDataCollectionId, true))")
 	    public void isChunckUploaded(
 	            @PathVariable("genericDataCollectionId") String genericDataCollectionId,
 	            HttpServletRequest request, HttpServletResponse response)
@@ -70,6 +73,8 @@ public class GenericFileUploadController extends FlowjsController {
 	                    "flowChunkNumber", "flowTotalChunks", "flowChunkSize",
 	                    "flowTotalSize", "flowIdentifier", "flowFilename",
 	                    "flowRelativePath"})
+		@PreAuthorize("isAuthenticated() and "
+				+ "(hasRole('admin') or @genericDataCollectionSecurity.checkAuthorize(#genericDataCollectionId, true))")
 	    public void uploadChunck(
 	            @PathVariable("genericDataCollectionId") String genericDataCollectionId,
 	            HttpServletRequest request,

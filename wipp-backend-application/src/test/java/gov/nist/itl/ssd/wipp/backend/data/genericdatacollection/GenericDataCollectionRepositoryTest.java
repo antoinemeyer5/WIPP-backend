@@ -11,16 +11,11 @@
  */
 package gov.nist.itl.ssd.wipp.backend.data.genericdatacollection;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.fail;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import gov.nist.itl.ssd.wipp.backend.Application;
+import gov.nist.itl.ssd.wipp.backend.app.SecurityConfig;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
@@ -28,16 +23,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.context.junit4.SpringRunner;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.web.context.WebApplicationContext;
+import org.springframework.security.test.context.support.WithMockUser;
 
-import gov.nist.itl.ssd.wipp.backend.Application;
-import gov.nist.itl.ssd.wipp.backend.app.SecurityConfig;
-import gov.nist.itl.ssd.wipp.backend.data.genericdatacollection.GenericDataCollection;
-import gov.nist.itl.ssd.wipp.backend.data.genericdatacollection.GenericDataCollectionRepository;
-import gov.nist.itl.ssd.wipp.backend.securityutils.WithMockKeycloakUser;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
 /**
  * Collection of tests for {@link GenericDataCollectionRepository} exposed methods
@@ -47,27 +37,19 @@ import gov.nist.itl.ssd.wipp.backend.securityutils.WithMockKeycloakUser;
  * @author Mylene Simon <mylene.simon at nist.gov>
  *
  */
-@RunWith(SpringRunner.class)
-@SpringBootTest(classes = { Application.class, SecurityConfig.class }, 
-				properties = { "spring.data.mongodb.port=0" })
+@SpringBootTest(
+		classes = { Application.class, SecurityConfig.class },
+		properties = { "spring.data.mongodb.port=0", "de.flapdoodle.mongodb.embedded.version=6.0.5"}
+)
 public class GenericDataCollectionRepositoryTest {
-
-	@Autowired WebApplicationContext context;
-	@Autowired FilterChainProxy filterChain;
-
-	MockMvc mvc;
 	
 	@Autowired
 	GenericDataCollectionRepository genericDataCollectionRepository;
 	
 	GenericDataCollection publicGenDataA, publicGenDataB, privateGenDataA, privateGenDataB;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
-		this.mvc = webAppContextSetup(context)
-				.apply(springSecurity())
-				.addFilters(filterChain)
-				.build();
 		
 		// Clear embedded database
 		genericDataCollectionRepository.deleteAll();
@@ -104,14 +86,14 @@ public class GenericDataCollectionRepositoryTest {
 		// Anonymous user should not be able to read a private collection
 		try {
 			genericDataCollectionRepository.findById(privateGenDataA.getId());
-			fail("Expected AccessDenied security error");
+			Assertions.fail("Expected AccessDenied security error");
 		} catch (AccessDeniedException e) {
 			// expected
 		}
 	}
 	
 	@Test
-	@WithMockKeycloakUser(username="user1", roles={ "user" })
+	@WithMockUser(username="user1", roles={ "user" })
 	public void findById_nonAdminCallingShouldReturnOnlyOwnOrPublicItems() throws Exception {
 		
 		// Non-admin user1 should be able to read own private collection
@@ -123,14 +105,14 @@ public class GenericDataCollectionRepositoryTest {
 		// Non-admin user1 should not be able to read a private collection from user2
 		try {
 			genericDataCollectionRepository.findById(privateGenDataB.getId());
-			fail("Expected AccessDenied security error");
+			Assertions.fail("Expected AccessDenied security error");
 		} catch (AccessDeniedException e) {
 			// expected
 		}
 	}
 
 	@Test
-	@WithMockKeycloakUser(username="admin", roles={ "admin" })
+	@WithMockUser(username="admin", roles={ "admin" })
 	public void findById_adminCallingShouldReturnAllItems() throws Exception {
 		
 		// Admin should be able to read a public collection from user1
@@ -155,7 +137,7 @@ public class GenericDataCollectionRepositoryTest {
 	}
 	
 	@Test
-	@WithMockKeycloakUser(username="user1", roles={ "user" })
+	@WithMockUser(username="user1", roles={ "user" })
 	public void findAll_nonAdminCallingShouldReturnOnlyOwnOrPublicItems() throws Exception {
 		
 		Pageable pageable = PageRequest.of(0, 10);
@@ -169,7 +151,7 @@ public class GenericDataCollectionRepositoryTest {
 	}
 
 	@Test
-	@WithMockKeycloakUser(username="admin", roles={ "admin" })
+	@WithMockUser(username="admin", roles={ "admin" })
 	public void findAll_adminCallingShouldReturnAllItems() throws Exception {
 		
 		Pageable pageable = PageRequest.of(0, 10);
@@ -194,7 +176,7 @@ public class GenericDataCollectionRepositoryTest {
 	}
 	
 	@Test
-	@WithMockKeycloakUser(username="user1", roles={ "user" })
+	@WithMockUser(username="user1", roles={ "user" })
 	public void findByNameContainingIgnoreCase_nonAdminCallingShouldReturnOnlyOwnOrPublicItems() throws Exception {
 		
 		Pageable pageable = PageRequest.of(0, 10);
@@ -208,7 +190,7 @@ public class GenericDataCollectionRepositoryTest {
 	}
 
 	@Test
-	@WithMockKeycloakUser(username="admin", roles={ "admin" })
+	@WithMockUser(username="admin", roles={ "admin" })
 	public void findByNameContainingIgnoreCase_adminCallingShouldReturnAllItems() throws Exception {
 		
 		Pageable pageable = PageRequest.of(0, 10);

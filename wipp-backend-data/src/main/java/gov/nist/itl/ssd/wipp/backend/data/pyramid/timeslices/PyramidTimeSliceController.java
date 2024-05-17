@@ -15,7 +15,6 @@ package gov.nist.itl.ssd.wipp.backend.data.pyramid.timeslices;
 //import gov.nist.itl.ssd.wipp.wippcore.rest.exception.NotFoundException;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
-import io.swagger.annotations.Api;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -23,6 +22,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -51,7 +53,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @RestController
-@Api(tags="Pyramid Entity")
+@Tag(name="Pyramid Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/pyramids/{pyramidId}/timeSlices")
 @ExposesResourceFor(PyramidTimeSlice.class)
 public class PyramidTimeSliceController {
@@ -64,11 +66,10 @@ public class PyramidTimeSliceController {
 
 	    @RequestMapping(value = "", method = RequestMethod.GET)
 		@PreAuthorize("hasRole('admin') or @pyramidSecurity.checkAuthorize(#pyramidId, false)")
-	    public HttpEntity<PagedModel<EntityModel<PyramidTimeSlice>>>
-	            getTimeSlicesPage(
-	                    @PathVariable("pyramidId") String pyramidId,
-	                    @PageableDefault Pageable pageable,
-	                    PagedResourcesAssembler<PyramidTimeSlice> assembler) {
+	    public HttpEntity<PagedModel<EntityModel<PyramidTimeSlice>>> getTimeSlicesPage(
+	            @PathVariable("pyramidId") String pyramidId,
+	            @ParameterObject @PageableDefault Pageable pageable,
+	            @Parameter(hidden = true) PagedResourcesAssembler<PyramidTimeSlice> assembler) {
 
 	        Page<PyramidTimeSlice> page = getPage(
 	                pyramidTimeSliceRepository.findAll(pyramidId), pageable);
@@ -97,7 +98,7 @@ public class PyramidTimeSliceController {
 	        // Self
 	        LinkBuilder lb = entityLinks.linkFor(PyramidTimeSlice.class, pyramidId);
 	        Link link = lb.slash(pts.getName()).withSelfRel();
-	        pts.add(link);
+	        //pts.add(link);
 
 	        String selfUri = link.getHref();
 	        String timeSliceBaseUri = CoreConfig.BASE_URI + "/pyramids/"
@@ -108,11 +109,11 @@ public class PyramidTimeSliceController {
 
 	        // DZI
 	        String dziUri = timeSliceFullUri + ".dzi";
-	        pts.add(new Link(dziUri, "dzi"));
+	        //pts.add(Link.of(dziUri, "dzi"));
 
 	        // OME
 	        String omeUri = timeSliceFullUri + ".ome.xml";
-	        pts.add(new Link(omeUri, "ome"));
+	        //pts.add(Link.of(omeUri, "ome"));
 	    }
 
 	    private Page<PyramidTimeSlice> getPage(List<PyramidTimeSlice> timeSlices,

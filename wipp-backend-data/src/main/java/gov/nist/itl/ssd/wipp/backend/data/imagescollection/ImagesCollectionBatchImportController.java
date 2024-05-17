@@ -3,7 +3,7 @@ package gov.nist.itl.ssd.wipp.backend.data.imagescollection;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.metadatafiles.MetadataFileHandler;
-import io.swagger.annotations.Api;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +23,7 @@ import java.util.Arrays;
  */
 
 @RestController
-@Api(tags="ImagesCollection Entity")
+@Tag(name="ImagesCollection Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/imagesCollections/batch-import")
 public class ImagesCollectionBatchImportController {
 
@@ -71,7 +71,7 @@ public class ImagesCollectionBatchImportController {
         Arrays.stream(foldersToImport)
             .forEach(f -> {
                 ImagesCollection coll = new ImagesCollection(configuration.getExperimentName() + "-" + f.getName(), false,
-                        ImagesCollection.ImagesCollectionImportMethod.BACKEND_IMPORT);
+                        ImagesCollection.ImagesCollectionImportMethod.BACKEND_IMPORT, ImagesCollection.ImagesCollectionFormat.OMETIFF);
                 coll.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
                 coll.setSourceBackendImport(configuration.getSourceFolder() + File.separator + f.getName());
                 coll.setNotes(configuration.getDescription());
@@ -84,7 +84,7 @@ public class ImagesCollectionBatchImportController {
         boolean metadataCollCreated = false;
         if (metadataFilesFolder.exists() && metadataFilesFolder.isDirectory()) {
             ImagesCollection metadataColl = new ImagesCollection(configuration.getExperimentName() + "-metadata", false,
-                    ImagesCollection.ImagesCollectionImportMethod.BACKEND_IMPORT);
+                    ImagesCollection.ImagesCollectionImportMethod.BACKEND_IMPORT, ImagesCollection.ImagesCollectionFormat.OMETIFF);
             metadataColl.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
             metadataColl.setSourceBackendImport(configuration.getSourceFolder() + File.separator + "metadata_files");
             metadataColl.setNotes(configuration.getDescription());

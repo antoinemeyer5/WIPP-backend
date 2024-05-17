@@ -11,44 +11,24 @@
  */
 package gov.nist.itl.ssd.wipp.backend.data.imagescollection;
 
-import static org.hamcrest.CoreMatchers.*;
-import static org.junit.Assert.*;
-import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
-
-import java.security.Principal;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.keycloak.KeycloakPrincipal;
-import org.keycloak.KeycloakSecurityContext;
-import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
-import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.representations.AccessToken;
+import gov.nist.itl.ssd.wipp.backend.Application;
+import gov.nist.itl.ssd.wipp.backend.app.SecurityConfig;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.hateoas.MediaTypes;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithAnonymousUser;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
-import org.springframework.security.web.FilterChainProxy;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import gov.nist.itl.ssd.wipp.backend.Application;
-import gov.nist.itl.ssd.wipp.backend.app.SecurityConfig;
-import gov.nist.itl.ssd.wipp.backend.securityutils.WithMockKeycloakUser;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.setup.MockMvcBuilders.webAppContextSetup;
 
 /**
  * <h1>Collection of tests for {@link ImagesCollectionRepositoryEventHandler}</h1>
@@ -62,15 +42,15 @@ import gov.nist.itl.ssd.wipp.backend.securityutils.WithMockKeycloakUser;
  * 	<li>GET, PUT, PATCH and DELETE for the Item Resource (/{collectionName}/{itemId})</li>
  * 	<li>GET for the Search Resource (/{collectionName}/search/findBy...)</li>
  * </ul>
- * Uses embedded MongoDB database and mock Keycloak users
+ * Uses embedded MongoDB database and mock users
  * 
  * @author Mylene Simon <mylene.simon at nist.gov>
  *
  */
-@RunWith(SpringRunner.class)
-@ContextConfiguration
-@SpringBootTest(classes = { Application.class, SecurityConfig.class }, 
-				properties = { "spring.data.mongodb.port=0" })
+@SpringBootTest(
+		classes = { Application.class, SecurityConfig.class },
+		properties = { "spring.data.mongodb.port=0", "de.flapdoodle.mongodb.embedded.version=6.0.5"}
+)
 public class ImagesCollectionRepositoryRestTest {
 
 	static final String PAYLOAD = "{\"name\": \"test-coll\"}";
@@ -84,7 +64,7 @@ public class ImagesCollectionRepositoryRestTest {
 	
 	ImagesCollection publicCollA, publicCollB, privateCollA, privateCollB;
 	
-	@Before
+	@BeforeEach
 	public void setUp() {
 		mvc = webAppContextSetup(context)
 				.apply(springSecurity())

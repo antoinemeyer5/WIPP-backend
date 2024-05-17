@@ -21,43 +21,33 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ForbiddenException;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollection;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollectionRepository;
-import io.swagger.annotations.Api;
-
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Optional;
-
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import org.apache.tomcat.util.http.fileupload.IOUtils;
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.*;
 import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.hateoas.server.ExposesResourceFor;
-import org.springframework.hateoas.Link;
-import org.springframework.hateoas.PagedModel;
-import org.springframework.hateoas.EntityModel;
-import org.springframework.hateoas.TemplateVariable;
-import org.springframework.hateoas.TemplateVariables;
-import org.springframework.hateoas.UriTemplate;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.*;
+import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 
 /**
  *
@@ -65,7 +55,7 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @RestController
-@Api(tags="ImagesCollection Entity")
+@Tag(name="ImagesCollection Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/imagesCollections/{imagesCollectionId}/images")
 @ExposesResourceFor(Image.class)
 public class ImageController {
@@ -92,8 +82,8 @@ public class ImageController {
     @PreAuthorize("hasRole('admin') or @imagesCollectionSecurity.checkAuthorize(#imagesCollectionId, false)")
     public HttpEntity<PagedModel<EntityModel<Image>>> getFilesPage(
             @PathVariable("imagesCollectionId") String imagesCollectionId,
-            @PageableDefault Pageable pageable,
-            PagedResourcesAssembler<Image> assembler) {
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<Image> assembler) {
         Page<Image> files = imageRepository.findByImagesCollection(
                 imagesCollectionId, pageable);
         PagedModel<EntityModel<Image>> resources = assembler.toModel(files);
@@ -129,13 +119,11 @@ public class ImageController {
     public DownloadUrl requestImageDownload(
             @PathVariable("imagesCollectionId") String imagesCollectionId,
             @PathVariable("fileName") String fileName) {
-    	System.out.println("enter request download");
         // Generate and send unique download URL
         String tokenParam = generateDownloadTokenParam(imagesCollectionId);
         String imagePath = "/" + fileName;
         String downloadLink = linkTo(ImageController.class,
         		imagesCollectionId).toString() + imagePath + tokenParam;
-        System.out.println(downloadLink);
         return new DownloadUrl(downloadLink);
     }
 
@@ -226,15 +214,32 @@ public class ImageController {
         return imageHandler.getOmeXml(imagesCollectionId, fileName);
     }
 
-    @RequestMapping(value = "filterByFileNameRegex", method = RequestMethod.GET)
+    @RequestMapping(value = "/filterByFileNameRegex", method = RequestMethod.GET)
     @PreAuthorize("hasRole('admin') or @imagesCollectionSecurity.checkAuthorize(#imagesCollectionId, false)")
     public HttpEntity<PagedModel<EntityModel<Image>>> getFilesMatchingRegexPage(
             @PathVariable("imagesCollectionId") String imagesCollectionId,
             @RequestParam(value="regex") String regex,
-            @PageableDefault Pageable pageable,
-            PagedResourcesAssembler<Image> assembler) {
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<Image> assembler) {
         Page<Image> files = imageRepository.findByImagesCollectionAndFileNameRegex(
                 imagesCollectionId, regex, pageable);
+        PagedModel<EntityModel<Image>> resources = assembler.toModel(files);
+        resources.forEach(
+                resource -> processResource(imagesCollectionId, resource));
+        return new ResponseEntity<>(resources, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/filterByFileNameTimePattern", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('admin') or @imagesCollectionSecurity.checkAuthorize(#imagesCollectionId, false)")
+    public HttpEntity<PagedModel<EntityModel<Image>>> getFilesMatchingTimePatternPage(
+            @PathVariable("imagesCollectionId") String imagesCollectionId,
+            @RequestParam(value="timePattern") String timePattern,
+            @ParameterObject @PageableDefault Pageable pageable,
+            @Parameter(hidden = true) PagedResourcesAssembler<Image> assembler) {
+
+        String tilePatternRegex = getRegexFromTimePattern(timePattern);
+        Page<Image> files = imageRepository.findByImagesCollectionAndFileNameRegex(
+                imagesCollectionId, tilePatternRegex, pageable);
         PagedModel<EntityModel<Image>> resources = assembler.toModel(files);
         resources.forEach(
                 resource -> processResource(imagesCollectionId, resource));
@@ -274,21 +279,39 @@ public class ImageController {
     		PagedModel<EntityModel<Image>> resources,
             PagedResourcesAssembler<Image> assembler) {
 
-    	Link imagesFilterLink = entityLinks.linkForItemResource(
+        // Add filterByFileNameRegex link to collection resource
+    	Link imagesRegexFilterLink = entityLinks.linkForItemResource(
                 ImagesCollection.class, imagesCollectionId)
                 .slash("images")
                 .slash("filterByFileNameRegex")
                 .withRel("filterByFileNameRegex");
 
-		TemplateVariable tv = new TemplateVariable("regex",
+		TemplateVariable regexTv = new TemplateVariable("regex",
 				TemplateVariable.VariableType.REQUEST_PARAM);
 
-		UriTemplate uriTemplate = UriTemplate.of(imagesFilterLink.getHref(),
-				new TemplateVariables(tv));
+		UriTemplate regexFilterUriTemplate = UriTemplate.of(imagesRegexFilterLink.getHref(),
+				new TemplateVariables(regexTv));
 
-		Link link = new Link(uriTemplate, "filterByFileNameRegex");
+		Link regexFilterLink = Link.of(regexFilterUriTemplate, "filterByFileNameRegex");
 
-		resources.add(paginationParameterTemplatesHelper.appendPaginationParameterTemplates(link));
+		resources.add(paginationParameterTemplatesHelper.appendPaginationParameterTemplates(regexFilterLink));
+
+        // Add filterByFileNameTimePattern link to collection resource
+        Link imagesTimePatternLink = entityLinks.linkForItemResource(
+                        ImagesCollection.class, imagesCollectionId)
+                .slash("images")
+                .slash("filterByFileNameTimePattern")
+                .withRel("filterByFileNameTimePattern");
+
+        TemplateVariable timePatternTv = new TemplateVariable("timePattern",
+                TemplateVariable.VariableType.REQUEST_PARAM);
+
+        UriTemplate timePatternFilterUriTemplate = UriTemplate.of(imagesTimePatternLink.getHref(),
+                new TemplateVariables(timePatternTv));
+
+        Link timePatternFilterLink = Link.of(timePatternFilterUriTemplate, "filterByFileNameTimePattern");
+
+        resources.add(paginationParameterTemplatesHelper.appendPaginationParameterTemplates(timePatternFilterLink));
 
     }
     
@@ -317,4 +340,26 @@ public class ImageController {
         
         return tokenParam;
     }
+
+    // MIST time pattern to regex converter
+    private String getRegexFromTimePattern(String filePattern) {
+        Pattern pattern = Pattern.compile("(.*)(\\{[t]+\\})(.*)");
+        Matcher matcher = pattern.matcher(filePattern);
+
+        // Check if pattern is correct. We expect 3 groups: (*)({ttt})(*)
+        if (!matcher.find() || matcher.groupCount() != 3) {
+            throw new ClientException("Filename time pattern is invalid");
+        }
+
+        // The matcher should find at group: 0 - the entire string,
+        // group 1 = prefix
+        // group 2 = {i}
+        // group 3 = suffix
+        String prefix = matcher.group(1);
+        int iCount = matcher.group(2).length() - 2;
+        String suffix = matcher.group(3);
+
+        return prefix + "\\d{" + iCount + "}" + suffix;
+    }
+
 }
