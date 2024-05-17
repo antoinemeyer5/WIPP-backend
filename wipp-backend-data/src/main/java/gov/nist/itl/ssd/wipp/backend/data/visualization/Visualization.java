@@ -40,6 +40,8 @@ public class Visualization {
     private Manifest manifest;
 
     private boolean publiclyShared;
+
+    private boolean iiifDataSource;
     
     public Visualization() {
     	
@@ -93,4 +95,8 @@ public class Visualization {
     public void setPubliclyShared(boolean publiclyShared) {
         this.publiclyShared = publiclyShared;
     }
+
+    public boolean isIiifDataSource() { return iiifDataSource; }
+
+    public void setIiifDataSource(boolean iiifDataSource) { this.iiifDataSource = iiifDataSource; }
 }

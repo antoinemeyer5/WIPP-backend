@@ -17,6 +17,7 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.ManualRefDeserializer;
  *
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
+@Deprecated
 public class BaseUrlManualRefDeserializer extends ManualRefDeserializer {
 
     public BaseUrlManualRefDeserializer() {

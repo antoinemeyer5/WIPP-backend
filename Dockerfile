@@ -43,6 +43,9 @@ RUN wget https://github.com/argoproj/argo-workflows/releases/download/${ARGO_VER
     chmod +x argo-linux-amd64 && \
     mv argo-linux-amd64 /usr/local/bin/argo
 
+# Install blosc for Zarr compression
+RUN apk add --no-cache blosc
+
 # Copy WIPP backend application exec WAR
 COPY --from=builder ${EXEC_DIR}/${BACKEND_NAME}/target/${BACKEND_NAME}-*-exec.war ${EXEC_DIR}/wipp-backend.war
 

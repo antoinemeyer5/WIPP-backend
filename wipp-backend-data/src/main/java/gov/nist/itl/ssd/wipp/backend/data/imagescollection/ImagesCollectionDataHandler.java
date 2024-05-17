@@ -15,14 +15,19 @@ import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataHandler;
 import gov.nist.itl.ssd.wipp.backend.core.model.job.Job;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.files.FileHandler;
+import gov.nist.itl.ssd.wipp.backend.data.imagescollection.images.Image;
+import gov.nist.itl.ssd.wipp.backend.data.imagescollection.images.ImageConversionService;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.images.ImageHandler;
+import gov.nist.itl.ssd.wipp.backend.data.imagescollection.images.ImageRepository;
 import gov.nist.itl.ssd.wipp.backend.data.imagescollection.metadatafiles.MetadataFileHandler;
+import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.BaseDataHandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -41,10 +46,16 @@ public class ImagesCollectionDataHandler extends BaseDataHandler implements Data
     private ImagesCollectionRepository imagesCollectionRepository;
 
     @Autowired
-    private ImageHandler imageRepository;
+    private ImageRepository imageRepository;
+
+    @Autowired
+    private ImageHandler imageHandler;
 
     @Autowired
     private MetadataFileHandler metadataRepository;
+
+    @Autowired
+    private ImageConversionService imageConversionService;
 
     public ImagesCollectionDataHandler() {
     }
@@ -67,14 +78,14 @@ public class ImagesCollectionDataHandler extends BaseDataHandler implements Data
 
             if (metadataFolder.exists() || imagesFolder.exists()) {
                 if (imagesFolder.exists()) {
-                    importFolder(imageRepository, imagesFolder, imagesCollectionId);
+                    importFolderForConversion(imageHandler, imagesFolder, imagesCollectionId);
                 }
                 if(metadataFolder.exists()) {
                     importFolder(metadataRepository, metadataFolder, imagesCollectionId);
                 }
             }
             else {
-                importFolder(imageRepository, jobOutputTempFolder, imagesCollectionId);
+                importFolderForConversion(imageHandler, jobOutputTempFolder, imagesCollectionId);
             }
             setOutputId(job, outputName, imagesCollectionId);
 
@@ -106,7 +117,7 @@ public class ImagesCollectionDataHandler extends BaseDataHandler implements Data
                     imagesCollectionRepository.save(imagesCollection);
                 }
             }
-            File inputImagesFolder = imageRepository.getFilesFolder(imagesCollectionId);
+            File inputImagesFolder = imageHandler.getFilesFolder(imagesCollectionId);
             imagesCollectionPath = inputImagesFolder.getAbsolutePath();
 
         }
@@ -128,5 +139,13 @@ public class ImagesCollectionDataHandler extends BaseDataHandler implements Data
 
     private void importFolder(FileHandler fileHandler, File file, String id) throws IOException {
         fileHandler.importFolder(id, file);
+    }
+
+    private void importFolderForConversion(ImageHandler imageHandler, File file, String id) throws IOException {
+        imageHandler.importFolderForConversion(id, file);
+        List<Image> images = imageRepository.findByImagesCollection(id);
+        for(Image image : images) {
+            imageConversionService.submitImageToExtractor(image);
+        }
     }
 }

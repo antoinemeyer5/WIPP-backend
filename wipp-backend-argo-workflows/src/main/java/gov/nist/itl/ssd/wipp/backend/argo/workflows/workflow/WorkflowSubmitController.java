@@ -62,8 +62,8 @@ public class WorkflowSubmitController {
         produces = { "application/hal+json" }
     )
     public EntityModel<Workflow> submit(
-        @PathVariable("workflowId") String workflowId,
-        final PersistentEntityResourceAssembler assembler
+        @PathVariable("workflowId") String workflowId
+        //final PersistentEntityResourceAssembler assembler
     ) {
         // Retrieve Workflow object
         Optional<Workflow> wippWorkflow = workflowRepository.findById(

@@ -15,15 +15,22 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.glencoesoftware.bioformats2raw.Converter;
+import com.glencoesoftware.pyramid.CompressionType;
+import com.glencoesoftware.pyramid.PyramidFromDirectoryWriter;
+import gov.nist.itl.ssd.wipp.backend.core.utils.SecurityUtils;
+import gov.nist.itl.ssd.wipp.backend.data.imagescollection.ImagesCollection;
 import jakarta.annotation.PostConstruct;
 
 import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
@@ -33,6 +40,8 @@ import gov.nist.itl.ssd.wipp.backend.data.imagescollection.files.FileUploadBase;
 import loci.common.services.DependencyException;
 import loci.common.services.ServiceException;
 import loci.formats.FormatException;
+import org.springframework.util.FileSystemUtils;
+import picocli.CommandLine;
 
 
 /**
@@ -62,8 +71,10 @@ public class ImageConversionService extends FileUploadBase{
 				appConfig.getOmeConverterThreads());
 
 		// Resume any interrupted conversion
+		SecurityUtils.runAsSystem();
 		imageRepository.findByImporting(true)
 		.forEach(this::submitImageToExtractor);
+		SecurityContextHolder.clearContext();
 	}
 
 	@Override
@@ -78,6 +89,14 @@ public class ImageConversionService extends FileUploadBase{
 
 	public void submitImageToExtractor(Image image, File sourceDir) {
 		String collectionId = image.getImagesCollection();
+		ImagesCollection imgCollection = imagesCollectionRepository.findById(collectionId).orElse(null);
+		// if images collection not found, image should be deleted to avoid inconsistent state
+		if (imgCollection == null) {
+		    LOG.warning("Images Collection not found for image " + image.getFileName()
+			    + " while attempting to convert, deleting.");
+		    imageRepository.delete(image);
+		    return;
+		}
 		File tempUploadDir = sourceDir;
 		File uploadDir = getUploadDir(image.getImagesCollection());
 		uploadDir.mkdirs();
@@ -128,21 +147,38 @@ public class ImageConversionService extends FileUploadBase{
 		}
 	}
 	
-	public static void convertToTiledOmeTiff(Path inputFile, Path outputFile) throws DependencyException, FormatException, IOException, ServiceException {
-		TiledOmeTiffConverter tiledOmeTiffConverter = new TiledOmeTiffConverter(
-				inputFile.toString(),
-				outputFile.toString(), 
-				CoreConfig.TILE_SIZE, 
-				CoreConfig.TILE_SIZE);
+	public static void convertToTiledOmeTiff(Path inputFile, Path outputFile) throws DependencyException, FormatException,
+			IOException, ServiceException {
+		String omeTiffOutputName = outputFile.toString();
+		String omeZarrOutputName = omeTiffOutputName.substring(0, omeTiffOutputName.lastIndexOf('.')) + ".zarr";
+
 		try {
-	    	tiledOmeTiffConverter.init();
-	    	tiledOmeTiffConverter.readWriteTiles();
-	    }
-	    catch(Exception e) {
-	      throw new IOException("Cannot convert image to OME TIFF.", e);
-	    }
-	    finally {
-	    	tiledOmeTiffConverter.cleanup();
-	    }
+	    	// First convert to OME NGFF/ZARR pyramid (downsampling step)
+	    	String[] converterArgs = new String[]{
+	    			inputFile.toString(),
+	    			omeZarrOutputName,
+	    			"--tile-height", String.valueOf(CoreConfig.TILE_SIZE),
+	    			"--tile-width", String.valueOf(CoreConfig.TILE_SIZE),
+	    	};
+	    	CommandLine.call(new Converter(), converterArgs);
+
+	    	// Then convert to OME TIFF pyramid
+	    	String[] converterPyrArgs = new String[]{
+	    			omeZarrOutputName,
+	    			outputFile.toString(),
+	    			"--rgb",
+	    			"--compression", "LZW",
+	    	};
+	    	CommandLine.call(new PyramidFromDirectoryWriter(), converterPyrArgs);
+
+		} catch (Exception e) {
+	    	throw new IOException("Cannot convert image to OME TIFF.", e);
+	    } finally {
+	    	// cleanup temporary OME ZARR directory
+	    	Path omeZarrDir = Paths.get(omeZarrOutputName);
+	    	if(Files.exists(omeZarrDir)) {
+	    		FileSystemUtils.deleteRecursively(omeZarrDir);
+	    	}
+		}
 	}
 }

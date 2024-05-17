@@ -84,9 +84,10 @@ public class SecurityConfig
 				.requestMatchers(HttpMethod.PUT).authenticated()
 				.requestMatchers(HttpMethod.PATCH).authenticated()
 				.requestMatchers(HttpMethod.DELETE).authenticated()
+				// temporary disabled
 				// restrict wdzt pyramid files access to users authorized to access the pyramid
-				.requestMatchers(CoreConfig.PYRAMIDS_BASE_URI + "/{pyramidId}/**")
-					.access(new WebExpressionAuthorizationManager("hasRole('admin') or @pyramidSecurity.checkAuthorize(#pyramidId, false)"))
+//				.requestMatchers(CoreConfig.PYRAMIDS_BASE_URI + "/{pyramidId}/**")
+//					.access(new WebExpressionAuthorizationManager("hasRole('admin') or @pyramidSecurity.checkAuthorize(#pyramidId, false)"))
 				// allow other GET/OPTIONS requests, fine grain access control done at method level
 				.anyRequest().permitAll()
 		);

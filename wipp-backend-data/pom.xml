@@ -25,6 +25,10 @@
 			<id>ome.snapshots</id>
 			<url>https://artifacts.openmicroscopy.org/artifactory/ome.snapshots</url>
 		</repository>
+		<repository>
+			<id>bioformats2raw2ometiff</id>
+			<url>https://repo.glencoesoftware.com/repository/bioformats2raw2ometiff</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
@@ -40,6 +44,24 @@
 			<artifactId>formats-gpl</artifactId>
 			<version>7.2.0</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>com.glencoesoftware</groupId>
+			<artifactId>raw2ometiff</artifactId>
+			<version>0.7.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.glencoesoftware</groupId>
+			<artifactId>bioformats2raw</artifactId>
+			<version>0.9.2</version>
+		</dependency>
+
+		<dependency>
+			<groupId>info.picocli</groupId>
+			<artifactId>picocli</artifactId>
+			<version>4.7.5</version>
 		</dependency>
 
 		<dependency>

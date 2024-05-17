@@ -73,8 +73,6 @@ public class ImagesCollectionEventHandler {
 
         // Set the owner to the connected user
         imagesCollection.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
-        System.out.println(SecurityContextHolder.getContext().getAuthentication().getAuthorities());
-
         
         // Default import method is UPLOADED
         if (imagesCollection.getImportMethod() == null) {
@@ -84,6 +82,11 @@ public class ImagesCollectionEventHandler {
         // Assert source import folder is not empty and exists if import method is BACKEND_IMPORT
         if(imagesCollection.getImportMethod().equals(ImagesCollectionImportMethod.BACKEND_IMPORT)) {
             imagesCollectionLogic.assertCollectionBackendImportSourceNotEmpty(imagesCollection);
+        }
+
+        // Default conversion format is OMETIFF
+        if (imagesCollection.getFormat() == null) {
+            imagesCollection.setFormat(ImagesCollection.ImagesCollectionFormat.OMETIFF);
         }
         
         // Collections from Catalog are locked by default
@@ -187,8 +190,8 @@ public class ImagesCollectionEventHandler {
     @HandleAfterDelete
     public void handleAfterDelete(ImagesCollection imagesCollection) {
     	// Delete all images and metadataFiles from deleted collection
-    	imageRepository.deleteAll(imagesCollection.getId(), false);
-    	metadataFileRepository.deleteAll(imagesCollection.getId(), false);
+    	imageRepository.deleteAll(imagesCollection.getId());
+    	metadataFileRepository.deleteAll(imagesCollection.getId());
     	File imagesCollectionFolder = new File (config.getImagesCollectionsFolder(), imagesCollection.getId());
     	try {
     		FileUtils.deleteDirectory(imagesCollectionFolder);

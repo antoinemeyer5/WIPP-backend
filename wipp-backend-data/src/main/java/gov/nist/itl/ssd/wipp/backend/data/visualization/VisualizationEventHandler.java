@@ -46,6 +46,9 @@ public class VisualizationEventHandler {
         
         // Set the owner to the connected user
         visualization.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        // Set the data source to IIIF (default in versions 3.2 and up)
+        visualization.setIiifDataSource(true);
     }
 	
 	@HandleBeforeSave
