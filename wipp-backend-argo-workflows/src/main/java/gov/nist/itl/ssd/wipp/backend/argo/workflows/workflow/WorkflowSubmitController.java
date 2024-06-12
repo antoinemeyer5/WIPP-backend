@@ -63,7 +63,6 @@ public class WorkflowSubmitController {
     )
     public EntityModel<Workflow> submit(
         @PathVariable("workflowId") String workflowId
-        //final PersistentEntityResourceAssembler assembler
     ) {
         // Retrieve Workflow object
         Optional<Workflow> wippWorkflow = workflowRepository.findById(

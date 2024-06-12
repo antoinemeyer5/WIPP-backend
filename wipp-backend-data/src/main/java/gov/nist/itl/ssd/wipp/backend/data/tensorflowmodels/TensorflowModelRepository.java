@@ -33,6 +33,7 @@ public interface TensorflowModelRepository extends PrincipalFilteredRepository<T
 	void delete(TensorflowModel t);
 	
 	// not exported
+	@RestResource(exported = false)
 	long countByName(@Param("name") String name);
 
 

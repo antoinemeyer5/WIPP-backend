@@ -21,6 +21,7 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -57,7 +58,7 @@ public class WorkflowCopyController
     @RequestMapping(
             value = "",
             method = RequestMethod.POST)  
-    public ResponseEntity<Workflow> copy(
+    public EntityModel<Workflow> copy(
             @PathVariable("workflowId") String workflowId,
             @RequestBody String workflowName) {
     	
@@ -135,7 +136,7 @@ public class WorkflowCopyController
             }
 
             copy = workflowRepository.save(copy);
-            return new ResponseEntity<>(copy, HttpStatus.OK);
+            return EntityModel.of(copy);
             
         } catch (Exception e) {
         	jobRepository.deleteByWippWorkflow(copy.getId());
