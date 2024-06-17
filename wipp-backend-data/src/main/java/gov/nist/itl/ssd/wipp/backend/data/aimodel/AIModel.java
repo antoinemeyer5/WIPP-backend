@@ -37,6 +37,8 @@ public class AIModel extends Data {
 
 	private String owner;
 
+	private MachineLearningLibraries machineLearningLibraries;
+
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private Date creationDate;
 	
@@ -49,9 +51,10 @@ public class AIModel extends Data {
 	public AIModel(){
 	}
 
-	public AIModel(String name){
+	public AIModel(String name, MachineLearningLibraries library){
 		this.name = name;
 		this.creationDate = new Date();
+		this.machineLearningLibraries = library;
 	}
 
 	public AIModel(Job job){

@@ -55,22 +55,22 @@ public class AIModelRepositoryTest {
 		tensorflowModelRepository.deleteAll();
 		
 		// Create and save publicTensorflowModelA (public: true, owner: user1)
-		publicTensorflowModelA = new AIModel("publicTensorflowModelA");
+		publicTensorflowModelA = new AIModel("publicTensorflowModelA", MachineLearningLibraries.TENSORFLOW);
 		publicTensorflowModelA.setOwner("user1");
 		publicTensorflowModelA.setPubliclyShared(true);
 		publicTensorflowModelA = tensorflowModelRepository.save(publicTensorflowModelA);
 		// Create and save publicTensorflowModelB (public: true, owner: user2)
-		publicTensorflowModelB = new AIModel("publicTensorflowModelB");
+		publicTensorflowModelB = new AIModel("publicTensorflowModelB", MachineLearningLibraries.TENSORFLOW);
 		publicTensorflowModelB.setOwner("user2");
 		publicTensorflowModelB.setPubliclyShared(true);
 		publicTensorflowModelB = tensorflowModelRepository.save(publicTensorflowModelB);
 		// Create and save privateTensorflowModelA (public: false, owner: user1)
-		privateTensorflowModelA = new AIModel("privateTensorflowModelA");
+		privateTensorflowModelA = new AIModel("privateTensorflowModelA", MachineLearningLibraries.TENSORFLOW);
 		privateTensorflowModelA.setOwner("user1");
 		privateTensorflowModelA.setPubliclyShared(false);
 		privateTensorflowModelA = tensorflowModelRepository.save(privateTensorflowModelA);
 		// Create and save privateTensorflowModelB (public: false, owner: user2)
-		privateTensorflowModelB = new AIModel("privateTensorflowModelB");
+		privateTensorflowModelB = new AIModel("privateTensorflowModelB", MachineLearningLibraries.TENSORFLOW);
 		privateTensorflowModelB.setOwner("user2");
 		privateTensorflowModelB.setPubliclyShared(false);
 		privateTensorflowModelB = tensorflowModelRepository.save(privateTensorflowModelB);
