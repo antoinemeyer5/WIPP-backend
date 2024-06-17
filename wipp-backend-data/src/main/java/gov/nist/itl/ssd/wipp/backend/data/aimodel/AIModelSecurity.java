@@ -9,7 +9,7 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
-package gov.nist.itl.ssd.wipp.backend.data.tensorflowmodels;
+package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import java.util.Optional;
 
@@ -27,13 +27,13 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
  *
  */
 @Service
-public class TensorflowModelSecurity {
+public class AIModelSecurity {
 	
 	@Autowired
-    private TensorflowModelRepository tensorflowModelRepository;
+    private AIModelRepository tensorflowModelRepository;
 
     public boolean checkAuthorize(String tensorflowModelId, Boolean editMode) {
-        Optional<TensorflowModel> tensorflowModel = tensorflowModelRepository.findById(tensorflowModelId);
+        Optional<AIModel> tensorflowModel = tensorflowModelRepository.findById(tensorflowModelId);
         if (tensorflowModel.isPresent()){
             return(checkAuthorize(tensorflowModel.get(), editMode));
         }
@@ -42,7 +42,7 @@ public class TensorflowModelSecurity {
         }
     }
 
-    public static boolean checkAuthorize(TensorflowModel tensorflowModel, Boolean editMode) {
+    public static boolean checkAuthorize(AIModel tensorflowModel, Boolean editMode) {
         String tensorflowModelOwner = tensorflowModel.getOwner();
         String connectedUser = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!tensorflowModel.isPubliclyShared() && (tensorflowModelOwner == null || !tensorflowModelOwner.equals(connectedUser))) {

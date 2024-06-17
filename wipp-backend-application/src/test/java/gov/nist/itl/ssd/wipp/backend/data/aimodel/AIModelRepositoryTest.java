@@ -9,7 +9,7 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
-package gov.nist.itl.ssd.wipp.backend.data.tensorflowmodels;
+package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import gov.nist.itl.ssd.wipp.backend.Application;
 import gov.nist.itl.ssd.wipp.backend.app.SecurityConfig;
@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 /**
- * Collection of tests for {@link TensorflowModelRepository} exposed methods
+ * Collection of tests for {@link AIModelRepository} exposed methods
  * Testing access control on READ operations
  * Uses embedded MongoDB database and mock users
  * 
@@ -41,12 +41,12 @@ import static org.hamcrest.Matchers.is;
 		classes = { Application.class, SecurityConfig.class },
 		properties = { "spring.data.mongodb.port=0", "de.flapdoodle.mongodb.embedded.version=6.0.5"}
 )
-public class TensorflowModelRepositoryTest {
+public class AIModelRepositoryTest {
 	
 	@Autowired
-	TensorflowModelRepository tensorflowModelRepository;
-	
-	TensorflowModel publicTensorflowModelA, publicTensorflowModelB, privateTensorflowModelA, privateTensorflowModelB;
+	AIModelRepository tensorflowModelRepository;
+
+	AIModel publicTensorflowModelA, publicTensorflowModelB, privateTensorflowModelA, privateTensorflowModelB;
 	
 	@BeforeEach
 	public void setUp() {
@@ -55,22 +55,22 @@ public class TensorflowModelRepositoryTest {
 		tensorflowModelRepository.deleteAll();
 		
 		// Create and save publicTensorflowModelA (public: true, owner: user1)
-		publicTensorflowModelA = new TensorflowModel("publicTensorflowModelA");
+		publicTensorflowModelA = new AIModel("publicTensorflowModelA");
 		publicTensorflowModelA.setOwner("user1");
 		publicTensorflowModelA.setPubliclyShared(true);
 		publicTensorflowModelA = tensorflowModelRepository.save(publicTensorflowModelA);
 		// Create and save publicTensorflowModelB (public: true, owner: user2)
-		publicTensorflowModelB = new TensorflowModel("publicTensorflowModelB");
+		publicTensorflowModelB = new AIModel("publicTensorflowModelB");
 		publicTensorflowModelB.setOwner("user2");
 		publicTensorflowModelB.setPubliclyShared(true);
 		publicTensorflowModelB = tensorflowModelRepository.save(publicTensorflowModelB);
 		// Create and save privateTensorflowModelA (public: false, owner: user1)
-		privateTensorflowModelA = new TensorflowModel("privateTensorflowModelA");
+		privateTensorflowModelA = new AIModel("privateTensorflowModelA");
 		privateTensorflowModelA.setOwner("user1");
 		privateTensorflowModelA.setPubliclyShared(false);
 		privateTensorflowModelA = tensorflowModelRepository.save(privateTensorflowModelA);
 		// Create and save privateTensorflowModelB (public: false, owner: user2)
-		privateTensorflowModelB = new TensorflowModel("privateTensorflowModelB");
+		privateTensorflowModelB = new AIModel("privateTensorflowModelB");
 		privateTensorflowModelB.setOwner("user2");
 		privateTensorflowModelB.setPubliclyShared(false);
 		privateTensorflowModelB = tensorflowModelRepository.save(privateTensorflowModelB);
@@ -129,7 +129,7 @@ public class TensorflowModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Anonymous user should get only get list of public tensorflowModels
-		Page<TensorflowModel> result = tensorflowModelRepository.findAll(pageable);
+		Page<AIModel> result = tensorflowModelRepository.findAll(pageable);
 		assertThat(result.getContent(), hasSize(2));
 		result.getContent().forEach(tensorflowModel -> {
 			assertThat(tensorflowModel.isPubliclyShared(), is(true));
@@ -143,7 +143,7 @@ public class TensorflowModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Non-admin user1 should only get list of own and public tensorflowModels
-		Page<TensorflowModel> result = tensorflowModelRepository.findAll(pageable);
+		Page<AIModel> result = tensorflowModelRepository.findAll(pageable);
 		assertThat(result.getContent(), hasSize(3));
 		result.getContent().forEach(tensorflowModel -> {
 			assertThat((tensorflowModel.isPubliclyShared() || tensorflowModel.getOwner().equals("user1")), is(true));
@@ -157,7 +157,7 @@ public class TensorflowModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Admin should get list of all tensorflowModels
-		Page<TensorflowModel> result = tensorflowModelRepository.findAll(pageable);
+		Page<AIModel> result = tensorflowModelRepository.findAll(pageable);
 		assertThat(result.getContent(), hasSize(4));
 	}
 	
@@ -168,7 +168,7 @@ public class TensorflowModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Anonymous user should get only get list of public tensorflowModels matching search criteria
-		Page<TensorflowModel> result = tensorflowModelRepository.findByNameContainingIgnoreCase("tensorflowModelA", pageable);
+		Page<AIModel> result = tensorflowModelRepository.findByNameContainingIgnoreCase("tensorflowModelA", pageable);
 		assertThat(result.getContent(), hasSize(1));
 		result.getContent().forEach(tensorflowModel -> {
 			assertThat(tensorflowModel.isPubliclyShared(), is(true));
@@ -182,7 +182,7 @@ public class TensorflowModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Non-admin user1 should only get list of own and public tensorflowModels matching search criteria
-		Page<TensorflowModel> result = tensorflowModelRepository.findByNameContainingIgnoreCase("tensorflowModel", pageable);
+		Page<AIModel> result = tensorflowModelRepository.findByNameContainingIgnoreCase("tensorflowModel", pageable);
 		assertThat(result.getContent(), hasSize(3));
 		result.getContent().forEach(tensorflowModel -> {
 			assertThat((tensorflowModel.isPubliclyShared() || tensorflowModel.getOwner().equals("user1")), is(true));
@@ -196,9 +196,9 @@ public class TensorflowModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Admin should get list of all tensorflowModels matching search criteria
-		Page<TensorflowModel> resultColl = tensorflowModelRepository.findByNameContainingIgnoreCase("tensorflowModel", pageable);
+		Page<AIModel> resultColl = tensorflowModelRepository.findByNameContainingIgnoreCase("tensorflowModel", pageable);
 		assertThat(resultColl.getContent(), hasSize(4));
-		Page<TensorflowModel> resultPrivate = tensorflowModelRepository.findByNameContainingIgnoreCase("private", pageable);
+		Page<AIModel> resultPrivate = tensorflowModelRepository.findByNameContainingIgnoreCase("private", pageable);
 		assertThat(resultPrivate.getContent(), hasSize(2));
 	}
 	

@@ -9,7 +9,7 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
-package gov.nist.itl.ssd.wipp.backend.data.tensorflowmodels;
+package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import java.io.File;
 import java.util.Optional;
@@ -31,17 +31,17 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.JobExecutionException;
  */
 @Component("tensorflowModelDataHandler")
 
-public class TensorflowModelDataHandler extends BaseDataHandler implements DataHandler {
+public class AIModelDataHandler extends BaseDataHandler implements DataHandler {
 
 	@Autowired
 	CoreConfig config;
 
 	@Autowired
-	private TensorflowModelRepository tensorflowModelRepository;
+	private AIModelRepository tensorflowModelRepository;
 
 	@Override
 	public void importData(Job job, String outputName) throws JobExecutionException {
-		TensorflowModel tm = new TensorflowModel(job, outputName);
+        AIModel tm = new AIModel(job, outputName);
 		// Set owner to job owner
         tm.setOwner(job.getOwner());
         // Set TM to private
@@ -88,9 +88,9 @@ public class TensorflowModelDataHandler extends BaseDataHandler implements DataH
 	
 	@Override
     public void setDataToPublic(String value) {
-    	Optional<TensorflowModel> optTensorflowModel = tensorflowModelRepository.findById(value);
+    	Optional<AIModel> optTensorflowModel = tensorflowModelRepository.findById(value);
         if(optTensorflowModel.isPresent()) {
-        	TensorflowModel tensorflowModel = optTensorflowModel.get();
+            AIModel tensorflowModel = optTensorflowModel.get();
             if (!tensorflowModel.isPubliclyShared()) {
             	tensorflowModel.setPubliclyShared(true);
             	tensorflowModelRepository.save(tensorflowModel);

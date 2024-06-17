@@ -9,7 +9,7 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
-package gov.nist.itl.ssd.wipp.backend.data.tensorflowmodels;
+package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import org.springframework.hateoas.Link;
@@ -22,13 +22,13 @@ import org.springframework.stereotype.Component;
 * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
 */
 @Component
-public class TensorflowModelResourceProcessor implements RepresentationModelProcessor<EntityModel<TensorflowModel>> {
+public class AIModelResourceProcessor implements RepresentationModelProcessor<EntityModel<AIModel>> {
 
 	@Override
-	public EntityModel<TensorflowModel> process(EntityModel<TensorflowModel> resource) {
-		TensorflowModel tm = resource.getContent();
+	public EntityModel<AIModel> process(EntityModel<AIModel> resource) {
+		AIModel tm = resource.getContent();
 		
-        Link downloadLink = linkTo(TensorflowModelDownloadController.class,
+        Link downloadLink = linkTo(AIModelDownloadController.class,
                 tm.getId()).slash("request")
                 .withRel("download");
         resource.add(downloadLink);

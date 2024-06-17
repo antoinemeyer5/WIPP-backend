@@ -9,7 +9,7 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
-package gov.nist.itl.ssd.wipp.backend.data.tensorflowmodels;
+package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataDownloadToken;
@@ -52,13 +52,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Tag(name="TensorflowModel Entity")
 @RequestMapping(CoreConfig.BASE_URI + "/tensorflowModels/{tensorflowModelId}/download")
-public class TensorflowModelDownloadController {
+public class AIModelDownloadController {
 
 	@Autowired
 	CoreConfig config;
 
 	@Autowired
-	TensorflowModelRepository tensorflowModelRepository;
+	AIModelRepository tensorflowModelRepository;
 	
 	@Autowired
     private DataDownloadTokenRepository dataDownloadTokenRepository;
@@ -72,7 +72,7 @@ public class TensorflowModelDownloadController {
             @PathVariable("tensorflowModelId") String tensorflowModelId) {
     	
     	// Check existence of images collection
-    	Optional<TensorflowModel> tm = tensorflowModelRepository.findById(
+    	Optional<AIModel> tm = tensorflowModelRepository.findById(
     			tensorflowModelId);
         if (!tm.isPresent()) {
             throw new ResourceNotFoundException(
@@ -85,7 +85,7 @@ public class TensorflowModelDownloadController {
         
         // Generate and send unique download URL
         String tokenParam = "?token=" + downloadToken.getToken();
-        String downloadLink = linkTo(TensorflowModelDownloadController.class,
+        String downloadLink = linkTo(AIModelDownloadController.class,
         		tensorflowModelId).toString() + tokenParam;
         return new DownloadUrl(downloadLink);
     }
@@ -109,8 +109,8 @@ public class TensorflowModelDownloadController {
     	}
     	
     	// Check existence of Tensorflow Model
-        TensorflowModel tm = null;
-		Optional<TensorflowModel> optTm = tensorflowModelRepository.findById(tensorflowModelId);
+		AIModel tm = null;
+		Optional<AIModel> optTm = tensorflowModelRepository.findById(tensorflowModelId);
 		
 		if (!optTm.isPresent()) {
 			throw new ResourceNotFoundException(

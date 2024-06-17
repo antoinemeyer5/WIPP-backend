@@ -10,7 +10,7 @@
  * software is used.
  */
 
-package gov.nist.itl.ssd.wipp.backend.data.tensorflowmodels;
+package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import gov.nist.itl.ssd.wipp.backend.core.model.auth.PrincipalFilteredRepository;
 
@@ -26,11 +26,11 @@ import org.springframework.data.rest.core.annotation.RestResource;
  */
 @Tag(name="TensorflowModel Entity")
 @RepositoryRestResource
-public interface TensorflowModelRepository extends PrincipalFilteredRepository<TensorflowModel, String> {
+public interface AIModelRepository extends PrincipalFilteredRepository<AIModel, String> {
 
 	@Override
 	@RestResource(exported = false)
-	void delete(TensorflowModel t);
+	void delete(AIModel t);
 	
 	// not exported
 	long countByName(@Param("name") String name);

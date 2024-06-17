@@ -9,7 +9,7 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
-package gov.nist.itl.ssd.wipp.backend.data.tensorflowmodels;
+package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,10 +20,10 @@ import org.springframework.stereotype.Component;
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @Component
-public class TensorflowModelLogic {
+public class AIModelLogic {
 
     @Autowired
-    private TensorflowModelRepository tensorflowModelRepository;
+    private AIModelRepository tensorflowModelRepository;
 
     public void assertTensorflowModelNameUnique(String name) {
         if (tensorflowModelRepository.countByName(name) != 0) {

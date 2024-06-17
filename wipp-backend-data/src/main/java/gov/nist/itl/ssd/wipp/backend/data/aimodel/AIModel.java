@@ -9,7 +9,7 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
-package gov.nist.itl.ssd.wipp.backend.data.tensorflowmodels;
+package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import java.util.Date;
 
@@ -29,7 +29,7 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.annotation.ManualRef;
  */
 @IdExposed
 @Document
-public class TensorflowModel extends Data {
+public class AIModel extends Data {
 	@Id
 	private String id;
 
@@ -46,21 +46,21 @@ public class TensorflowModel extends Data {
 
 	private boolean publiclyShared;
 
-	public TensorflowModel(){
+	public AIModel(){
 	}
 
-	public TensorflowModel(String name){
+	public AIModel(String name){
 		this.name = name;
 		this.creationDate = new Date();
 	}
 
-	public TensorflowModel(Job job){
+	public AIModel(Job job){
 		this.name = job.getName();
 		this.sourceJob = job.getId();
 		this.creationDate = new Date();
 	}
 	
-	public TensorflowModel(Job job, String outputName){
+	public AIModel(Job job, String outputName){
 		this.name = job.getName() + "-" + outputName;
 		this.sourceJob = job.getId();
 		this.creationDate = new Date();

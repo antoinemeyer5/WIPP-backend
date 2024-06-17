@@ -9,7 +9,7 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
-package gov.nist.itl.ssd.wipp.backend.data.tensorflowmodels;
+package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import java.util.Objects;
 import java.util.Optional;
@@ -33,14 +33,14 @@ import gov.nist.itl.ssd.wipp.backend.data.tensorboard.TensorboardLogsRepository;
  *
  */
 @Component
-@RepositoryEventHandler(TensorflowModel.class)
-public class TensorflowModelEventHandler {
+@RepositoryEventHandler(AIModel.class)
+public class AIModelEventHandler {
 	
 	@Autowired
-	TensorflowModelRepository tensorflowModelRepository;
+    AIModelRepository tensorflowModelRepository;
 	
 	@Autowired
-	TensorflowModelLogic tensorflowModelLogic;
+    AIModelLogic tensorflowModelLogic;
 	
 	@Autowired
 	TensorboardLogsRepository tensorboardLogsRepository;
@@ -50,21 +50,21 @@ public class TensorflowModelEventHandler {
 
     @PreAuthorize("isAuthenticated()")
     @HandleBeforeCreate
-    public void handleBeforeCreate(TensorflowModel tensorflowModel) {
+    public void handleBeforeCreate(AIModel tensorflowModel) {
     	throw new ClientException("Creation of TensorflowModel via REST API is not allowed.");
     }
 
     @HandleBeforeSave
     @PreAuthorize("isAuthenticated() and (hasRole('admin') or #tensorflowModel.owner == authentication.name)")
-    public void handleBeforeSave(TensorflowModel tensorflowModel) {
+    public void handleBeforeSave(AIModel tensorflowModel) {
     	// Assert data exists
-        Optional<TensorflowModel> result = tensorflowModelRepository.findById(
+        Optional<AIModel> result = tensorflowModelRepository.findById(
         		tensorflowModel.getId());
         if (!result.isPresent()) {
             throw new NotFoundException("TensorflowModel with id " + tensorflowModel.getId() + " not found");
         }
-        
-        TensorflowModel oldSv = result.get();
+
+        AIModel oldSv = result.get();
         
         // Source job cannot be changed
         if (!Objects.equals(
@@ -93,7 +93,7 @@ public class TensorflowModelEventHandler {
     }
     
     @HandleAfterSave
-    public void handleAfterSave(TensorflowModel tensorflowModel) {
+    public void handleAfterSave(AIModel tensorflowModel) {
     	// If TensorflowModel was made public, check for associated TensorboardLogs
     	if (tensorflowModel.isPubliclyShared() && tensorflowModel.getSourceJob() != null) {
     		TensorboardLogs tensorboardLogs = tensorboardLogsRepository.findOneBySourceJob(
