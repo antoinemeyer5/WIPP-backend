@@ -37,10 +37,10 @@ import gov.nist.itl.ssd.wipp.backend.data.tensorboard.TensorboardLogsRepository;
 public class AIModelEventHandler {
 	
 	@Autowired
-    AIModelRepository tensorflowModelRepository;
+    AIModelRepository aiModelRepository;
 	
 	@Autowired
-    AIModelLogic tensorflowModelLogic;
+    AIModelLogic aiModelLogic;
 	
 	@Autowired
 	TensorboardLogsRepository tensorboardLogsRepository;
@@ -50,54 +50,54 @@ public class AIModelEventHandler {
 
     @PreAuthorize("isAuthenticated()")
     @HandleBeforeCreate
-    public void handleBeforeCreate(AIModel tensorflowModel) {
-    	throw new ClientException("Creation of TensorflowModel via REST API is not allowed.");
+    public void handleBeforeCreate(AIModel aiModel) {
+    	throw new ClientException("Creation of AIModel via REST API is not allowed.");
     }
 
     @HandleBeforeSave
-    @PreAuthorize("isAuthenticated() and (hasRole('admin') or #tensorflowModel.owner == authentication.name)")
-    public void handleBeforeSave(AIModel tensorflowModel) {
+    @PreAuthorize("isAuthenticated() and (hasRole('admin') or #aiModel.owner == authentication.name)")
+    public void handleBeforeSave(AIModel aiModel) {
     	// Assert data exists
-        Optional<AIModel> result = tensorflowModelRepository.findById(
-        		tensorflowModel.getId());
+        Optional<AIModel> result = aiModelRepository.findById(
+                aiModel.getId());
         if (!result.isPresent()) {
-            throw new NotFoundException("TensorflowModel with id " + tensorflowModel.getId() + " not found");
+            throw new NotFoundException("AIModel with id " + aiModel.getId() + " not found");
         }
 
         AIModel oldSv = result.get();
         
         // Source job cannot be changed
         if (!Objects.equals(
-        		tensorflowModel.getSourceJob(),
+                aiModel.getSourceJob(),
         		oldSv.getSourceJob())) {
             throw new ClientException("Can not change source job.");
         }
 
         // Assert data name is unique
-        if (!Objects.equals(tensorflowModel.getName(), oldSv.getName())) {
-            tensorflowModelLogic.assertTensorflowModelNameUnique(
-            		tensorflowModel.getName());
+        if (!Objects.equals(aiModel.getName(), oldSv.getName())) {
+            aiModelLogic.assertAIModelNameUnique(
+                    aiModel.getName());
         }
         
         // A public data cannot become private
-        if (oldSv.isPubliclyShared() && !tensorflowModel.isPubliclyShared()){
+        if (oldSv.isPubliclyShared() && !aiModel.isPubliclyShared()){
             throw new ClientException("Can not change a public data to private.");
         }
                 
         // Owner cannot be changed
         if (!Objects.equals(
-        		tensorflowModel.getOwner(),
+                aiModel.getOwner(),
         		oldSv.getOwner())) {
             throw new ClientException("Can not change owner.");
         }
     }
     
     @HandleAfterSave
-    public void handleAfterSave(AIModel tensorflowModel) {
-    	// If TensorflowModel was made public, check for associated TensorboardLogs
-    	if (tensorflowModel.isPubliclyShared() && tensorflowModel.getSourceJob() != null) {
+    public void handleAfterSave(AIModel aiModel) {
+    	// If AIModel was made public, check for associated TensorboardLogs
+    	if (aiModel.isPubliclyShared() && aiModel.getSourceJob() != null) {
     		TensorboardLogs tensorboardLogs = tensorboardLogsRepository.findOneBySourceJob(
-    				tensorflowModel.getSourceJob());
+                    aiModel.getSourceJob());
     		if (!tensorboardLogs.isPubliclyShared()) {
     			tensorboardLogs.setPubliclyShared(true);
     			tensorboardLogsRepository.save(tensorboardLogs);

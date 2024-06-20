@@ -21,7 +21,7 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ForbiddenException;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
 
 /**
- * Tensorflow model Security service
+ * AI model Security service
  * 
  * @author Mylene Simon <mylene.simon at nist.gov>
  *
@@ -30,26 +30,26 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
 public class AIModelSecurity {
 	
 	@Autowired
-    private AIModelRepository tensorflowModelRepository;
+    private AIModelRepository aiModelRepository;
 
-    public boolean checkAuthorize(String tensorflowModelId, Boolean editMode) {
-        Optional<AIModel> tensorflowModel = tensorflowModelRepository.findById(tensorflowModelId);
-        if (tensorflowModel.isPresent()){
-            return(checkAuthorize(tensorflowModel.get(), editMode));
+    public boolean checkAuthorize(String aiModelId, Boolean editMode) {
+        Optional<AIModel> aiModel = aiModelRepository.findById(aiModelId);
+        if (aiModel.isPresent()){
+            return(checkAuthorize(aiModel.get(), editMode));
         }
         else {
-            throw new NotFoundException("Tensorflow model with id " + tensorflowModelId + " not found");
+            throw new NotFoundException("AI model with id " + aiModelId + " not found");
         }
     }
 
-    public static boolean checkAuthorize(AIModel tensorflowModel, Boolean editMode) {
-        String tensorflowModelOwner = tensorflowModel.getOwner();
+    public static boolean checkAuthorize(AIModel aiModel, Boolean editMode) {
+        String aiModelOwner = aiModel.getOwner();
         String connectedUser = SecurityContextHolder.getContext().getAuthentication().getName();
-        if (!tensorflowModel.isPubliclyShared() && (tensorflowModelOwner == null || !tensorflowModelOwner.equals(connectedUser))) {
-            throw new ForbiddenException("You do not have access to this Tensorflow model");
+        if (!aiModel.isPubliclyShared() && (aiModelOwner == null || !aiModelOwner.equals(connectedUser))) {
+            throw new ForbiddenException("You do not have access to this AI model");
         }
-        if (tensorflowModel.isPubliclyShared() && editMode && (tensorflowModelOwner == null || !tensorflowModelOwner.equals(connectedUser))){
-            throw new ForbiddenException("You do not have the right to edit this Tensorflow model");
+        if (aiModel.isPubliclyShared() && editMode && (aiModelOwner == null || !aiModelOwner.equals(connectedUser))){
+            throw new ForbiddenException("You do not have the right to edit this AI model");
         }
         return(true);
     }

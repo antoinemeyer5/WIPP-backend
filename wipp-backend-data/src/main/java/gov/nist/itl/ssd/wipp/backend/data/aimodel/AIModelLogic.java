@@ -23,11 +23,11 @@ import org.springframework.stereotype.Component;
 public class AIModelLogic {
 
     @Autowired
-    private AIModelRepository tensorflowModelRepository;
+    private AIModelRepository aiModelRepository;
 
-    public void assertTensorflowModelNameUnique(String name) {
-        if (tensorflowModelRepository.countByName(name) != 0) {
-            throw new ClientException("A tensorflow model named \""
+    public void assertAIModelNameUnique(String name) {
+        if (aiModelRepository.countByName(name) != 0) {
+            throw new ClientException("A ai model named \""
                     + name + "\" already exists.");
         }
     }

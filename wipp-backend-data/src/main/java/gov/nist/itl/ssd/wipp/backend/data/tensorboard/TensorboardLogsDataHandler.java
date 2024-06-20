@@ -51,7 +51,7 @@ public class TensorboardLogsDataHandler extends BaseDataHandler implements DataH
 	@Override
 	public String exportDataAsParam(String value) {
 		String tensorboardLogsId = value;
-		File inputTensorboardLogs = new File(config.getTensorflowModelsFolder(), tensorboardLogsId);
+		File inputTensorboardLogs = new File(config.getAIModelsFolder(), tensorboardLogsId);
 		String tensorboardLogsPath = inputTensorboardLogs.getAbsolutePath();
 		return tensorboardLogsPath;
 	}

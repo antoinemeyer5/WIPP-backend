@@ -24,7 +24,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
  * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Tag(name="TensorflowModel Entity")
+@Tag(name="AIModel Entity")
 @RepositoryRestResource
 public interface AIModelRepository extends PrincipalFilteredRepository<AIModel, String> {
 

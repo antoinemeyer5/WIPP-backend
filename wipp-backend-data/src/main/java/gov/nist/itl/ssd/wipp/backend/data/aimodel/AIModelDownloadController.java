@@ -44,21 +44,21 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Tensorflow Models download controller
+ * AI Models download controller
  *
  * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @RestController
-@Tag(name="TensorflowModel Entity")
-@RequestMapping(CoreConfig.BASE_URI + "/tensorflowModels/{tensorflowModelId}/download")
+@Tag(name="AIModel Entity")
+@RequestMapping(CoreConfig.BASE_URI + "/AIModels/{AIModelId}/download")
 public class AIModelDownloadController {
 
 	@Autowired
 	CoreConfig config;
 
 	@Autowired
-	AIModelRepository tensorflowModelRepository;
+	AIModelRepository aiModelRepository;
 	
 	@Autowired
     private DataDownloadTokenRepository dataDownloadTokenRepository;
@@ -67,26 +67,26 @@ public class AIModelDownloadController {
             value = "request",
             method = RequestMethod.GET,
             produces = "application/json")
-	@PreAuthorize("hasRole('admin') or @tensorflowModelSecurity.checkAuthorize(#tensorflowModelId, false)")
+	@PreAuthorize("hasRole('admin') or @aiModelSecurity.checkAuthorize(#AIModelId, false)")
     public DownloadUrl requestDownload(
-            @PathVariable("tensorflowModelId") String tensorflowModelId) {
+            @PathVariable("AIModelId") String aiModelId) {
     	
     	// Check existence of images collection
-    	Optional<AIModel> tm = tensorflowModelRepository.findById(
-    			tensorflowModelId);
+    	Optional<AIModel> tm = aiModelRepository.findById(
+				aiModelId);
         if (!tm.isPresent()) {
             throw new ResourceNotFoundException(
-                    "Tensorflow model " + tensorflowModelId + " not found.");
+                    "AI model " + aiModelId + " not found.");
         }
         
         // Generate download token
-        DataDownloadToken downloadToken = new DataDownloadToken(tensorflowModelId);
+        DataDownloadToken downloadToken = new DataDownloadToken(aiModelId);
         dataDownloadTokenRepository.save(downloadToken);
         
         // Generate and send unique download URL
         String tokenParam = "?token=" + downloadToken.getToken();
         String downloadLink = linkTo(AIModelDownloadController.class,
-        		tensorflowModelId).toString() + tokenParam;
+				aiModelId).toString() + tokenParam;
         return new DownloadUrl(downloadLink);
     }
 	
@@ -95,7 +95,7 @@ public class AIModelDownloadController {
 			method = RequestMethod.GET,
 			produces = "application/zip")
 	public void get(
-			@PathVariable("tensorflowModelId") String tensorflowModelId,
+			@PathVariable("AIModelId") String aiModelId,
 			@RequestParam("token") String token,
 			HttpServletResponse response) throws IOException {
 		
@@ -104,33 +104,33 @@ public class AIModelDownloadController {
     	
 		// Check validity of download token
     	Optional<DataDownloadToken> downloadToken = dataDownloadTokenRepository.findByToken(token);
-    	if (!downloadToken.isPresent() || !downloadToken.get().getDataId().equals(tensorflowModelId)) {
+    	if (!downloadToken.isPresent() || !downloadToken.get().getDataId().equals(aiModelId)) {
     		throw new ForbiddenException("Invalid download token.");
     	}
     	
-    	// Check existence of Tensorflow Model
+    	// Check existence of AI Model
 		AIModel tm = null;
-		Optional<AIModel> optTm = tensorflowModelRepository.findById(tensorflowModelId);
+		Optional<AIModel> optTm = aiModelRepository.findById(aiModelId);
 		
 		if (!optTm.isPresent()) {
 			throw new ResourceNotFoundException(
-					"Tensorflow model " + tensorflowModelId + " not found.");
+					"AI model " + aiModelId + " not found.");
 		} else { // TrainedModel is present
             tm = optTm.get();
         }
 
-		// get tensorflow model folder
-		File tensorflowModelStorageFolder = new File(config.getTensorflowModelsFolder(), tm.getId());
-		if (! tensorflowModelStorageFolder.exists()) {
+		// get AI model folder
+		File aiModelStorageFolder = new File(config.getAIModelsFolder(), tm.getId());
+		if (! aiModelStorageFolder.exists()) {
 			throw new ResourceNotFoundException(
-					"Tensorflow model " + tensorflowModelId + " " + tm.getName() + " not found.");
+					"AI model " + aiModelId + " " + tm.getName() + " not found.");
 		}
 
 		response.setHeader("Content-disposition",
-				"attachment;filename=" + "TensorflowModel-" + tm.getName() + ".zip");
+				"attachment;filename=" + "AIModel-" + tm.getName() + ".zip");
 
 		ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
-		addToZip("", zos, tensorflowModelStorageFolder);
+		addToZip("", zos, aiModelStorageFolder);
 		zos.finish();
 		
 		// Clear security context after system operations

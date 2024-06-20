@@ -41,8 +41,8 @@ public class AIModel extends Data {
 
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private Date creationDate;
-	
-    @Indexed(unique = true, sparse = true)
+
+	@Indexed(unique = true, sparse = true)
     @ManualRef(Job.class)
     private String sourceJob;
 
@@ -63,10 +63,11 @@ public class AIModel extends Data {
 		this.creationDate = new Date();
 	}
 	
-	public AIModel(Job job, String outputName){
+	public AIModel(Job job, String outputName, MachineLearningLibraries library){
 		this.name = job.getName() + "-" + outputName;
 		this.sourceJob = job.getId();
 		this.creationDate = new Date();
+		this.machineLearningLibraries = library;
 	}
 
 	public String getId(){
@@ -81,13 +82,15 @@ public class AIModel extends Data {
 		return creationDate;
 	}
 
-    public String getSourceJob() {
+	public String getSourceJob() {
         return sourceJob;
     }
 
 	public String getOwner() {
 		return owner;
 	}
+
+	public String getMachineLearningLibrary() { return machineLearningLibraries.label; }
 
 	public void setOwner(String owner) {
 		this.owner = owner;

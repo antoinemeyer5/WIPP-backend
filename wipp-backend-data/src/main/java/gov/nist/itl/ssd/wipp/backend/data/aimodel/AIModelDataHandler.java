@@ -29,7 +29,7 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.JobExecutionException;
  * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Component("tensorflowModelDataHandler")
+@Component("AIModelDataHandler")
 
 public class AIModelDataHandler extends BaseDataHandler implements DataHandler {
 
@@ -37,25 +37,25 @@ public class AIModelDataHandler extends BaseDataHandler implements DataHandler {
 	CoreConfig config;
 
 	@Autowired
-	private AIModelRepository tensorflowModelRepository;
+	private AIModelRepository aiModelRepository;
 
 	@Override
 	public void importData(Job job, String outputName) throws JobExecutionException {
-        AIModel tm = new AIModel(job, outputName);
+        AIModel tm = new AIModel(job, outputName, MachineLearningLibraries.TENSORFLOW);
 		// Set owner to job owner
         tm.setOwner(job.getOwner());
         // Set TM to private
         tm.setPubliclyShared(false);
-        tensorflowModelRepository.save(tm);
+        aiModelRepository.save(tm);
 
-		File trainedModelFolder = new File(config.getTensorflowModelsFolder(), tm.getId());
+		File trainedModelFolder = new File(config.getAIModelsFolder(), tm.getId());
 		trainedModelFolder.mkdirs();
 
 		File tempOutputDir = getJobOutputTempFolder(job.getId(), outputName);
 		boolean success = tempOutputDir.renameTo(trainedModelFolder);
 		if (!success) {
-			tensorflowModelRepository.delete(tm);
-			throw new JobExecutionException("Cannot move tensorflow model to final destination.");
+            aiModelRepository.delete(tm);
+			throw new JobExecutionException("Cannot move ai model to final destination.");
 		}
 
 		setOutputId(job, outputName, tm.getId());
@@ -63,37 +63,37 @@ public class AIModelDataHandler extends BaseDataHandler implements DataHandler {
 	
 	@Override
     public String exportDataAsParam(String value) {
-        String tensorflowModelId = value;
-        String tensorflowModelPath;
+        String aiModelId = value;
+        String aiModelPath;
 
         // check if the input of the job is the output of another job and if so return the associated path
         String regex = "\\{\\{ (.*)\\.(.*) \\}\\}";
         Pattern pattern = Pattern.compile(regex);
-        Matcher m = pattern.matcher(tensorflowModelId);
+        Matcher m = pattern.matcher(aiModelId);
         if (m.find()) {
             String jobId = m.group(1);
             String outputName = m.group(2);
-            tensorflowModelPath = getJobOutputTempFolder(jobId, outputName).getAbsolutePath();
+            aiModelPath = getJobOutputTempFolder(jobId, outputName).getAbsolutePath();
         }
-        // else return the path of the tensorflow model
+        // else return the path of the AI model
         else {
-            File tensorflowModelFolder = new File(config.getTensorflowModelsFolder(), tensorflowModelId);
-            tensorflowModelPath = tensorflowModelFolder.getAbsolutePath();
+            File aiModelFolder = new File(config.getAIModelsFolder(), aiModelId);
+            aiModelPath = aiModelFolder.getAbsolutePath();
 
         }
-        tensorflowModelPath = tensorflowModelPath.replaceFirst(config.getStorageRootFolder(),config.getContainerInputsMountPath());
-        return tensorflowModelPath;
+        aiModelPath = aiModelPath.replaceFirst(config.getStorageRootFolder(),config.getContainerInputsMountPath());
+        return aiModelPath;
 
     }
 	
 	@Override
     public void setDataToPublic(String value) {
-    	Optional<AIModel> optTensorflowModel = tensorflowModelRepository.findById(value);
-        if(optTensorflowModel.isPresent()) {
-            AIModel tensorflowModel = optTensorflowModel.get();
-            if (!tensorflowModel.isPubliclyShared()) {
-            	tensorflowModel.setPubliclyShared(true);
-            	tensorflowModelRepository.save(tensorflowModel);
+    	Optional<AIModel> optAIModel = aiModelRepository.findById(value);
+        if(optAIModel.isPresent()) {
+            AIModel aiModel = optAIModel.get();
+            if (!aiModel.isPubliclyShared()) {
+                aiModel.setPubliclyShared(true);
+                aiModelRepository.save(aiModel);
             }
         }
     }
