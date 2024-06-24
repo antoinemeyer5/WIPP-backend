@@ -27,13 +27,13 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
  *
  */
 @Service
-public class AIModelSecurity {
+public class AiModelSecurity {
 	
 	@Autowired
-    private AIModelRepository aiModelRepository;
+    private AiModelRepository aiModelRepository;
 
     public boolean checkAuthorize(String aiModelId, Boolean editMode) {
-        Optional<AIModel> aiModel = aiModelRepository.findById(aiModelId);
+        Optional<AiModel> aiModel = aiModelRepository.findById(aiModelId);
         if (aiModel.isPresent()){
             return(checkAuthorize(aiModel.get(), editMode));
         }
@@ -42,7 +42,7 @@ public class AIModelSecurity {
         }
     }
 
-    public static boolean checkAuthorize(AIModel aiModel, Boolean editMode) {
+    public static boolean checkAuthorize(AiModel aiModel, Boolean editMode) {
         String aiModelOwner = aiModel.getOwner();
         String connectedUser = SecurityContextHolder.getContext().getAuthentication().getName();
         if (!aiModel.isPubliclyShared() && (aiModelOwner == null || !aiModelOwner.equals(connectedUser))) {

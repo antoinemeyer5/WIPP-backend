@@ -29,7 +29,7 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.annotation.ManualRef;
  */
 @IdExposed
 @Document
-public class AIModel extends Data {
+public class AiModel extends Data {
 	@Id
 	private String id;
 
@@ -37,7 +37,7 @@ public class AIModel extends Data {
 
 	private String owner;
 
-	private MachineLearningLibraries machineLearningLibraries;
+	private MachineLearningLibraries machineLearningLibraries; // = framework
 
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private Date creationDate;
@@ -48,22 +48,22 @@ public class AIModel extends Data {
 
 	private boolean publiclyShared;
 
-	public AIModel(){
+	public AiModel(){
 	}
 
-	public AIModel(String name, MachineLearningLibraries library){
+	public AiModel(String name, MachineLearningLibraries library){
 		this.name = name;
 		this.creationDate = new Date();
 		this.machineLearningLibraries = library;
 	}
 
-	public AIModel(Job job){
+	public AiModel(Job job){
 		this.name = job.getName();
 		this.sourceJob = job.getId();
 		this.creationDate = new Date();
 	}
 	
-	public AIModel(Job job, String outputName, MachineLearningLibraries library){
+	public AiModel(Job job, String outputName, MachineLearningLibraries library){
 		this.name = job.getName() + "-" + outputName;
 		this.sourceJob = job.getId();
 		this.creationDate = new Date();

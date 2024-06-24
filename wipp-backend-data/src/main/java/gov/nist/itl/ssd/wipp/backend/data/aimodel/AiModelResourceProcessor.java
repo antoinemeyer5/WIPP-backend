@@ -22,13 +22,13 @@ import org.springframework.stereotype.Component;
 * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
 */
 @Component
-public class AIModelResourceProcessor implements RepresentationModelProcessor<EntityModel<AIModel>> {
+public class AiModelResourceProcessor implements RepresentationModelProcessor<EntityModel<AiModel>> {
 
 	@Override
-	public EntityModel<AIModel> process(EntityModel<AIModel> resource) {
-		AIModel tm = resource.getContent();
+	public EntityModel<AiModel> process(EntityModel<AiModel> resource) {
+		AiModel tm = resource.getContent();
 		
-        Link downloadLink = linkTo(AIModelDownloadController.class,
+        Link downloadLink = linkTo(AiModelDownloadController.class,
                 tm.getId()).slash("request")
                 .withRel("download");
         resource.add(downloadLink);

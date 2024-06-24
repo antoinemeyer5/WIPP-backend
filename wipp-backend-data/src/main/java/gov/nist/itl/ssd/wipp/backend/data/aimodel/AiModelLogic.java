@@ -20,12 +20,12 @@ import org.springframework.stereotype.Component;
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @Component
-public class AIModelLogic {
+public class AiModelLogic {
 
     @Autowired
-    private AIModelRepository aiModelRepository;
+    private AiModelRepository aiModelRepository;
 
-    public void assertAIModelNameUnique(String name) {
+    public void assertAiModelNameUnique(String name) {
         if (aiModelRepository.countByName(name) != 0) {
             throw new ClientException("A ai model named \""
                     + name + "\" already exists.");

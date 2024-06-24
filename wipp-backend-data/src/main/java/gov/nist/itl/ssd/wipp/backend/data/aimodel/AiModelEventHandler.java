@@ -33,14 +33,14 @@ import gov.nist.itl.ssd.wipp.backend.data.tensorboard.TensorboardLogsRepository;
  *
  */
 @Component
-@RepositoryEventHandler(AIModel.class)
-public class AIModelEventHandler {
+@RepositoryEventHandler(AiModel.class)
+public class AiModelEventHandler {
 	
 	@Autowired
-    AIModelRepository aiModelRepository;
+    AiModelRepository aiModelRepository;
 	
 	@Autowired
-    AIModelLogic aiModelLogic;
+    AiModelLogic aiModelLogic;
 	
 	@Autowired
 	TensorboardLogsRepository tensorboardLogsRepository;
@@ -50,21 +50,21 @@ public class AIModelEventHandler {
 
     @PreAuthorize("isAuthenticated()")
     @HandleBeforeCreate
-    public void handleBeforeCreate(AIModel aiModel) {
-    	throw new ClientException("Creation of AIModel via REST API is not allowed.");
+    public void handleBeforeCreate(AiModel aiModel) {
+    	throw new ClientException("Creation of AiModel via REST API is not allowed.");
     }
 
     @HandleBeforeSave
     @PreAuthorize("isAuthenticated() and (hasRole('admin') or #aiModel.owner == authentication.name)")
-    public void handleBeforeSave(AIModel aiModel) {
+    public void handleBeforeSave(AiModel aiModel) {
     	// Assert data exists
-        Optional<AIModel> result = aiModelRepository.findById(
+        Optional<AiModel> result = aiModelRepository.findById(
                 aiModel.getId());
         if (!result.isPresent()) {
-            throw new NotFoundException("AIModel with id " + aiModel.getId() + " not found");
+            throw new NotFoundException("AiModel with id " + aiModel.getId() + " not found");
         }
 
-        AIModel oldSv = result.get();
+        AiModel oldSv = result.get();
         
         // Source job cannot be changed
         if (!Objects.equals(
@@ -75,7 +75,7 @@ public class AIModelEventHandler {
 
         // Assert data name is unique
         if (!Objects.equals(aiModel.getName(), oldSv.getName())) {
-            aiModelLogic.assertAIModelNameUnique(
+            aiModelLogic.assertAiModelNameUnique(
                     aiModel.getName());
         }
         
@@ -93,8 +93,8 @@ public class AIModelEventHandler {
     }
     
     @HandleAfterSave
-    public void handleAfterSave(AIModel aiModel) {
-    	// If AIModel was made public, check for associated TensorboardLogs
+    public void handleAfterSave(AiModel aiModel) {
+    	// If AiModel was made public, check for associated TensorboardLogs
     	if (aiModel.isPubliclyShared() && aiModel.getSourceJob() != null) {
     		TensorboardLogs tensorboardLogs = tensorboardLogsRepository.findOneBySourceJob(
                     aiModel.getSourceJob());

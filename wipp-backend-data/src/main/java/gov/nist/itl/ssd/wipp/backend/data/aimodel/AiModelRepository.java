@@ -24,13 +24,13 @@ import org.springframework.data.rest.core.annotation.RestResource;
  * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Tag(name="AIModel Entity")
+@Tag(name="AiModel Entity")
 @RepositoryRestResource
-public interface AIModelRepository extends PrincipalFilteredRepository<AIModel, String> {
+public interface AiModelRepository extends PrincipalFilteredRepository<AiModel, String> {
 
 	@Override
 	@RestResource(exported = false)
-	void delete(AIModel t);
+	void delete(AiModel t);
 	
 	// not exported
 	long countByName(@Param("name") String name);

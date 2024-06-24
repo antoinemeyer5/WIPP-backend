@@ -151,7 +151,7 @@ public class CoreConfig {
 		return pyramidAnnotationsFolder;
 	}
 
-	public String getAIModelsFolder() {
+	public String getAiModelsFolder() {
     	return aiModelsFolder;
     }
     

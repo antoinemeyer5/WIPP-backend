@@ -16,10 +16,8 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.BaseDataHandler;
-import gov.nist.itl.ssd.wipp.backend.data.modelcards.ModelCards;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -32,29 +30,29 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.JobExecutionException;
  * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Component("AIModelDataHandler")
+@Component("AiModelDataHandler")
 
-public class AIModelDataHandler extends BaseDataHandler implements DataHandler {
+public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
 	@Autowired
 	CoreConfig config;
 
 	@Autowired
-	private AIModelRepository aiModelRepository;
+	private AiModelRepository aiModelRepository;
 
     @Autowired
     private PluginRepository wippPluginRepository;
 
 	@Override
 	public void importData(Job job, String outputName) throws JobExecutionException {
-        AIModel tm = new AIModel(job, outputName, MachineLearningLibraries.TENSORFLOW);
+        AiModel tm = new AiModel(job, outputName, MachineLearningLibraries.TENSORFLOW);
 		// Set owner to job owner
         tm.setOwner(job.getOwner());
         // Set TM to private
         tm.setPubliclyShared(false);
         aiModelRepository.save(tm);
 
-		File trainedModelFolder = new File(config.getAIModelsFolder(), tm.getId());
+		File trainedModelFolder = new File(config.getAiModelsFolder(), tm.getId());
 		trainedModelFolder.mkdirs();
 
 		File tempOutputDir = getJobOutputTempFolder(job.getId(), outputName);
@@ -99,7 +97,7 @@ public class AIModelDataHandler extends BaseDataHandler implements DataHandler {
         }
         // else return the path of the AI model
         else {
-            File aiModelFolder = new File(config.getAIModelsFolder(), aiModelId);
+            File aiModelFolder = new File(config.getAiModelsFolder(), aiModelId);
             aiModelPath = aiModelFolder.getAbsolutePath();
 
         }
@@ -110,9 +108,9 @@ public class AIModelDataHandler extends BaseDataHandler implements DataHandler {
 	
 	@Override
     public void setDataToPublic(String value) {
-    	Optional<AIModel> optAIModel = aiModelRepository.findById(value);
-        if(optAIModel.isPresent()) {
-            AIModel aiModel = optAIModel.get();
+    	Optional<AiModel> optAiModel = aiModelRepository.findById(value);
+        if(optAiModel.isPresent()) {
+            AiModel aiModel = optAiModel.get();
             if (!aiModel.isPubliclyShared()) {
                 aiModel.setPubliclyShared(true);
                 aiModelRepository.save(aiModel);

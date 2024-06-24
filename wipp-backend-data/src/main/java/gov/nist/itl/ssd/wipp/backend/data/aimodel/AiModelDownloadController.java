@@ -50,15 +50,15 @@ import org.springframework.web.bind.annotation.RestController;
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @RestController
-@Tag(name="AIModel Entity")
-@RequestMapping(CoreConfig.BASE_URI + "/AIModels/{AIModelId}/download")
-public class AIModelDownloadController {
+@Tag(name="AiModel Entity")
+@RequestMapping(CoreConfig.BASE_URI + "/aiModels/{aiModelId}/download")
+public class AiModelDownloadController {
 
 	@Autowired
 	CoreConfig config;
 
 	@Autowired
-	AIModelRepository aiModelRepository;
+	AiModelRepository aiModelRepository;
 	
 	@Autowired
     private DataDownloadTokenRepository dataDownloadTokenRepository;
@@ -67,12 +67,12 @@ public class AIModelDownloadController {
             value = "request",
             method = RequestMethod.GET,
             produces = "application/json")
-	@PreAuthorize("hasRole('admin') or @aiModelSecurity.checkAuthorize(#AIModelId, false)")
+	@PreAuthorize("hasRole('admin') or @aiModelSecurity.checkAuthorize(#aiModelId, false)")
     public DownloadUrl requestDownload(
-            @PathVariable("AIModelId") String aiModelId) {
+            @PathVariable("aiModelId") String aiModelId) {
     	
     	// Check existence of images collection
-    	Optional<AIModel> tm = aiModelRepository.findById(
+    	Optional<AiModel> tm = aiModelRepository.findById(
 				aiModelId);
         if (!tm.isPresent()) {
             throw new ResourceNotFoundException(
@@ -85,7 +85,7 @@ public class AIModelDownloadController {
         
         // Generate and send unique download URL
         String tokenParam = "?token=" + downloadToken.getToken();
-        String downloadLink = linkTo(AIModelDownloadController.class,
+        String downloadLink = linkTo(AiModelDownloadController.class,
 				aiModelId).toString() + tokenParam;
         return new DownloadUrl(downloadLink);
     }
@@ -95,7 +95,7 @@ public class AIModelDownloadController {
 			method = RequestMethod.GET,
 			produces = "application/zip")
 	public void get(
-			@PathVariable("AIModelId") String aiModelId,
+			@PathVariable("aiModelId") String aiModelId,
 			@RequestParam("token") String token,
 			HttpServletResponse response) throws IOException {
 		
@@ -109,8 +109,8 @@ public class AIModelDownloadController {
     	}
     	
     	// Check existence of AI Model
-		AIModel tm = null;
-		Optional<AIModel> optTm = aiModelRepository.findById(aiModelId);
+		AiModel tm = null;
+		Optional<AiModel> optTm = aiModelRepository.findById(aiModelId);
 		
 		if (!optTm.isPresent()) {
 			throw new ResourceNotFoundException(
@@ -120,14 +120,14 @@ public class AIModelDownloadController {
         }
 
 		// get AI model folder
-		File aiModelStorageFolder = new File(config.getAIModelsFolder(), tm.getId());
+		File aiModelStorageFolder = new File(config.getAiModelsFolder(), tm.getId());
 		if (! aiModelStorageFolder.exists()) {
 			throw new ResourceNotFoundException(
 					"AI model " + aiModelId + " " + tm.getName() + " not found.");
 		}
 
 		response.setHeader("Content-disposition",
-				"attachment;filename=" + "AIModel-" + tm.getName() + ".zip");
+				"attachment;filename=" + "AiModel-" + tm.getName() + ".zip");
 
 		ZipOutputStream zos = new ZipOutputStream(response.getOutputStream());
 		addToZip("", zos, aiModelStorageFolder);

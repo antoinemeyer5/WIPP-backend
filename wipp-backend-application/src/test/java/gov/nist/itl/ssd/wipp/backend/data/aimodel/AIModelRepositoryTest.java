@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 /**
- * Collection of tests for {@link AIModelRepository} exposed methods
+ * Collection of tests for {@link AiModelRepository} exposed methods
  * Testing access control on READ operations
  * Uses embedded MongoDB database and mock users
  * 
@@ -44,9 +44,9 @@ import static org.hamcrest.Matchers.is;
 public class AIModelRepositoryTest {
 	
 	@Autowired
-	AIModelRepository aiModelRepository;
+	AiModelRepository aiModelRepository;
 
-	AIModel publicTensorflowModelA, publicTensorflowModelB, privateTensorflowModelA, privateTensorflowModelB, publicPytorchModelA;
+	AiModel publicTensorflowModelA, publicTensorflowModelB, privateTensorflowModelA, privateTensorflowModelB, publicPytorchModelA;
 	
 	@BeforeEach
 	public void setUp() {
@@ -55,27 +55,27 @@ public class AIModelRepositoryTest {
 		aiModelRepository.deleteAll();
 		
 		// Create and save publicTensorflowModelA (public: true, owner: user1)
-		publicTensorflowModelA = new AIModel("publicTensorflowModelA", MachineLearningLibraries.TENSORFLOW);
+		publicTensorflowModelA = new AiModel("publicTensorflowModelA", MachineLearningLibraries.TENSORFLOW);
 		publicTensorflowModelA.setOwner("user1");
 		publicTensorflowModelA.setPubliclyShared(true);
 		publicTensorflowModelA = aiModelRepository.save(publicTensorflowModelA);
 		// Create and save publicTensorflowModelB (public: true, owner: user2)
-		publicTensorflowModelB = new AIModel("publicTensorflowModelB", MachineLearningLibraries.TENSORFLOW);
+		publicTensorflowModelB = new AiModel("publicTensorflowModelB", MachineLearningLibraries.TENSORFLOW);
 		publicTensorflowModelB.setOwner("user2");
 		publicTensorflowModelB.setPubliclyShared(true);
 		publicTensorflowModelB = aiModelRepository.save(publicTensorflowModelB);
 		// Create and save privateTensorflowModelA (public: false, owner: user1)
-		privateTensorflowModelA = new AIModel("privateTensorflowModelA", MachineLearningLibraries.TENSORFLOW);
+		privateTensorflowModelA = new AiModel("privateTensorflowModelA", MachineLearningLibraries.TENSORFLOW);
 		privateTensorflowModelA.setOwner("user1");
 		privateTensorflowModelA.setPubliclyShared(false);
 		privateTensorflowModelA = aiModelRepository.save(privateTensorflowModelA);
 		// Create and save privateTensorflowModelB (public: false, owner: user2)
-		privateTensorflowModelB = new AIModel("privateTensorflowModelB", MachineLearningLibraries.TENSORFLOW);
+		privateTensorflowModelB = new AiModel("privateTensorflowModelB", MachineLearningLibraries.TENSORFLOW);
 		privateTensorflowModelB.setOwner("user2");
 		privateTensorflowModelB.setPubliclyShared(false);
 		privateTensorflowModelB = aiModelRepository.save(privateTensorflowModelB);
 		// Create and save publicPytorchModelA (public: true, owner: user1)
-		publicPytorchModelA = new AIModel("publicPytorchModelA", MachineLearningLibraries.PYTORCH);
+		publicPytorchModelA = new AiModel("publicPytorchModelA", MachineLearningLibraries.PYTORCH);
 		publicPytorchModelA.setOwner("user1");
 		publicPytorchModelA.setPubliclyShared(true);
 		publicPytorchModelA = aiModelRepository.save(publicPytorchModelA);
@@ -134,7 +134,7 @@ public class AIModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Anonymous user should get only get list of public aiModels
-		Page<AIModel> result = aiModelRepository.findAll(pageable);
+		Page<AiModel> result = aiModelRepository.findAll(pageable);
 		assertThat(result.getContent(), hasSize(2));
 		result.getContent().forEach(tensorflowModel -> {
 			assertThat(tensorflowModel.isPubliclyShared(), is(true));
@@ -148,7 +148,7 @@ public class AIModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Non-admin user1 should only get list of own and public aiModels
-		Page<AIModel> result = aiModelRepository.findAll(pageable);
+		Page<AiModel> result = aiModelRepository.findAll(pageable);
 		assertThat(result.getContent(), hasSize(3));
 		result.getContent().forEach(tensorflowModel -> {
 			assertThat((tensorflowModel.isPubliclyShared() || tensorflowModel.getOwner().equals("user1")), is(true));
@@ -162,7 +162,7 @@ public class AIModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Admin should get list of all aiModels
-		Page<AIModel> result = aiModelRepository.findAll(pageable);
+		Page<AiModel> result = aiModelRepository.findAll(pageable);
 		assertThat(result.getContent(), hasSize(4));
 	}
 	
@@ -173,7 +173,7 @@ public class AIModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Anonymous user should get only get list of public aiModels matching search criteria
-		Page<AIModel> result = aiModelRepository.findByNameContainingIgnoreCase("tensorflowModelA", pageable);
+		Page<AiModel> result = aiModelRepository.findByNameContainingIgnoreCase("tensorflowModelA", pageable);
 		assertThat(result.getContent(), hasSize(1));
 		result.getContent().forEach(tensorflowModel -> {
 			assertThat(tensorflowModel.isPubliclyShared(), is(true));
@@ -187,7 +187,7 @@ public class AIModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Non-admin user1 should only get list of own and public aiModels matching search criteria
-		Page<AIModel> result = aiModelRepository.findByNameContainingIgnoreCase("tensorflowModel", pageable);
+		Page<AiModel> result = aiModelRepository.findByNameContainingIgnoreCase("tensorflowModel", pageable);
 		assertThat(result.getContent(), hasSize(3));
 		result.getContent().forEach(tensorflowModel -> {
 			assertThat((tensorflowModel.isPubliclyShared() || tensorflowModel.getOwner().equals("user1")), is(true));
@@ -201,9 +201,9 @@ public class AIModelRepositoryTest {
 		Pageable pageable = PageRequest.of(0, 10);
 
 		// Admin should get list of all aiModels matching search criteria
-		Page<AIModel> resultColl = aiModelRepository.findByNameContainingIgnoreCase("tensorflowModel", pageable);
+		Page<AiModel> resultColl = aiModelRepository.findByNameContainingIgnoreCase("tensorflowModel", pageable);
 		assertThat(resultColl.getContent(), hasSize(4));
-		Page<AIModel> resultPrivate = aiModelRepository.findByNameContainingIgnoreCase("private", pageable);
+		Page<AiModel> resultPrivate = aiModelRepository.findByNameContainingIgnoreCase("private", pageable);
 		assertThat(resultPrivate.getContent(), hasSize(2));
 	}
 

@@ -1,6 +1,6 @@
 package gov.nist.itl.ssd.wipp.backend.data.modelcards;
 
-import gov.nist.itl.ssd.wipp.backend.data.aimodel.AIModel;
+import gov.nist.itl.ssd.wipp.backend.data.aimodel.AiModel;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -14,7 +14,7 @@ public class ModelCards extends Data
     @Id
     private String id;
 
-    private AIModel aiModel;
+    private AiModel aiModel;
 
     private String author;
     private String type;
@@ -22,7 +22,7 @@ public class ModelCards extends Data
     private String license;
     private String contact;
 
-    public ModelCards(AIModel aiModel)
+    public ModelCards(AiModel aiModel)
     {
         this.aiModel = aiModel;
     }
