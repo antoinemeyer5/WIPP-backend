@@ -55,27 +55,27 @@ public class AIModelRepositoryTest {
 		aiModelRepository.deleteAll();
 		
 		// Create and save publicTensorflowModelA (public: true, owner: user1)
-		publicTensorflowModelA = new AiModel("publicTensorflowModelA", MachineLearningLibraries.TENSORFLOW);
+		publicTensorflowModelA = new AiModel("publicTensorflowModelA", AiModelFramework.TENSORFLOW);
 		publicTensorflowModelA.setOwner("user1");
 		publicTensorflowModelA.setPubliclyShared(true);
 		publicTensorflowModelA = aiModelRepository.save(publicTensorflowModelA);
 		// Create and save publicTensorflowModelB (public: true, owner: user2)
-		publicTensorflowModelB = new AiModel("publicTensorflowModelB", MachineLearningLibraries.TENSORFLOW);
+		publicTensorflowModelB = new AiModel("publicTensorflowModelB", AiModelFramework.TENSORFLOW);
 		publicTensorflowModelB.setOwner("user2");
 		publicTensorflowModelB.setPubliclyShared(true);
 		publicTensorflowModelB = aiModelRepository.save(publicTensorflowModelB);
 		// Create and save privateTensorflowModelA (public: false, owner: user1)
-		privateTensorflowModelA = new AiModel("privateTensorflowModelA", MachineLearningLibraries.TENSORFLOW);
+		privateTensorflowModelA = new AiModel("privateTensorflowModelA", AiModelFramework.TENSORFLOW);
 		privateTensorflowModelA.setOwner("user1");
 		privateTensorflowModelA.setPubliclyShared(false);
 		privateTensorflowModelA = aiModelRepository.save(privateTensorflowModelA);
 		// Create and save privateTensorflowModelB (public: false, owner: user2)
-		privateTensorflowModelB = new AiModel("privateTensorflowModelB", MachineLearningLibraries.TENSORFLOW);
+		privateTensorflowModelB = new AiModel("privateTensorflowModelB", AiModelFramework.TENSORFLOW);
 		privateTensorflowModelB.setOwner("user2");
 		privateTensorflowModelB.setPubliclyShared(false);
 		privateTensorflowModelB = aiModelRepository.save(privateTensorflowModelB);
 		// Create and save publicPytorchModelA (public: true, owner: user1)
-		publicPytorchModelA = new AiModel("publicPytorchModelA", MachineLearningLibraries.PYTORCH);
+		publicPytorchModelA = new AiModel("publicPytorchModelA", AiModelFramework.PYTORCH);
 		publicPytorchModelA.setOwner("user1");
 		publicPytorchModelA.setPubliclyShared(true);
 		publicPytorchModelA = aiModelRepository.save(publicPytorchModelA);

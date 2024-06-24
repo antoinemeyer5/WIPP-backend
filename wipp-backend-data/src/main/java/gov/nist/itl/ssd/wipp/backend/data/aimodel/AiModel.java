@@ -37,7 +37,7 @@ public class AiModel extends Data {
 
 	private String owner;
 
-	private MachineLearningLibraries machineLearningLibraries; // = framework
+	private AiModelFramework framework;
 
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private Date creationDate;
@@ -51,10 +51,10 @@ public class AiModel extends Data {
 	public AiModel(){
 	}
 
-	public AiModel(String name, MachineLearningLibraries library){
+	public AiModel(String name, AiModelFramework framework){
 		this.name = name;
 		this.creationDate = new Date();
-		this.machineLearningLibraries = library;
+		this.framework = framework;
 	}
 
 	public AiModel(Job job){
@@ -63,11 +63,11 @@ public class AiModel extends Data {
 		this.creationDate = new Date();
 	}
 	
-	public AiModel(Job job, String outputName, MachineLearningLibraries library){
+	public AiModel(Job job, String outputName, AiModelFramework framework){
 		this.name = job.getName() + "-" + outputName;
 		this.sourceJob = job.getId();
 		this.creationDate = new Date();
-		this.machineLearningLibraries = library;
+		this.framework = framework;
 	}
 
 	public String getId(){
@@ -90,7 +90,7 @@ public class AiModel extends Data {
 		return owner;
 	}
 
-	public String getMachineLearningLibrary() { return machineLearningLibraries.label; }
+	public String getMachineLearningLibrary() { return framework.name(); }
 
 	public void setOwner(String owner) {
 		this.owner = owner;

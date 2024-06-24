@@ -45,7 +45,7 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
 	@Override
 	public void importData(Job job, String outputName) throws JobExecutionException {
-        AiModel tm = new AiModel(job, outputName, MachineLearningLibraries.TENSORFLOW);
+        AiModel tm = new AiModel(job, outputName, AiModelFramework.TENSORFLOW);
 		// Set owner to job owner
         tm.setOwner(job.getOwner());
         // Set TM to private
