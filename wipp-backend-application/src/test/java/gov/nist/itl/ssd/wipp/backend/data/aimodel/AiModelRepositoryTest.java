@@ -41,7 +41,7 @@ import static org.hamcrest.Matchers.is;
 		classes = { Application.class, SecurityConfig.class },
 		properties = { "spring.data.mongodb.port=0", "de.flapdoodle.mongodb.embedded.version=6.0.5"}
 )
-public class AIModelRepositoryTest {
+public class AiModelRepositoryTest {
 	
 	@Autowired
 	AiModelRepository aiModelRepository;
@@ -59,21 +59,25 @@ public class AIModelRepositoryTest {
 		publicTensorflowModelA.setOwner("user1");
 		publicTensorflowModelA.setPubliclyShared(true);
 		publicTensorflowModelA = aiModelRepository.save(publicTensorflowModelA);
+
 		// Create and save publicTensorflowModelB (public: true, owner: user2)
 		publicTensorflowModelB = new AiModel("publicTensorflowModelB", AiModelFramework.TENSORFLOW);
 		publicTensorflowModelB.setOwner("user2");
 		publicTensorflowModelB.setPubliclyShared(true);
 		publicTensorflowModelB = aiModelRepository.save(publicTensorflowModelB);
+
 		// Create and save privateTensorflowModelA (public: false, owner: user1)
 		privateTensorflowModelA = new AiModel("privateTensorflowModelA", AiModelFramework.TENSORFLOW);
 		privateTensorflowModelA.setOwner("user1");
 		privateTensorflowModelA.setPubliclyShared(false);
 		privateTensorflowModelA = aiModelRepository.save(privateTensorflowModelA);
+
 		// Create and save privateTensorflowModelB (public: false, owner: user2)
 		privateTensorflowModelB = new AiModel("privateTensorflowModelB", AiModelFramework.TENSORFLOW);
 		privateTensorflowModelB.setOwner("user2");
 		privateTensorflowModelB.setPubliclyShared(false);
 		privateTensorflowModelB = aiModelRepository.save(privateTensorflowModelB);
+
 		// Create and save publicPytorchModelA (public: true, owner: user1)
 		publicPytorchModelA = new AiModel("publicPytorchModelA", AiModelFramework.PYTORCH);
 		publicPytorchModelA.setOwner("user1");
@@ -135,9 +139,9 @@ public class AIModelRepositoryTest {
 
 		// Anonymous user should get only get list of public aiModels
 		Page<AiModel> result = aiModelRepository.findAll(pageable);
-		assertThat(result.getContent(), hasSize(2));
-		result.getContent().forEach(tensorflowModel -> {
-			assertThat(tensorflowModel.isPubliclyShared(), is(true));
+		assertThat(result.getContent(), hasSize(3));
+		result.getContent().forEach(aiModel -> {
+			assertThat(aiModel.isPubliclyShared(), is(true));
 		});
 	}
 	
@@ -149,9 +153,9 @@ public class AIModelRepositoryTest {
 
 		// Non-admin user1 should only get list of own and public aiModels
 		Page<AiModel> result = aiModelRepository.findAll(pageable);
-		assertThat(result.getContent(), hasSize(3));
-		result.getContent().forEach(tensorflowModel -> {
-			assertThat((tensorflowModel.isPubliclyShared() || tensorflowModel.getOwner().equals("user1")), is(true));
+		assertThat(result.getContent(), hasSize(4));
+		result.getContent().forEach(aiModel -> {
+			assertThat((aiModel.isPubliclyShared() || aiModel.getOwner().equals("user1")), is(true));
 		});
 	}
 
@@ -163,7 +167,7 @@ public class AIModelRepositoryTest {
 
 		// Admin should get list of all aiModels
 		Page<AiModel> result = aiModelRepository.findAll(pageable);
-		assertThat(result.getContent(), hasSize(4));
+		assertThat(result.getContent(), hasSize(5));
 	}
 	
 	@Test
@@ -209,9 +213,9 @@ public class AIModelRepositoryTest {
 
 	@Test
 	@WithAnonymousUser
-	public void checkMachineLearningLibraryValue() throws Exception {
-		Assertions.assertEquals(publicTensorflowModelA.getMachineLearningLibrary(), "TensorFlow");
-		Assertions.assertEquals(publicPytorchModelA.getMachineLearningLibrary(), "PyTorch");
+	public void checkFrameworkValue() throws Exception {
+		Assertions.assertEquals(publicTensorflowModelA.getFramework(), AiModelFramework.TENSORFLOW.name());
+		Assertions.assertEquals(publicPytorchModelA.getFramework(), AiModelFramework.PYTORCH.name());
 	}
 
 }

@@ -90,7 +90,7 @@ public class AiModel extends Data {
 		return owner;
 	}
 
-	public String getMachineLearningLibrary() { return framework.name(); }
+	public String getFramework() { return framework.name(); }
 
 	public void setOwner(String owner) {
 		this.owner = owner;
