@@ -18,6 +18,8 @@ import java.util.regex.Pattern;
 
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.BaseDataHandler;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.ModelCard;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.ModelCardRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -30,7 +32,7 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.JobExecutionException;
  * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Component("AiModelDataHandler")
+@Component("tensorflowModelDataHandler")
 
 public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
@@ -42,6 +44,9 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
     @Autowired
     private PluginRepository wippPluginRepository;
+
+    @Autowired
+    private ModelCardRepository modelCardRepository;
 
 	@Override
 	public void importData(Job job, String outputName) throws JobExecutionException {
@@ -64,21 +69,9 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
 		setOutputId(job, outputName, tm.getId());
 
-        // TODO: create model card
-        // 1. I have job informations in: job
-        //Date d = job.getName();
-
-        // 2. I can retrive plugin informations with:
-        //Optional<Plugin> pluginOpt = wippPluginRepository.findById(job.getWippExecutable());
-        //Plugin plugin = pluginOpt.get();
-        //System.out.println("Plugin : " + plugin.getAuthor());
-
-        // 3. I can create the Model Card with:
-        //ModelCards mc = new ModelCards(tm);
-        //System.out.println("Model card : " + mc.getId());
-
-        // jai toutes les infos ici, le job, la date, le nom dans Job
-        // est ce aue jai le plugin ;amifest aussi aui traite auelaue part ?
+        // Create Model Card
+        ModelCard mc = new ModelCard(tm);
+        modelCardRepository.save(mc);
 	}
 	
 	@Override
