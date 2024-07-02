@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.BaseDataHandler;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.ModelCard;
@@ -32,8 +33,7 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.JobExecutionException;
  * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Component("tensorflowModelDataHandler")
-
+@Component("aiModelDataHandler")
 public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
 	@Autowired
@@ -69,8 +69,12 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
 		setOutputId(job, outputName, tm.getId());
 
-        // Create Model Card
-        ModelCard mc = new ModelCard(tm);
+        // Get plugin
+        Plugin plugin = wippPluginRepository.findById(job.getWippExecutable()).orElse(null);
+        assert plugin != null;
+
+        // Create & save Model Card
+        ModelCard mc = new ModelCard(tm, job, plugin);
         modelCardRepository.save(mc);
 	}
 	
