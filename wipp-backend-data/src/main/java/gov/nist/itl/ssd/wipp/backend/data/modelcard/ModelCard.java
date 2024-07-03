@@ -31,6 +31,7 @@ package gov.nist.itl.ssd.wipp.backend.data.modelcard;
 
 import java.util.Date;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -101,6 +102,7 @@ public class ModelCard extends Data
      * Filling source: aiModel.getCreationDate() or job.getCreationDate()
      */
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private Date date;
 
     /**
