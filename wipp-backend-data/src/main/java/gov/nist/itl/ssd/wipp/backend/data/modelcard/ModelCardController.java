@@ -1,3 +1,32 @@
+/**
+ * NIST-developed software is provided by NIST as a public service. You may
+ * use, copy, and distribute copies of the software in any medium, provided
+ * that you keep intact this entire notice. You may improve, modify, and create
+ * derivative works of the software or any portion of the software, and you may
+ * copy and distribute such modifications or works. Modified works should carry
+ * a notice stating that you changed the software and should note the date and
+ * nature of any such change. Please explicitly acknowledge the National
+ * Institute of Standards and Technology as the source of the software.
+ *
+ * NIST-developed software is expressly provided "AS IS." NIST MAKES NO
+ * WARRANTY OF ANY KIND, EXPRESS, IMPLIED, IN FACT, OR ARISING BY OPERATION OF
+ * LAW, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTY OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, AND DATA ACCURACY. NIST
+ * NEITHER REPRESENTS NOR WARRANTS THAT THE OPERATION OF THE SOFTWARE WILL BE
+ * UNINTERRUPTED OR ERROR-FREE, OR THAT ANY DEFECTS WILL BE CORRECTED. NIST
+ * DOES NOT WARRANT OR MAKE ANY REPRESENTATIONS REGARDING THE USE OF THE
+ * SOFTWARE OR THE RESULTS THEREOF, INCLUDING BUT NOT LIMITED TO THE
+ * CORRECTNESS, ACCURACY, RELIABILITY, OR USEFULNESS OF THE SOFTWARE.
+ *
+ * You are solely responsible for determining the appropriateness of using and
+ * distributing the software and you assume all risks associated with its use,
+ * including but not limited to the risks and costs of program errors,
+ * compliance with applicable laws, damage to or loss of data, programs or
+ * equipment, and the unavailability or interruption of operation. This
+ * software is not intended to be used in any situation where a failure could
+ * cause risk of injury or damage to property. The software developed by NIST
+ * employees is not subject to copyright protection within the United States.
+ */
 package gov.nist.itl.ssd.wipp.backend.data.modelcard;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
@@ -5,6 +34,10 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.ModelDetails;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.Owners;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.Tensorflow;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.Version;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -41,22 +74,32 @@ public class ModelCardController {
     public ResponseEntity<byte[]> tensorflow(@PathVariable("id") String id) throws IOException
     {
         // Get
-        Optional<ModelCard> mc = modelCardRepository.findById(id);
-        if(!mc.isPresent()){
+        Optional<ModelCard> omc = modelCardRepository.findById(id);
+        if(!omc.isPresent()){
             throw new ResourceNotFoundException("ModelCard not found.");
         }
+        ModelCard mc = omc.get();
 
-        // Convert ModelCard object
+        // Convert ModelCard object to Tensorflow ModelCard
+        Tensorflow tf = new Tensorflow();
+        tf.setModelDetails(new ModelDetails(
+                mc.getName(),
+                mc.getDescription(),
+                new Version(mc.getVersion()),
+                new Owners(mc.getAuthor()),
+                mc.getCitation()
+        ));
+
+        // Convert into bytes
         byte[] bytes = new byte[0];
         try {
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-            String json = mapper.writeValueAsString(mc.get());
-            bytes = json.getBytes();
+            bytes = mapper.writeValueAsString(tf).getBytes();
         }
         catch (JsonGenerationException | JsonMappingException e) { e.printStackTrace(); }
-        
-        //
+
+        // Setup response head
         HttpHeaders head = new HttpHeaders();
         head.add(
                 "content-disposition",
@@ -65,7 +108,7 @@ public class ModelCardController {
         List<String> exposedHead = List.of("content-disposition");
         head.setAccessControlExposeHeaders(exposedHead);
 
-        //
+        // Return response
         return ResponseEntity
                 .ok()
                 .headers(head)
@@ -74,10 +117,35 @@ public class ModelCardController {
                 .body(bytes);
     }
 
-    @RequestMapping(value = "huggingface", method = RequestMethod.GET)
-    public void huggingface(@PathVariable("id") String id) throws IOException {
-        /* todo */
-    }
+    /*@RequestMapping(
+            value = "huggingface",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public ResponseEntity<byte[]> huggingface(@PathVariable("id") String id) throws IOException
+    {
+
+        byte[] bytes = new byte[0];
+
+
+
+        // Setup response head
+        HttpHeaders head = new HttpHeaders();
+        head.add(
+                "content-disposition",
+                "attachment; filename=\"WIPP_ModelCard_Huggingface.yaml\""
+        );
+        List<String> exposedHead = List.of("content-disposition");
+        head.setAccessControlExposeHeaders(exposedHead);
+
+        // Return response
+        return ResponseEntity
+                .ok()
+                .headers(head)
+                .contentType(MediaType.APPLICATION_JSON)
+                .contentLength(bytes.length)
+                .body(bytes);
+    }*/
 
     @RequestMapping(value = "bioimageio", method = RequestMethod.GET)
     public void bioimageio(@PathVariable("id") String id) throws IOException {
