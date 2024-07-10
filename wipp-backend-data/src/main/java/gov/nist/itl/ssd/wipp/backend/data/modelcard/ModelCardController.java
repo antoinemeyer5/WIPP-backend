@@ -33,7 +33,9 @@ import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.huggingface.HuggingFace;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.ModelDetails;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.Owners;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.Tensorflow;
@@ -117,23 +119,38 @@ public class ModelCardController {
                 .body(bytes);
     }
 
-    /*@RequestMapping(
+    @RequestMapping(
             value = "huggingface",
             method = RequestMethod.GET,
-            produces = MediaType.APPLICATION_JSON_VALUE
+            produces = "application/x-yaml"
     )
     public ResponseEntity<byte[]> huggingface(@PathVariable("id") String id) throws IOException
     {
+        // Get
+        Optional<ModelCard> omc = modelCardRepository.findById(id);
+        if(!omc.isPresent()){
+            throw new ResourceNotFoundException("ModelCard not found.");
+        }
+        ModelCard mc = omc.get();
 
-        byte[] bytes = new byte[0];
+        // Convert ModelCard object to HuggingFace ModelCard
+        HuggingFace hf = new HuggingFace(
+                mc.getId(),
+                mc.getDescription(),
+                mc.getCitation(),
+                mc.getAuthor()
+        );
 
-
+        // Convert into bytes
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        byte[] bytes = mapper.writeValueAsString(hf).getBytes();
 
         // Setup response head
         HttpHeaders head = new HttpHeaders();
         head.add(
                 "content-disposition",
-                "attachment; filename=\"WIPP_ModelCard_Huggingface.yaml\""
+                "attachment; filename=\"WIPP_ModelCard_Huggingface.yaml"
         );
         List<String> exposedHead = List.of("content-disposition");
         head.setAccessControlExposeHeaders(exposedHead);
@@ -142,10 +159,10 @@ public class ModelCardController {
         return ResponseEntity
                 .ok()
                 .headers(head)
-                .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.valueOf("application/yaml"))
                 .contentLength(bytes.length)
                 .body(bytes);
-    }*/
+    }
 
     @RequestMapping(value = "bioimageio", method = RequestMethod.GET)
     public void bioimageio(@PathVariable("id") String id) throws IOException {
