@@ -34,23 +34,29 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Inputs {
     /***************** ATTRIBUTE(S) *****************/
-    private String id;
+    //private String id;
     private String description;
+    /*
     private String axes;
     private String sample_tensor;
     private String data;
     private String optional;
     private String preprocessing;
+    */
 
     /***************** CONSTRUCTOR(S) *****************/
-    public Inputs() { }
+    public Inputs(String des) {
+        this.description = des;
+    }
 
     /***************** METHOD(S) *****************/
-    public String getId() {return id;}
+    //public String getId() {return id;}
     public String getDescription() {return description;}
+    /*
     public String getAxes() {return axes;}
     public String getSample_tensor() {return sample_tensor;}
     public String getData() {return data;}
     public String getOptional() {return optional;}
     public String getPreprocessing() {return preprocessing;}
+    */
 }

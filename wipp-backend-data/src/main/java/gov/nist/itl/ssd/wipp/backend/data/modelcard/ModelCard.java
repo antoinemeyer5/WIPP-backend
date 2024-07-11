@@ -30,8 +30,10 @@
 package gov.nist.itl.ssd.wipp.backend.data.modelcard;
 
 import java.util.Date;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginIO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -124,14 +126,14 @@ public class ModelCard extends Data
      * E.g. ['CC0-1.0', 'MIT', 'BSD-2-Clause']
      * Filling source: Java enums
      */
-    //private String license;
+    private String license;
 
     /**
      * Provides a way for people to contact the Model Card authors.
      * E.g. ['[firstname].[lastname]@nist.gov', '[username]@[domain]']
      * Filling source: [SOURCE?]
      */
-    //private String contact;
+    private String contact;
 
     /**
      * The developers’ preferred citation for this model.
@@ -145,14 +147,14 @@ public class ModelCard extends Data
      * E.g. ['images', '[type]']
      * Filling source: plugin.getInputs() or Java enums
      */
-    //private String inputs;
+    private List<PluginIO> inputs;
 
     /**
      * Describes the output type expected by this model.
      * E.g. ['images', 'text', '[type]']
      * Filling source: plugin.getOutputs() or Java enums
      */
-    //private String outputs;
+    private List<PluginIO> outputs;
 
     /**
      * Pointer to input collection in WIPP.
@@ -175,11 +177,11 @@ public class ModelCard extends Data
         this.date = aiModel.getCreationDate();      // AiModel
         this.description = plugin.getDescription(); // Plugin
         //this.documentation = ;
-        //this.license = ;
-        //this.contact = ;
+        this.license = "Unlicense";                 // By default
+        //this.contact = null;
         this.citation = plugin.getCitation();       // Plugin
-        //this.inputs = plugin.getInputs();
-        //this.outputs = plugin.getOutputs();
+        this.inputs = plugin.getInputs();           // Plugin
+        this.outputs = plugin.getOutputs();         // Plugin
         //this.trainingData = ;
     }
 
@@ -193,4 +195,8 @@ public class ModelCard extends Data
     public Date getDate() { return date; }
     public String getDescription() { return description; }
     public String getCitation() { return citation; }
+    public String getLicense() {return license;}
+    public String getContact() {return contact;}
+    public List<PluginIO> getInputs() {return inputs;}
+    public List<PluginIO> getOutputs() {return outputs;}
 }

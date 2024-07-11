@@ -31,6 +31,8 @@ package gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document
 public class BioImageIo {
     /***************** ATTRIBUTE(S) *****************/
@@ -40,10 +42,10 @@ public class BioImageIo {
     private Cite[] cite;
     private String description;
     private String documentation;
-    private Inputs inputs;
+    private List<Inputs> inputs;
     private String license;
     private String name;
-    private Outputs outputs;
+    private List<Outputs> outputs;
     private Weights weights;
     //private String attachments;
     //private String config;
@@ -58,10 +60,13 @@ public class BioImageIo {
     // more
 
     /***************** CONSTRUCTOR(S) *****************/
-    public BioImageIo(Authors[] aut, Cite[] cit, String des, String nam, String ver) {
+    public BioImageIo(Authors[] aut, Cite[] cit, String des, List<Inputs> inp, List<Outputs> out, String lic, String nam, String ver) {
         this.authors = aut;
         this.cite = cit;
         this.description = des;
+        this.inputs = inp;
+        this.outputs = out;
+        this.license = lic;
         this.name = nam;
         this.version = ver;
     }
@@ -73,10 +78,10 @@ public class BioImageIo {
     public Cite[] getCite() {return cite;}
     public String getDescription() {return description;}
     public String getDocumentation() {return documentation;}
-    public Inputs getInputs() {return inputs;}
+    public List<Inputs> getInputs() {return inputs;}
     public String getLicense() {return license;}
     public String getName() {return name;}
-    public Outputs getOutputs() {return outputs;}
+    public List<Outputs> getOutputs() {return outputs;}
     public Weights getWeights() {return weights;}
     public String getId() {return id;}
     public String getMaintainers() {return maintainers;}

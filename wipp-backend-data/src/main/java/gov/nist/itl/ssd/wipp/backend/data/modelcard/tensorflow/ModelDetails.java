@@ -39,17 +39,18 @@ public class ModelDetails
     private String overview;
     private Version version;
     private Owners owners;
-    //private String licences;
+    private String licence;
     //private String reference;
     private String citation;
 
     /***************** CONSTRUCTOR(S) *****************/
-    public ModelDetails(String na, String ov, Version ve, Owners ow, String ci)
+    public ModelDetails(String na, String ov, Version ve, Owners ow, String li, String ci)
     {
         this.name = na;
         this.overview = ov;
         this.version = ve;
         this.owners = ow;
+        this.licence = li;
         this.citation = ci;
     }
 

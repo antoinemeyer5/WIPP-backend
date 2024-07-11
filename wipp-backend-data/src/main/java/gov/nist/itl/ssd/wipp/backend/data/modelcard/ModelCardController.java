@@ -35,9 +35,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio.Authors;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio.BioImageIo;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio.Cite;
+import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginIO;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio.*;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.huggingface.HuggingFace;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -52,6 +51,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -89,6 +89,7 @@ public class ModelCardController {
                 mc.getDescription(),
                 new Version(mc.getVersion()),
                 new Owners(mc.getAuthor()),
+                mc.getLicense(),
                 mc.getCitation()
         ));
         tf.setModelParameters(new ModelParameters());
@@ -107,7 +108,7 @@ public class ModelCardController {
         HttpHeaders head = new HttpHeaders();
         head.add(
                 "content-disposition",
-                "attachment; filename=\"WIPP_ModelCard_Tensorflow.json\""
+                "attachment; filename=\"WIPP_ModelCard_Tensorflow.json"
         );
         List<String> exposedHead = List.of("content-disposition");
         head.setAccessControlExposeHeaders(exposedHead);
@@ -139,6 +140,7 @@ public class ModelCardController {
         HuggingFace hf = new HuggingFace(
                 mc.getId(),
                 mc.getDescription(),
+                mc.getLicense(),
                 mc.getCitation(),
                 mc.getAuthor()
         );
@@ -180,14 +182,24 @@ public class ModelCardController {
         }
         ModelCard mc = omc.get();
 
-        // Convert ModelCard object to Bioimageio ModelCard
+        // Fill-in
         Authors[] authors = new Authors[1];
         authors[0] = new Authors(mc.getAuthor());
-        Cite[] cite = new Cite[0];
+
+        List<Inputs> inputs = new ArrayList<>();
+        for(PluginIO p : mc.getInputs()){ inputs.add( new Inputs(p.getDescription()) ); }
+
+        List<Outputs> outputs = new ArrayList<>();
+        for(PluginIO p : mc.getOutputs()){ outputs.add( new Outputs(p.getDescription()) ); }
+
+        // Convert ModelCard object to Bioimageio ModelCard
         BioImageIo bii = new BioImageIo(
                 authors,
-                cite,
+                new Cite[0],
                 mc.getDescription(),
+                inputs,
+                outputs,
+                mc.getLicense(),
                 mc.getName(),
                 mc.getVersion()
         );

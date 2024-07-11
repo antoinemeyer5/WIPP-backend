@@ -29,5 +29,24 @@
  */
 package gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio;
 
+import org.springframework.data.mongodb.core.mapping.Document;
+
+@Document
 public class Outputs {
+    /***************** ATTRIBUTE(S) *****************/
+    //private String id;
+    private String description;
+    /*private String axes;
+    private String test_tensor;
+    private String sample_tensor;
+    private String data;
+    private String postprocessing;*/
+
+    /***************** CONSTRUCTOR(S) *****************/
+    public Outputs(String des) {
+        this.description = des;
+    }
+
+    /***************** METHOD(S) *****************/
+    public String getDescription() {return description;}
 }
