@@ -35,11 +35,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio.Authors;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio.BioImageIo;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio.Cite;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.huggingface.HuggingFace;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.ModelDetails;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.Owners;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.Tensorflow;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.Version;
+import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.*;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -91,6 +91,8 @@ public class ModelCardController {
                 new Owners(mc.getAuthor()),
                 mc.getCitation()
         ));
+        tf.setModelParameters(new ModelParameters());
+        tf.setConsiderations(new Considerations());
 
         // Convert into bytes
         byte[] bytes = new byte[0];
@@ -164,9 +166,53 @@ public class ModelCardController {
                 .body(bytes);
     }
 
-    @RequestMapping(value = "bioimageio", method = RequestMethod.GET)
-    public void bioimageio(@PathVariable("id") String id) throws IOException {
-        /* todo */
+    @RequestMapping(
+            value = "bioimageio",
+            method = RequestMethod.GET,
+            produces = "application/x-yaml"
+    )
+    public ResponseEntity<byte[]> bioimageio(@PathVariable("id") String id) throws IOException
+    {
+        // Get
+        Optional<ModelCard> omc = modelCardRepository.findById(id);
+        if(!omc.isPresent()){
+            throw new ResourceNotFoundException("ModelCard not found.");
+        }
+        ModelCard mc = omc.get();
+
+        // Convert ModelCard object to Bioimageio ModelCard
+        Authors[] authors = new Authors[1];
+        authors[0] = new Authors(mc.getAuthor());
+        Cite[] cite = new Cite[0];
+        BioImageIo bii = new BioImageIo(
+                authors,
+                cite,
+                mc.getDescription(),
+                mc.getName(),
+                mc.getVersion()
+        );
+
+        // Convert into bytes
+        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+        byte[] bytes = mapper.writeValueAsString(bii).getBytes();
+
+        // Setup response head
+        HttpHeaders head = new HttpHeaders();
+        head.add(
+                "content-disposition",
+                "attachment; filename=\"WIPP_ModelCard_BioImageIo.yaml"
+        );
+        List<String> exposedHead = List.of("content-disposition");
+        head.setAccessControlExposeHeaders(exposedHead);
+
+        // Return response
+        return ResponseEntity
+                .ok()
+                .headers(head)
+                .contentType(MediaType.valueOf("application/yaml"))
+                .contentLength(bytes.length)
+                .body(bytes);
     }
 
 }

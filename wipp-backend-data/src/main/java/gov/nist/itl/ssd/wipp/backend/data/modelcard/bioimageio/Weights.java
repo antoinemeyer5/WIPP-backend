@@ -27,30 +27,28 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow;
+package gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Tensorflow
-{
+public class Weights {
     /***************** ATTRIBUTE(S) *****************/
-    private ModelDetails modelDetails;
-    private ModelParameters modelParameters;
-    private Considerations considerations;
-    /*public class quantitativeAnalysis {
-        private String performance_metrics;
-        private String graphics;
-    }*/
+    private String keras_hdf5;
+    private String onnx;
+    private String pytorch_state_dict;
+    private String tensorflow_js;
+    private String tensorflow_saved_model_bundle;
+    private String torchscript;
 
     /***************** CONSTRUCTOR(S) *****************/
-    public Tensorflow() { }
+    public Weights() { }
 
     /***************** METHOD(S) *****************/
-    public ModelDetails getModelDetails() { return modelDetails; }
-    public Considerations getConsiderations() { return considerations; }
-    public ModelParameters getModelParameters() { return modelParameters; }
-    public void setModelDetails(ModelDetails modelDetails) { this.modelDetails = modelDetails; }
-    public void setModelParameters(ModelParameters modelParameters) { this.modelParameters = modelParameters; }
-    public void setConsiderations(Considerations considerations) { this.considerations = considerations; }
+    public String getKeras_hdf5() {return keras_hdf5;}
+    public String getOnnx() {return onnx;}
+    public String getPytorch_state_dict() {return pytorch_state_dict;}
+    public String getTensorflow_js() {return tensorflow_js;}
+    public String getTensorflow_saved_model_bundle() {return tensorflow_saved_model_bundle;}
+    public String getTorchscript() {return torchscript;}
 }

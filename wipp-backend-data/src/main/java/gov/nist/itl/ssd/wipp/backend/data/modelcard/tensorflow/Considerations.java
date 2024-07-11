@@ -32,25 +32,21 @@ package gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Tensorflow
-{
+public class Considerations {
     /***************** ATTRIBUTE(S) *****************/
-    private ModelDetails modelDetails;
-    private ModelParameters modelParameters;
-    private Considerations considerations;
-    /*public class quantitativeAnalysis {
-        private String performance_metrics;
-        private String graphics;
-    }*/
+    private String users;
+    private String use_cases;
+    private String limitations;
+    private String tradeoffs;
+    private String ethical_considerations;
 
     /***************** CONSTRUCTOR(S) *****************/
-    public Tensorflow() { }
+    public Considerations() {}
 
     /***************** METHOD(S) *****************/
-    public ModelDetails getModelDetails() { return modelDetails; }
-    public Considerations getConsiderations() { return considerations; }
-    public ModelParameters getModelParameters() { return modelParameters; }
-    public void setModelDetails(ModelDetails modelDetails) { this.modelDetails = modelDetails; }
-    public void setModelParameters(ModelParameters modelParameters) { this.modelParameters = modelParameters; }
-    public void setConsiderations(Considerations considerations) { this.considerations = considerations; }
+    public String getUsers() {return users;}
+    public String getUse_cases() {return use_cases;}
+    public String getLimitations() {return limitations;}
+    public String getTradeoffs() {return tradeoffs;}
+    public String getEthical_considerations() {return ethical_considerations;}
 }

@@ -27,30 +27,28 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow;
+package gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Tensorflow
-{
+public class Authors {
     /***************** ATTRIBUTE(S) *****************/
-    private ModelDetails modelDetails;
-    private ModelParameters modelParameters;
-    private Considerations considerations;
-    /*public class quantitativeAnalysis {
-        private String performance_metrics;
-        private String graphics;
-    }*/
+    private String affiliation;
+    private String email;
+    private String orcid;
+    private String name;
+    private String github_user;
 
     /***************** CONSTRUCTOR(S) *****************/
-    public Tensorflow() { }
+    public Authors(String name) {
+        this.name = name;
+    }
 
     /***************** METHOD(S) *****************/
-    public ModelDetails getModelDetails() { return modelDetails; }
-    public Considerations getConsiderations() { return considerations; }
-    public ModelParameters getModelParameters() { return modelParameters; }
-    public void setModelDetails(ModelDetails modelDetails) { this.modelDetails = modelDetails; }
-    public void setModelParameters(ModelParameters modelParameters) { this.modelParameters = modelParameters; }
-    public void setConsiderations(Considerations considerations) { this.considerations = considerations; }
+    public String getAffiliation() {return affiliation;}
+    public String getEmail() {return email;}
+    public String getOrcid() {return orcid;}
+    public String getName() {return name;}
+    public String getGithub_user() {return github_user;}
 }

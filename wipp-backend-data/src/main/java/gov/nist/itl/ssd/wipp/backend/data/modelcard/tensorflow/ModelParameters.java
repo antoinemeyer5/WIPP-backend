@@ -32,25 +32,23 @@ package gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Tensorflow
-{
+public class ModelParameters {
     /***************** ATTRIBUTE(S) *****************/
-    private ModelDetails modelDetails;
-    private ModelParameters modelParameters;
-    private Considerations considerations;
-    /*public class quantitativeAnalysis {
-        private String performance_metrics;
-        private String graphics;
-    }*/
+    private String model_architecture;
+    private String input_format;
+    private String input_format_map;
+    private String output_format;
+    private String output_format_map;
+    private String data;
 
     /***************** CONSTRUCTOR(S) *****************/
-    public Tensorflow() { }
+    public ModelParameters() {}
 
     /***************** METHOD(S) *****************/
-    public ModelDetails getModelDetails() { return modelDetails; }
-    public Considerations getConsiderations() { return considerations; }
-    public ModelParameters getModelParameters() { return modelParameters; }
-    public void setModelDetails(ModelDetails modelDetails) { this.modelDetails = modelDetails; }
-    public void setModelParameters(ModelParameters modelParameters) { this.modelParameters = modelParameters; }
-    public void setConsiderations(Considerations considerations) { this.considerations = considerations; }
+    public String getModel_architecture() {return model_architecture;}
+    public String getInput_format() {return input_format;}
+    public String getInput_format_map() {return input_format_map;}
+    public String getOutput_format() {return output_format;}
+    public String getOutput_format_map() {return output_format_map;}
+    public String getData() {return data;}
 }

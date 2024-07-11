@@ -27,30 +27,30 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow;
+package gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Tensorflow
-{
+public class Inputs {
     /***************** ATTRIBUTE(S) *****************/
-    private ModelDetails modelDetails;
-    private ModelParameters modelParameters;
-    private Considerations considerations;
-    /*public class quantitativeAnalysis {
-        private String performance_metrics;
-        private String graphics;
-    }*/
+    private String id;
+    private String description;
+    private String axes;
+    private String sample_tensor;
+    private String data;
+    private String optional;
+    private String preprocessing;
 
     /***************** CONSTRUCTOR(S) *****************/
-    public Tensorflow() { }
+    public Inputs() { }
 
     /***************** METHOD(S) *****************/
-    public ModelDetails getModelDetails() { return modelDetails; }
-    public Considerations getConsiderations() { return considerations; }
-    public ModelParameters getModelParameters() { return modelParameters; }
-    public void setModelDetails(ModelDetails modelDetails) { this.modelDetails = modelDetails; }
-    public void setModelParameters(ModelParameters modelParameters) { this.modelParameters = modelParameters; }
-    public void setConsiderations(Considerations considerations) { this.considerations = considerations; }
+    public String getId() {return id;}
+    public String getDescription() {return description;}
+    public String getAxes() {return axes;}
+    public String getSample_tensor() {return sample_tensor;}
+    public String getData() {return data;}
+    public String getOptional() {return optional;}
+    public String getPreprocessing() {return preprocessing;}
 }
