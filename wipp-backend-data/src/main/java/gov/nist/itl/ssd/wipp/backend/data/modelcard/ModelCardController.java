@@ -142,7 +142,8 @@ public class ModelCardController {
                 mc.getDescription(),
                 mc.getLicense(),
                 mc.getCitation(),
-                mc.getAuthor()
+                mc.getAuthor(),
+                mc.getContact()
         );
 
         // Convert into bytes
@@ -186,6 +187,9 @@ public class ModelCardController {
         Authors[] authors = new Authors[1];
         authors[0] = new Authors(mc.getAuthor());
 
+        Cite[] cites = new Cite[1];
+        cites[0] = new Cite(mc.getCitation());
+
         List<Inputs> inputs = new ArrayList<>();
         for(PluginIO p : mc.getInputs()){ inputs.add( new Inputs(p.getDescription()) ); }
 
@@ -195,12 +199,13 @@ public class ModelCardController {
         // Convert ModelCard object to Bioimageio ModelCard
         BioImageIo bii = new BioImageIo(
                 authors,
-                new Cite[0],
+                cites,
                 mc.getDescription(),
                 inputs,
                 outputs,
                 mc.getLicense(),
                 mc.getName(),
+                mc.getContact(),
                 mc.getVersion()
         );
 

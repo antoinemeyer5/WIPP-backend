@@ -39,7 +39,9 @@ public class Cite {
     private String url;
 
     /***************** CONSTRUCTOR(S) *****************/
-    public Cite() { }
+    public Cite(String text) {
+        this.text = text;
+    }
 
     /***************** METHOD(S) *****************/
     public String getText() {return text;}
