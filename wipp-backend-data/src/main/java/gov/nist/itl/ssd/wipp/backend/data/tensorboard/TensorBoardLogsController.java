@@ -33,19 +33,17 @@ import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * TensorBoard controller
@@ -54,7 +52,7 @@ import java.util.Optional;
  */
 @RestController
 @Tag(name="TensorboardLogs Entity")
-@RequestMapping(CoreConfig.BASE_URI + "/tensorboardLogs/{id}/export")
+@RequestMapping(CoreConfig.BASE_URI + "/tensorboardLogs/{id}")
 public class TensorBoardLogsController {
 
     @Autowired
@@ -63,8 +61,8 @@ public class TensorBoardLogsController {
     @Autowired
     TensorboardLogsRepository tensorboardLogsRepository;
 
-    @RequestMapping(value = "csv", method = RequestMethod.GET)
-    public void exportCSV(@PathVariable("id") String id) throws IOException
+    @RequestMapping(value = "create/csv", method = RequestMethod.GET)
+    public void createCSV(@PathVariable("id") String id) throws IOException
     {
         // Define
         List<String> tags = Arrays.asList("accuracy", "loss");
@@ -77,7 +75,7 @@ public class TensorBoardLogsController {
         }
         String run = otl.get().getName();
 
-        // Download
+        // Creation of CSV files
         for (String tag : tags) {
             for(String type : types) {
                 URL website = new URL(
@@ -94,10 +92,36 @@ public class TensorBoardLogsController {
         }
     }
 
-    /*
-    TODO
-    @RequestMapping(value="json", method= RequestMethod.GET)
-    public void exportJSON(@PathVariable("id") String id) throws IOException
-    {}
-    */
+    @RequestMapping(
+            value = "get/csv",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<List<String>> getCSV(@PathVariable("id") String id, String type, String tag) throws IOException
+    {
+        // Get file name
+        Optional<TensorboardLogs> otl = tensorboardLogsRepository.findById(id);
+        if(!otl.isPresent()){
+            throw new ResourceNotFoundException("TensorboardLogs not found.");
+        }
+        String run = otl.get().getName();
+
+        // Get file content
+        String filename = config.getTensorboardLogsFolder() + "/" + run + "/" + type + "/" + tag + ".csv";
+        List<List<String>> records = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                records.add(Arrays.asList(values));
+            }
+
+            // Data returned
+            return records;
+        } catch (FileNotFoundException fnfe) {
+            // No data because no file
+            return null;
+        }
+    }
+
 }
