@@ -61,8 +61,8 @@ public class TensorBoardLogsController {
     @Autowired
     TensorboardLogsRepository tensorboardLogsRepository;
 
-    @RequestMapping(value = "create/csv", method = RequestMethod.GET)
-    public void createCSV(@PathVariable("id") String id) throws IOException
+    @RequestMapping(value = "export/csv", method = RequestMethod.GET)
+    public void exportCSV(@PathVariable("id") String id) throws IOException
     {
         // Define
         List<String> tags = Arrays.asList("accuracy", "loss");
@@ -80,9 +80,8 @@ public class TensorBoardLogsController {
             for(String type : types) {
                 URL website = new URL(
                         "http://localhost:6006/data/plugin/scalars/scalars" // todo: url tensorboard variable not hard coded
-                                + "?tag=" + tag
-                                + "&run=" + run + "/" + type
-                                + "&format=csv");
+                                + "?tag=" + tag + "&run=" + run
+                                + "/" + type + "&format=csv");
                 ReadableByteChannel rbc = Channels.newChannel(website.openStream());
                 FileOutputStream fos = new FileOutputStream(
                         config.getTensorboardLogsFolder()
