@@ -61,6 +61,11 @@ public class TensorBoardLogsController {
     @Autowired
     TensorboardLogsRepository tensorboardLogsRepository;
 
+    /**
+     * Download TensorFlow results (through TensorBoard instance) as CSV file
+     * @param id
+     * @throws IOException
+     */
     @RequestMapping(value = "export/csv", method = RequestMethod.GET)
     public void exportCSV(@PathVariable("id") String id) throws IOException
     {
@@ -91,6 +96,14 @@ public class TensorBoardLogsController {
         }
     }
 
+    /**
+     * Retrieves data from CSV selected by TensorBoardLog id, data type and tag
+     * @param id
+     * @param type
+     * @param tag
+     * @return
+     * @throws IOException
+     */
     @RequestMapping(
             value = "get/csv",
             method = RequestMethod.GET,
