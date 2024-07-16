@@ -127,7 +127,7 @@ public class WorkflowExitController {
                     List<PluginIO> outputs = plugin.getOutputs();
                     for (PluginIO output : outputs) {
                         DataHandler dataHandler = dataHandlerService.getDataHandler(output.getType());
-                        dataHandler.importData(job, output.getName()); // create model card inside
+                        dataHandler.importData(job, output.getName());
                     }
                 } catch (Exception e) {
                     job.setStatus(JobStatus.ERROR);
