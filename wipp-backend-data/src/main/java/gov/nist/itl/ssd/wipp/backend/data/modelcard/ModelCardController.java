@@ -35,7 +35,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
-import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginIO;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio.*;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.huggingface.HuggingFace;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.*;
@@ -142,8 +141,7 @@ public class ModelCardController {
                 mc.getDescription(),
                 mc.getLicense(),
                 mc.getCitation(),
-                mc.getAuthor(),
-                mc.getContact()
+                mc.getAuthor()
         );
 
         // Convert into bytes
@@ -190,22 +188,19 @@ public class ModelCardController {
         Cite[] cites = new Cite[1];
         cites[0] = new Cite(mc.getCitation());
 
-        List<Inputs> inputs = new ArrayList<>();
-        for(PluginIO p : mc.getInputs()){ inputs.add( new Inputs(p.getDescription()) ); }
+        //List<Inputs> inputs = new ArrayList<>();
+        //for(PluginIO p : mc.getInputs()){ inputs.add( new Inputs(p.getDescription()) ); }
 
-        List<Outputs> outputs = new ArrayList<>();
-        for(PluginIO p : mc.getOutputs()){ outputs.add( new Outputs(p.getDescription()) ); }
+        //List<Outputs> outputs = new ArrayList<>();
+        //for(PluginIO p : mc.getOutputs()){ outputs.add( new Outputs(p.getDescription()) ); }
 
         // Convert ModelCard object to Bioimageio ModelCard
         BioImageIo bii = new BioImageIo(
                 authors,
                 cites,
                 mc.getDescription(),
-                inputs,
-                outputs,
                 mc.getLicense(),
                 mc.getName(),
-                mc.getContact(),
                 mc.getVersion()
         );
 

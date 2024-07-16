@@ -30,10 +30,8 @@
 package gov.nist.itl.ssd.wipp.backend.data.modelcard;
 
 import java.util.Date;
-import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginIO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -96,7 +94,10 @@ public class ModelCard extends Data
      *  'Supervision/Learning Method', 'Machine Learning Type']
      * Filling source: Java enums
      */
-    //private String type;
+    private String type;
+
+    // todo: comments
+    private String architecture;
 
     /**
      * Creation date.
@@ -106,6 +107,10 @@ public class ModelCard extends Data
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private Date date;
+
+    // todo: comments
+    private Integer[] training;
+    private Integer[] testing;
 
     /**
      * Provide basic details about the model.
@@ -133,7 +138,7 @@ public class ModelCard extends Data
      * E.g. ['[firstname].[lastname]@nist.gov', '[username]@[domain]']
      * Filling source: [SOURCE?]
      */
-    private String contact;
+    // private String contact;
 
     /**
      * The developers’ preferred citation for this model.
@@ -147,21 +152,21 @@ public class ModelCard extends Data
      * E.g. ['images', '[type]']
      * Filling source: plugin.getInputs() or Java enums
      */
-    private List<PluginIO> inputs;
+    // private List<> inputs;
 
     /**
      * Describes the output type expected by this model.
      * E.g. ['images', 'text', '[type]']
      * Filling source: plugin.getOutputs() or Java enums
      */
-    private List<PluginIO> outputs;
+    // private List<> outputs;
 
     /**
      * Pointer to input collection in WIPP.
      * E.g. ['[url]']
      * Filling source: [SOURCE?]
      */
-    //private String trainingData;
+    // private String trainingData;
 
     /***************** CONSTRUCTOR(S) *****************/
     public ModelCard(){}
@@ -173,16 +178,17 @@ public class ModelCard extends Data
         this.author = plugin.getAuthor();           // Plugin
         this.version = plugin.getVersion();         // Plugin
         this.framework = aiModel.getFramework();    // AiModel
-        //this.type = ;
+        this.type = "Untype";                       // Can be selected -> todo: add in PM
+        this.architecture = "Unknown";              // Can be selected -> todo: add in PM
         this.date = aiModel.getCreationDate();      // AiModel
+        this.training = new Integer[]{-1, -1};      // Tensorboard Logs
+        this.testing = new Integer[]{-1, -1};       // Tensorboard Logs
         this.description = plugin.getDescription(); // Plugin
-        //this.documentation = ;
-        this.license = "Unlicense";                 // By default
-        //this.contact = null;
+        this.license = "Unlicense";                 // Can be selected -> todo: add in PM
         this.citation = plugin.getCitation();       // Plugin
-        this.inputs = plugin.getInputs();           // Plugin
-        this.outputs = plugin.getOutputs();         // Plugin
-        //this.trainingData = ;
+
+        // input type -> ?? PM?
+        // output type -> ?? PM?
     }
 
     /***************** METHOD(S) *****************/
@@ -192,11 +198,21 @@ public class ModelCard extends Data
     public String getAuthor() { return author; }
     public String getVersion() { return version; }
     public String getFramework() { return framework; }
+    public String getType() { return type; }
+    public String getArchitecture() { return architecture; }
     public Date getDate() { return date; }
+    public Integer[] getTraining() { return training; }
+    public Integer[] getTesting() { return testing; }
     public String getDescription() { return description; }
     public String getCitation() { return citation; }
     public String getLicense() {return license;}
-    public String getContact() {return contact;}
-    public List<PluginIO> getInputs() {return inputs;}
-    public List<PluginIO> getOutputs() {return outputs;}
+
+    public void setTraining(Integer time, Integer epoch) {
+        this.training[0] = time;
+        this.training[1] = epoch;
+    }
+    public void setTesting(Integer time, Integer epoch) {
+        this.testing[0] = time;
+        this.testing[1] = epoch;
+    }
 }

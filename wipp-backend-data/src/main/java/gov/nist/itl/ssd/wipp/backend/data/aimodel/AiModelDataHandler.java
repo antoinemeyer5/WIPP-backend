@@ -12,6 +12,8 @@
 package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
 import java.io.File;
+import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -21,6 +23,7 @@ import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.BaseDataHandler;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.ModelCard;
 import gov.nist.itl.ssd.wipp.backend.data.modelcard.ModelCardRepository;
+import gov.nist.itl.ssd.wipp.backend.data.tensorboard.TensorBoardLogsController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -44,6 +47,9 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
     @Autowired
     private PluginRepository wippPluginRepository;
+
+    @Autowired
+    private TensorBoardLogsController tensorBoardLogsController;
 
     @Autowired
     private ModelCardRepository modelCardRepository;
@@ -75,6 +81,23 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
         // Create & save Model Card
         ModelCard mc = new ModelCard(tm, job, plugin);
+
+        // Fill with TensorboardLogs data
+        try {
+            for(String task : new String[]{"train", "test"}) {
+                List<List<String>> data =
+                        tensorBoardLogsController.getCSV("6682f3d43149955bd95f59ab", task, "loss"); // todo: use real id
+                float startTime = Float.parseFloat(data.get(1).getFirst());
+                float endTime = Float.parseFloat(data.getLast().getFirst());
+                Integer epoch = Integer.parseInt(data.getLast().get(1));
+                switch(task){
+                    case "train": mc.setTraining(Math.round(endTime - startTime), epoch); break;
+                    case "test": mc.setTesting(Math.round(endTime - startTime), epoch); break;
+                }
+            }
+        } catch (IOException e) { throw new RuntimeException(e); }
+
+        // Save
         modelCardRepository.save(mc);
 	}
 	

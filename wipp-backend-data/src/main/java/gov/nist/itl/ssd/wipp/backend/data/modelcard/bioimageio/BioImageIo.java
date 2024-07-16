@@ -60,16 +60,13 @@ public class BioImageIo {
     // more
 
     /***************** CONSTRUCTOR(S) *****************/
-    public BioImageIo(Authors[] aut, Cite[] cit, String des, List<Inputs> inp, List<Outputs> out, String lic,
-                      String nam, String mai, String ver) {
+    public BioImageIo(Authors[] aut, Cite[] cit, String des, String lic,
+                      String nam, String ver) {
         this.authors = aut;
         this.cite = cit;
         this.description = des;
-        this.inputs = inp;
-        this.outputs = out;
         this.license = lic;
         this.name = nam;
-        this.maintainers = mai;
         this.version = ver;
     }
 

@@ -78,13 +78,12 @@ public class HuggingFace {
     private String model_card_authors;
     private String model_card_contact;
 
-    public HuggingFace(String mi, String md, String li, String cb, String mca, String dev) {
+    public HuggingFace(String mi, String md, String li, String cb, String mca) {
         this.model_id = mi;
         this.model_description = md;
         this.license = li;
         this.citation_bibtex = cb;
         this.model_card_authors = mca;
-        this.developers = dev;
     }
 
     public String getModel_id() { return model_id; }
