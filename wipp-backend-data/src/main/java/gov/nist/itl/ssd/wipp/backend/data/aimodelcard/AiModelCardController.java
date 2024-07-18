@@ -144,6 +144,8 @@ public class AiModelCardController {
                 mc.getCitation(),
                 mc.getAuthor()
         );
+        hf.setTraining_data(mc.getTrainingData());
+        hf.setTesting_metrics(mc.getTesting());
 
         // Convert into bytes
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -196,8 +198,10 @@ public class AiModelCardController {
                 mc.getDescription(),
                 mc.getLicense(),
                 mc.getName(),
-                mc.getVersion()
+                mc.getVersion(),
+                mc.getType()
         );
+        bii.setTraining_data(mc.getTrainingData());
 
         // Convert into bytes
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());

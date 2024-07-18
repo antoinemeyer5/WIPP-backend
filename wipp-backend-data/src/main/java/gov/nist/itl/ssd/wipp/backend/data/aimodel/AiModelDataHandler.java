@@ -84,25 +84,53 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
         // Fill with TensorboardLogs data
         try {
-            for(String task : new String[]{"train", "test"}) {
-                List<List<String>> data =
-                        tensorBoardLogsController.getCSV("6682f3d43149955bd95f59ab", task, "loss"); // todo: use real id
-                float startTime = Float.parseFloat(data.get(1).getFirst());
-                float endTime = Float.parseFloat(data.getLast().getFirst());
-                Integer epochs = Integer.parseInt(data.getLast().get(1));
-                switch(task){
-                    case "train":
-                        mc.addTrainingEntries("time", Math.round(endTime - startTime));
-                        mc.addTrainingEntries("epochs", epochs);
-                        mc.addTrainingEntries("maxAccuracy", -1); // todo
-                        mc.addTrainingEntries("minLoss", -1); // todo
-                        break;
-                    case "test":
-                        mc.addTestingEntries("time", Math.round(endTime - startTime));
-                        mc.addTestingEntries("epochs", epochs);
-                        mc.addTestingEntries("maxAccuracy", -1); // todo
-                        mc.addTestingEntries("minLoss", -1); // todo
-                        break;
+            // Declare id
+            String id = "6682f3d43149955bd95f59ab"; // todo: use real id
+            // Declare variables
+            List<List<String>> data;
+            Float startTime, endTime, time, epochs, maxAccuracy, minLoss;
+            for(String type : new String[]{"train", "test"})
+            {
+                // type & ACCURACY
+                data = tensorBoardLogsController.getCSV(id, type, "accuracy");
+                // Get time
+                startTime = Float.parseFloat(data.get(1).getFirst());
+                endTime = Float.parseFloat(data.getLast().getFirst());
+                time = endTime - startTime;
+                // Get epoch
+                epochs = Float.parseFloat(data.getLast().get(1));
+                // Find max
+                data.removeFirst();
+                maxAccuracy = -1f;
+                for(List<String> e : data){
+                    Float c = Float.parseFloat(e.getLast());
+                    if( c > maxAccuracy) { maxAccuracy = c; }
+                }
+                // Add data
+                if(type.equals("train")){
+                    mc.addTrainingEntries("time", time);
+                    mc.addTrainingEntries("epochs", epochs);
+                    mc.addTrainingEntries("maxAccuracy", maxAccuracy);
+                }else{
+                    mc.addTestingEntries("time", time);
+                    mc.addTestingEntries("epochs", epochs);
+                    mc.addTestingEntries("maxAccuracy", maxAccuracy);
+                }
+
+                // type & LOSS
+                data = tensorBoardLogsController.getCSV(id, type, "loss");
+                data.removeFirst();
+                // Find min
+                minLoss = 1000f;
+                for(List<String> e : data){
+                    Float c = Float.parseFloat(e.getLast());
+                    if( c < minLoss) { minLoss = c; }
+                }
+                // Add data
+                if(type.equals("train")){
+                    mc.addTrainingEntries("minLoss", minLoss);
+                } else {
+                    mc.addTestingEntries("minLoss", minLoss);
                 }
             }
         } catch (IOException e) { throw new RuntimeException(e); }

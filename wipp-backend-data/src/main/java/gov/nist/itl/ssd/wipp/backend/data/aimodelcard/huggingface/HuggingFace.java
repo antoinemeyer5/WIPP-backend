@@ -31,6 +31,8 @@ package gov.nist.itl.ssd.wipp.backend.data.aimodelcard.huggingface;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Map;
+
 @Document
 public class HuggingFace {
     private String model_id;
@@ -52,13 +54,13 @@ public class HuggingFace {
     private String bias_risks_limitations;
     private String bias_recommendations;
     private String get_started_code;
-    private String training_data;
+    private Map<String, String> training_data;
     //private String preprocessing;
     private String training_regime;
     //private String speeds_sizes_time;
     private String testing_data;
     private String testing_factors;
-    private String testing_metrics;
+    private Map<String, Float> testing_metrics;
     private String results;
     private String results_summary;
     //private String model_examination;
@@ -98,14 +100,17 @@ public class HuggingFace {
     public String getBias_risks_limitations() {return bias_risks_limitations;}
     public String getBias_recommendations() {return bias_recommendations;}
     public String getGet_started_code() {return get_started_code;}
-    public String getTraining_data() {return training_data;}
+    public Map<String, String> getTraining_data() {return training_data;}
     public String getTraining_regime() { return training_regime; }
     public String getTesting_data() { return testing_data; }
     public String getTesting_factors() { return testing_factors; }
-    public String getTesting_metrics() { return testing_metrics; }
+    public Map<String, Float> getTesting_metrics() { return testing_metrics; }
     public String getResults() { return results; }
     public String getResults_summary() { return results_summary; }
     public String getCitation_bibtex() { return citation_bibtex; }
     public String getModel_card_authors() { return model_card_authors; }
     public String getModel_card_contact() { return model_card_contact; }
+
+    public void setTraining_data(Map<String, String> td) { this.training_data = td; }
+    public void setTesting_metrics(Map<String, Float> tm) { this.testing_metrics = tm; }
 }
