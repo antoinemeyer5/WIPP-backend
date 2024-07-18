@@ -27,64 +27,30 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio;
+package gov.nist.itl.ssd.wipp.backend.data.aimodelcard.tensorflow;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 @Document
-public class BioImageIo {
+public class Tensorflow
+{
     /***************** ATTRIBUTE(S) *****************/
-    private String type;
-    private String format_version;
-    private Authors[] authors;
-    private Cite[] cite;
-    private String description;
-    private String documentation;
-    private List<Inputs> inputs;
-    private String license;
-    private String name;
-    private List<Outputs> outputs;
-    private Weights weights;
-    //private String attachments;
-    //private String config;
-    //private String covers;
-    //private String git_repo;
-    private String id;
-    private String maintainers;
-    private String timestamp;
-    private String training_data;
-    //private String uploader;
-    private String version;
-    // more
+    private ModelDetails modelDetails;
+    private ModelParameters modelParameters;
+    private Considerations considerations;
+    /*public class quantitativeAnalysis {
+        private String performance_metrics;
+        private String graphics;
+    }*/
 
     /***************** CONSTRUCTOR(S) *****************/
-    public BioImageIo(Authors[] aut, Cite[] cit, String des, String lic,
-                      String nam, String ver) {
-        this.authors = aut;
-        this.cite = cit;
-        this.description = des;
-        this.license = lic;
-        this.name = nam;
-        this.version = ver;
-    }
+    public Tensorflow() { }
 
     /***************** METHOD(S) *****************/
-    public String getType() {return type;}
-    public String getFormat_version() {return format_version;}
-    public Authors[] getAuthors() {return authors;}
-    public Cite[] getCite() {return cite;}
-    public String getDescription() {return description;}
-    public String getDocumentation() {return documentation;}
-    public List<Inputs> getInputs() {return inputs;}
-    public String getLicense() {return license;}
-    public String getName() {return name;}
-    public List<Outputs> getOutputs() {return outputs;}
-    public Weights getWeights() {return weights;}
-    public String getId() {return id;}
-    public String getMaintainers() {return maintainers;}
-    public String getTimestamp() {return timestamp;}
-    public String getTraining_data() {return training_data;}
-    public String getVersion() {return version;}
+    public ModelDetails getModelDetails() { return modelDetails; }
+    public Considerations getConsiderations() { return considerations; }
+    public ModelParameters getModelParameters() { return modelParameters; }
+    public void setModelDetails(ModelDetails modelDetails) { this.modelDetails = modelDetails; }
+    public void setModelParameters(ModelParameters modelParameters) { this.modelParameters = modelParameters; }
+    public void setConsiderations(Considerations considerations) { this.considerations = considerations; }
 }

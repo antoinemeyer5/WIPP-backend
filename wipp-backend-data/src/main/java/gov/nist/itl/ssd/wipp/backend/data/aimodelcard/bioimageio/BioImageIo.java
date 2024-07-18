@@ -27,28 +27,64 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio;
+package gov.nist.itl.ssd.wipp.backend.data.aimodelcard.bioimageio;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
+
 @Document
-public class Weights {
+public class BioImageIo {
     /***************** ATTRIBUTE(S) *****************/
-    private String keras_hdf5;
-    private String onnx;
-    private String pytorch_state_dict;
-    private String tensorflow_js;
-    private String tensorflow_saved_model_bundle;
-    private String torchscript;
+    private String type;
+    private String format_version;
+    private Authors[] authors;
+    private Cite[] cite;
+    private String description;
+    private String documentation;
+    private List<Inputs> inputs;
+    private String license;
+    private String name;
+    private List<Outputs> outputs;
+    private Weights weights;
+    //private String attachments;
+    //private String config;
+    //private String covers;
+    //private String git_repo;
+    private String id;
+    private String maintainers;
+    private String timestamp;
+    private String training_data;
+    //private String uploader;
+    private String version;
+    // more
 
     /***************** CONSTRUCTOR(S) *****************/
-    public Weights() { }
+    public BioImageIo(Authors[] aut, Cite[] cit, String des, String lic,
+                      String nam, String ver) {
+        this.authors = aut;
+        this.cite = cit;
+        this.description = des;
+        this.license = lic;
+        this.name = nam;
+        this.version = ver;
+    }
 
     /***************** METHOD(S) *****************/
-    public String getKeras_hdf5() {return keras_hdf5;}
-    public String getOnnx() {return onnx;}
-    public String getPytorch_state_dict() {return pytorch_state_dict;}
-    public String getTensorflow_js() {return tensorflow_js;}
-    public String getTensorflow_saved_model_bundle() {return tensorflow_saved_model_bundle;}
-    public String getTorchscript() {return torchscript;}
+    public String getType() {return type;}
+    public String getFormat_version() {return format_version;}
+    public Authors[] getAuthors() {return authors;}
+    public Cite[] getCite() {return cite;}
+    public String getDescription() {return description;}
+    public String getDocumentation() {return documentation;}
+    public List<Inputs> getInputs() {return inputs;}
+    public String getLicense() {return license;}
+    public String getName() {return name;}
+    public List<Outputs> getOutputs() {return outputs;}
+    public Weights getWeights() {return weights;}
+    public String getId() {return id;}
+    public String getMaintainers() {return maintainers;}
+    public String getTimestamp() {return timestamp;}
+    public String getTraining_data() {return training_data;}
+    public String getVersion() {return version;}
 }

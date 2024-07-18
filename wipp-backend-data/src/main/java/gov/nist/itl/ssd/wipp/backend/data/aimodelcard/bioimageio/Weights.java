@@ -27,24 +27,28 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio;
+package gov.nist.itl.ssd.wipp.backend.data.aimodelcard.bioimageio;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class Cite {
+public class Weights {
     /***************** ATTRIBUTE(S) *****************/
-    private String text;
-    private String doi;
-    private String url;
+    private String keras_hdf5;
+    private String onnx;
+    private String pytorch_state_dict;
+    private String tensorflow_js;
+    private String tensorflow_saved_model_bundle;
+    private String torchscript;
 
     /***************** CONSTRUCTOR(S) *****************/
-    public Cite(String text) {
-        this.text = text;
-    }
+    public Weights() { }
 
     /***************** METHOD(S) *****************/
-    public String getText() {return text;}
-    public String getDoi() {return doi;}
-    public String getUrl() {return url;}
+    public String getKeras_hdf5() {return keras_hdf5;}
+    public String getOnnx() {return onnx;}
+    public String getPytorch_state_dict() {return pytorch_state_dict;}
+    public String getTensorflow_js() {return tensorflow_js;}
+    public String getTensorflow_saved_model_bundle() {return tensorflow_saved_model_bundle;}
+    public String getTorchscript() {return torchscript;}
 }

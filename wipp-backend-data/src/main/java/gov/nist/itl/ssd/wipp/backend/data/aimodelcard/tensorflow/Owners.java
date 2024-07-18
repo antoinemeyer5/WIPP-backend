@@ -27,37 +27,15 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow;
+package gov.nist.itl.ssd.wipp.backend.data.aimodelcard.tensorflow;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
 @Document
-public class ModelDetails
-{
-    /***************** ATTRIBUTE(S) *****************/
+public class Owners {
     private String name;
-    private String overview;
-    private Version version;
-    private Owners owners;
-    private String licence;
-    //private String reference;
-    private String citation;
+    //private String contact;
 
-    /***************** CONSTRUCTOR(S) *****************/
-    public ModelDetails(String na, String ov, Version ve, Owners ow, String li, String ci)
-    {
-        this.name = na;
-        this.overview = ov;
-        this.version = ve;
-        this.owners = ow;
-        this.licence = li;
-        this.citation = ci;
-    }
-
-    /***************** METHOD(S) *****************/
+    public Owners(String na) { this.name = na; }
     public String getName() { return name; }
-    public String getOverview() { return overview; }
-    public Version getVersion() { return version; }
-    public Owners getOwners() { return owners; }
-    public String getCitation() { return citation; }
 }

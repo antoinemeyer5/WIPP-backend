@@ -27,7 +27,7 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard.huggingface;
+package gov.nist.itl.ssd.wipp.backend.data.aimodelcard.huggingface;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 

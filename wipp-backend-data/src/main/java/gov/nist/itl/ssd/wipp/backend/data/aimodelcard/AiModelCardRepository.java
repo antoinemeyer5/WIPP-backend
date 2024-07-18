@@ -27,28 +27,26 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow;
+package gov.nist.itl.ssd.wipp.backend.data.aimodelcard;
 
-import org.springframework.data.mongodb.core.mapping.Document;
+import gov.nist.itl.ssd.wipp.backend.core.model.auth.PrincipalFilteredRepository;
 
-@Document
-public class ModelParameters {
-    /***************** ATTRIBUTE(S) *****************/
-    private String model_architecture;
-    private String input_format;
-    private String input_format_map;
-    private String output_format;
-    private String output_format_map;
-    private String data;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.mongodb.repository.Query;
+import org.springframework.data.rest.core.annotation.RepositoryRestResource;
+import org.springframework.data.rest.core.annotation.RestResource;
 
-    /***************** CONSTRUCTOR(S) *****************/
-    public ModelParameters() {}
+/**
+ * @author Antoine Meyer <antoine.meyer at nist.gov>
+ */
+@Tag(name="AiModelCard Entity")
+@RepositoryRestResource
+public interface AiModelCardRepository extends PrincipalFilteredRepository<AiModelCard, String> {
 
-    /***************** METHOD(S) *****************/
-    public String getModel_architecture() {return model_architecture;}
-    public String getInput_format() {return input_format;}
-    public String getInput_format_map() {return input_format_map;}
-    public String getOutput_format() {return output_format;}
-    public String getOutput_format_map() {return output_format_map;}
-    public String getData() {return data;}
+    @Override
+    @RestResource(exported = false)
+    void delete(AiModelCard mc);
+
+    @Query("{aiModelId:'?0'}")
+    AiModelCard findModelCardByAiModelId(String aiModelId);
 }

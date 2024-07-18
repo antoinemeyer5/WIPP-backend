@@ -27,7 +27,7 @@
  * cause risk of injury or damage to property. The software developed by NIST
  * employees is not subject to copyright protection within the United States.
  */
-package gov.nist.itl.ssd.wipp.backend.data.modelcard;
+package gov.nist.itl.ssd.wipp.backend.data.aimodelcard;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -35,9 +35,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.bioimageio.*;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.huggingface.HuggingFace;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.tensorflow.*;
+import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.bioimageio.Authors;
+import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.bioimageio.BioImageIo;
+import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.bioimageio.Cite;
+import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.tensorflow.*;
+import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.huggingface.HuggingFace;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
@@ -50,7 +52,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -60,12 +61,12 @@ import java.util.Optional;
  * @author Antoine Meyer <antoine.meyer at nist.gov>
  */
 @RestController
-@Tag(name="ModelCard Entity")
-@RequestMapping(CoreConfig.BASE_URI + "/modelCards/{id}/export")
-public class ModelCardController {
+@Tag(name="AiModelCard Entity")
+@RequestMapping(CoreConfig.BASE_URI + "/aiModelCards/{id}/export")
+public class AiModelCardController {
 
     @Autowired
-    ModelCardRepository modelCardRepository;
+    AiModelCardRepository aiModelCardRepository;
 
     @RequestMapping(
             value = "tensorflow",
@@ -75,11 +76,11 @@ public class ModelCardController {
     public ResponseEntity<byte[]> tensorflow(@PathVariable("id") String id) throws IOException
     {
         // Get
-        Optional<ModelCard> omc = modelCardRepository.findById(id);
+        Optional<AiModelCard> omc = aiModelCardRepository.findById(id);
         if(!omc.isPresent()){
             throw new ResourceNotFoundException("ModelCard not found.");
         }
-        ModelCard mc = omc.get();
+        AiModelCard mc = omc.get();
 
         // Convert ModelCard object to Tensorflow ModelCard
         Tensorflow tf = new Tensorflow();
@@ -129,11 +130,11 @@ public class ModelCardController {
     public ResponseEntity<byte[]> huggingface(@PathVariable("id") String id) throws IOException
     {
         // Get
-        Optional<ModelCard> omc = modelCardRepository.findById(id);
+        Optional<AiModelCard> omc = aiModelCardRepository.findById(id);
         if(!omc.isPresent()){
             throw new ResourceNotFoundException("ModelCard not found.");
         }
-        ModelCard mc = omc.get();
+        AiModelCard mc = omc.get();
 
         // Convert ModelCard object to HuggingFace ModelCard
         HuggingFace hf = new HuggingFace(
@@ -175,11 +176,11 @@ public class ModelCardController {
     public ResponseEntity<byte[]> bioimageio(@PathVariable("id") String id) throws IOException
     {
         // Get
-        Optional<ModelCard> omc = modelCardRepository.findById(id);
+        Optional<AiModelCard> omc = aiModelCardRepository.findById(id);
         if(!omc.isPresent()){
             throw new ResourceNotFoundException("ModelCard not found.");
         }
-        ModelCard mc = omc.get();
+        AiModelCard mc = omc.get();
 
         // Fill-in
         Authors[] authors = new Authors[1];
@@ -187,12 +188,6 @@ public class ModelCardController {
 
         Cite[] cites = new Cite[1];
         cites[0] = new Cite(mc.getCitation());
-
-        //List<Inputs> inputs = new ArrayList<>();
-        //for(PluginIO p : mc.getInputs()){ inputs.add( new Inputs(p.getDescription()) ); }
-
-        //List<Outputs> outputs = new ArrayList<>();
-        //for(PluginIO p : mc.getOutputs()){ outputs.add( new Outputs(p.getDescription()) ); }
 
         // Convert ModelCard object to Bioimageio ModelCard
         BioImageIo bii = new BioImageIo(

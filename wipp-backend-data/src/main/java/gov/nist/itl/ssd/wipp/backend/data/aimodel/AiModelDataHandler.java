@@ -21,8 +21,8 @@ import java.util.regex.Pattern;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.BaseDataHandler;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.ModelCard;
-import gov.nist.itl.ssd.wipp.backend.data.modelcard.ModelCardRepository;
+import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.AiModelCard;
+import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.AiModelCardRepository;
 import gov.nist.itl.ssd.wipp.backend.data.tensorboard.TensorBoardLogsController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -52,7 +52,7 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
     private TensorBoardLogsController tensorBoardLogsController;
 
     @Autowired
-    private ModelCardRepository modelCardRepository;
+    private AiModelCardRepository modelCardRepository;
 
 	@Override
 	public void importData(Job job, String outputName) throws JobExecutionException {
@@ -80,7 +80,7 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
         assert plugin != null;
 
         // Create & save Model Card
-        ModelCard mc = new ModelCard(tm, job, plugin);
+        AiModelCard mc = new AiModelCard(tm, job, plugin);
 
         // Fill with TensorboardLogs data
         try {
@@ -89,10 +89,20 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
                         tensorBoardLogsController.getCSV("6682f3d43149955bd95f59ab", task, "loss"); // todo: use real id
                 float startTime = Float.parseFloat(data.get(1).getFirst());
                 float endTime = Float.parseFloat(data.getLast().getFirst());
-                Integer epoch = Integer.parseInt(data.getLast().get(1));
+                Integer epochs = Integer.parseInt(data.getLast().get(1));
                 switch(task){
-                    case "train": mc.setTraining(Math.round(endTime - startTime), epoch); break;
-                    case "test": mc.setTesting(Math.round(endTime - startTime), epoch); break;
+                    case "train":
+                        mc.addTrainingEntries("time", Math.round(endTime - startTime));
+                        mc.addTrainingEntries("epochs", epochs);
+                        mc.addTrainingEntries("maxAccuracy", -1); // todo
+                        mc.addTrainingEntries("minLoss", -1); // todo
+                        break;
+                    case "test":
+                        mc.addTestingEntries("time", Math.round(endTime - startTime));
+                        mc.addTestingEntries("epochs", epochs);
+                        mc.addTestingEntries("maxAccuracy", -1); // todo
+                        mc.addTestingEntries("minLoss", -1); // todo
+                        break;
                 }
             }
         } catch (IOException e) { throw new RuntimeException(e); }
