@@ -56,11 +56,18 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
 	@Override
 	public void importData(Job job, String outputName) throws JobExecutionException {
-        AiModel tm = new AiModel(job, outputName, AiModelFramework.TENSORFLOW);
+        // Get plugin
+        Plugin plugin = wippPluginRepository.findById(job.getWippExecutable()).orElse(null);
+        assert plugin != null;
+
+        AiModel tm = new AiModel(job, outputName);
 		// Set owner to job owner
         tm.setOwner(job.getOwner());
         // Set TM to private
         tm.setPubliclyShared(false);
+        // Set framework
+        // todo: is it working?
+        tm.setFramework(plugin.getOutputs().getFirst().getOptions().get("framework").toString());
         aiModelRepository.save(tm);
 
 		File trainedModelFolder = new File(config.getAiModelsFolder(), tm.getId());
@@ -74,10 +81,6 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 		}
 
 		setOutputId(job, outputName, tm.getId());
-
-        // Get plugin
-        Plugin plugin = wippPluginRepository.findById(job.getWippExecutable()).orElse(null);
-        assert plugin != null;
 
         // Create & save Model Card
         AiModelCard mc = new AiModelCard(tm, job, plugin);

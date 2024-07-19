@@ -69,8 +69,8 @@ public class AiModelCard extends Data
     private String author;
     private String description;
     private String citation;
-    private String type; // todo
-    private String architecture; // todo
+    private String type;
+    private String architecture;
 
     private Map<String, Float> training;
     private Map<String, Float> testing;
@@ -94,8 +94,9 @@ public class AiModelCard extends Data
         this.author = plugin.getAuthor();
         this.description = plugin.getDescription();
         this.citation = plugin.getCitation();
-        this.type = "TO ADD IN PLUGIN MANIFEST";
-        this.architecture = "TO ADD IN PLUGIN MANIFEST";
+        this.type = plugin.getType();
+        // todo: is it working?
+        this.architecture = plugin.getOutputs().getFirst().getOptions().get("architecture").toString();
 
         this.training = new HashMap<>();
         this.testing = new HashMap<>();

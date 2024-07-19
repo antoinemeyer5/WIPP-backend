@@ -37,7 +37,7 @@ public class AiModel extends Data {
 
 	private String owner;
 
-	private AiModelFramework framework;
+	private String framework;
 
 	@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
 	private Date creationDate;
@@ -51,10 +51,9 @@ public class AiModel extends Data {
 	public AiModel(){
 	}
 
-	public AiModel(String name, AiModelFramework framework){
+	public AiModel(String name){
 		this.name = name;
 		this.creationDate = new Date();
-		this.framework = framework;
 	}
 
 	public AiModel(Job job){
@@ -63,11 +62,10 @@ public class AiModel extends Data {
 		this.creationDate = new Date();
 	}
 	
-	public AiModel(Job job, String outputName, AiModelFramework framework){
+	public AiModel(Job job, String outputName){
 		this.name = job.getName() + "-" + outputName;
 		this.sourceJob = job.getId();
 		this.creationDate = new Date();
-		this.framework = framework;
 	}
 
 	public String getId(){
@@ -90,7 +88,9 @@ public class AiModel extends Data {
 		return owner;
 	}
 
-	public String getFramework() { return framework.name(); }
+	public String getFramework() { return framework; }
+
+	public void setFramework(String framework) { this.framework = framework; }
 
 	public void setOwner(String owner) {
 		this.owner = owner;

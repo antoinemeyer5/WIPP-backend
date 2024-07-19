@@ -27,13 +27,14 @@ public class Plugin extends Computation {
     private String containerId;
     private List<String> baseCommand;
 
+    private String type;
     private String title;
     private String description;
     private String author;
     private String institution;
     private String repository;
     private String website;
-    private String citation;    
+    private String citation;
 
     private List<PluginIO> inputs;
     private List<PluginIO> outputs;
@@ -106,7 +107,11 @@ public class Plugin extends Computation {
 		this.citation = citation;
 	}
 
-	public String getDescription() {
+    public String getType() { return type; }
+
+    public void setType(String type) { this.type = type; }
+
+    public String getDescription() {
         return description;
     }
 
