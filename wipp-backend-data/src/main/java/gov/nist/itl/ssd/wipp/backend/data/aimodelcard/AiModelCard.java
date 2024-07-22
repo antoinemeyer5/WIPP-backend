@@ -69,7 +69,7 @@ public class AiModelCard extends Data
     private String author;
     private String description;
     private String citation;
-    private String type;
+    private String operationType;
     private String architecture;
 
     private Map<String, Float> training;
@@ -94,7 +94,7 @@ public class AiModelCard extends Data
         this.author = plugin.getAuthor();
         this.description = plugin.getDescription();
         this.citation = plugin.getCitation();
-        this.type = plugin.getType();
+        this.operationType = plugin.getOperationType();
         // todo: is it working?
         this.architecture = plugin.getOutputs().getFirst().getOptions().get("architecture").toString();
 
@@ -118,7 +118,7 @@ public class AiModelCard extends Data
     public String getAuthor() { return author; }
     public String getDescription() { return description; }
     public String getCitation() { return citation; }
-    public String getType() { return type; }
+    public String getOperationType() { return operationType; }
     public String getArchitecture() { return architecture; }
 
     public Map<String, Float> getTraining() { return training; }

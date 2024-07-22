@@ -19,6 +19,8 @@ import java.util.Map;
  */
 public class PluginIO {
     private String name;
+    private String framework;
+    private String architecture;
     private String description;
     private String type;
     // The options field contains any objects and is parsed by the UI
@@ -31,6 +33,22 @@ public class PluginIO {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getFramework() {
+        return framework;
+    }
+
+    public void setFramework(String framework) {
+        this.framework = framework;
+    }
+
+    public String getArchitecture() {
+        return architecture;
+    }
+
+    public void setArchitecture(String architecture) {
+        this.architecture = architecture;
     }
 
     public String getDescription() {

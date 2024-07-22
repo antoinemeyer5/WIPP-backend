@@ -199,7 +199,7 @@ public class AiModelCardController {
                 mc.getLicense(),
                 mc.getName(),
                 mc.getVersion(),
-                mc.getType()
+                mc.getOperationType()
         );
         bii.setTraining_data(mc.getTrainingData());
 
