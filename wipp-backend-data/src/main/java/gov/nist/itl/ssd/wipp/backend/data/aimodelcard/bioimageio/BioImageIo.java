@@ -31,6 +31,7 @@ package gov.nist.itl.ssd.wipp.backend.data.aimodelcard.bioimageio;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -57,12 +58,12 @@ public class BioImageIo {
     private String timestamp;
     private Map<String, String> training_data;
     //private String uploader;
-    private String version;
+    private Date version;
     // more
 
     /***************** CONSTRUCTOR(S) *****************/
     public BioImageIo(Authors[] aut, Cite[] cit, String des, String lic,
-                      String nam, String ver, String typ) {
+                      String nam, Date ver, String typ) {
         this.authors = aut;
         this.cite = cit;
         this.description = des;
@@ -88,7 +89,7 @@ public class BioImageIo {
     public String getMaintainers() {return maintainers;}
     public String getTimestamp() {return timestamp;}
     public Map<String, String> getTraining_data() {return training_data;}
-    public String getVersion() {return version;}
+    public Date getVersion() {return version;}
 
     public void setTraining_data(Map<String, String> td){ this. training_data = td; }
 }

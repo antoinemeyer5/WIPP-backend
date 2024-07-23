@@ -55,7 +55,9 @@ public class AiModelCard extends Data
     /***************** ATTRIBUTE(S) *****************/
     @Id
     private String id;
-    private String version;  // todo
+    @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
+    private Date version;
 
     private String aiModelId;
     private String name;
@@ -82,7 +84,7 @@ public class AiModelCard extends Data
 
     public AiModelCard(AiModel aiModel, Job job, Plugin plugin)
     {
-        this.version = "TO DETERMINE A WAY TO DEFINE";
+        this.version = new Date();
 
         this.aiModelId = aiModel.getId();
         this.name = aiModel.getName();
@@ -95,8 +97,13 @@ public class AiModelCard extends Data
         this.description = plugin.getDescription();
         this.citation = plugin.getCitation();
         this.operationType = plugin.getOperationType();
-        // todo: is it working?
-        this.architecture = plugin.getOutputs().getFirst().getOptions().get("architecture").toString();
+        // WARNING!: first output architecture used to set AiModel architecture
+        Map<String, Object> outputs_options = plugin.getOutputs().getFirst().getOptions();
+        if(outputs_options!=null && !outputs_options.isEmpty()) {
+            this.architecture = outputs_options.get("architecture").toString();
+        } else {
+            this.architecture = "N/A";
+        }
 
         this.training = new HashMap<>();
         this.testing = new HashMap<>();
@@ -106,7 +113,7 @@ public class AiModelCard extends Data
 
     /***************** GET *****************/
     public String getId() { return id; }
-    public String getVersion() { return version; }
+    public Date getVersion() { return version; }
 
     public String getAiModelId() { return aiModelId; }
     public String getName() { return name; }

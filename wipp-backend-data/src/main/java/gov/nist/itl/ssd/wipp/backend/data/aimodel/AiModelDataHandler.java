@@ -14,6 +14,7 @@ package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -60,35 +61,35 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
         Plugin plugin = wippPluginRepository.findById(job.getWippExecutable()).orElse(null);
         assert plugin != null;
 
-        AiModel tm = new AiModel(job, outputName);
+        AiModel aiModel = new AiModel(job, outputName);
 		// Set owner to job owner
-        tm.setOwner(job.getOwner());
+        aiModel.setOwner(job.getOwner());
         // Set TM to private
-        tm.setPubliclyShared(false);
-        // Set framework
-        // todo: is it working?
-        tm.setFramework(plugin.getOutputs().getFirst().getOptions().get("framework").toString());
-        aiModelRepository.save(tm);
+        aiModel.setPubliclyShared(false);
+        // Set framework (WARNING!: first output framework used to set AiModel framework)
+        Map<String, Object> outputs_options = plugin.getOutputs().getFirst().getOptions();
+        if(outputs_options!=null && !outputs_options.isEmpty()) {
+            aiModel.setFramework(outputs_options.get("framework").toString());
+        } else { aiModel.setFramework("N/A"); }
+        aiModelRepository.save(aiModel);
 
-		File trainedModelFolder = new File(config.getAiModelsFolder(), tm.getId());
+		File trainedModelFolder = new File(config.getAiModelsFolder(), aiModel.getId());
 		trainedModelFolder.mkdirs();
 
 		File tempOutputDir = getJobOutputTempFolder(job.getId(), outputName);
 		boolean success = tempOutputDir.renameTo(trainedModelFolder);
 		if (!success) {
-            aiModelRepository.delete(tm);
+            aiModelRepository.delete(aiModel);
 			throw new JobExecutionException("Cannot move ai model to final destination.");
 		}
-
-		setOutputId(job, outputName, tm.getId());
+		setOutputId(job, outputName, aiModel.getId());
 
         // Create & save Model Card
-        AiModelCard mc = new AiModelCard(tm, job, plugin);
-
+        AiModelCard mc = new AiModelCard(aiModel, job, plugin);
         // Fill with TensorboardLogs data
         try {
             // Declare id
-            String id = "6682f3d43149955bd95f59ab"; // todo: use real id
+            String id = "6682f3d43149955bd95f59ab"; // todo: use real id in tensorboard
             // Declare variables
             List<List<String>> data;
             Float startTime, endTime, time, epochs, maxAccuracy, minLoss;
@@ -119,7 +120,6 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
                     mc.addTestingEntries("epochs", epochs);
                     mc.addTestingEntries("maxAccuracy", maxAccuracy);
                 }
-
                 // type & LOSS
                 data = tensorBoardLogsController.getCSV(id, type, "loss");
                 data.removeFirst();

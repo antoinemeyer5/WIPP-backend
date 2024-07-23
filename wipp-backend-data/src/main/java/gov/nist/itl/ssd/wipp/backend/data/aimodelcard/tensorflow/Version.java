@@ -31,12 +31,14 @@ package gov.nist.itl.ssd.wipp.backend.data.aimodelcard.tensorflow;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.Date;
+
 @Document
 public class Version {
-    private String name;
-    //private Date date;
+    //private String name;
+    private Date date;
     //private String diff;
 
-    public Version(String na) { this.name = na; }
-    public String getName() { return name; }
+    public Version(Date da) { this.date = da; }
+    public Date getDate() { return date; }
 }
