@@ -39,7 +39,7 @@ import java.util.Map;
 public class BioImageIo {
     /***************** ATTRIBUTE(S) *****************/
     private String type;
-    private String format_version;
+    // private String format_version;
     private Authors[] authors;
     private Cite[] cite;
     private String description;
@@ -55,7 +55,7 @@ public class BioImageIo {
     //private String git_repo;
     private String id;
     private String maintainers;
-    private String timestamp;
+    private Date timestamp;
     private Map<String, String> training_data;
     //private String uploader;
     private Date version;
@@ -75,7 +75,7 @@ public class BioImageIo {
 
     /***************** METHOD(S) *****************/
     public String getType() {return type;}
-    public String getFormat_version() {return format_version;}
+    // public String getFormat_version() {return format_version;}
     public Authors[] getAuthors() {return authors;}
     public Cite[] getCite() {return cite;}
     public String getDescription() {return description;}
@@ -87,9 +87,10 @@ public class BioImageIo {
     public Weights getWeights() {return weights;}
     public String getId() {return id;}
     public String getMaintainers() {return maintainers;}
-    public String getTimestamp() {return timestamp;}
+    public Date getTimestamp() {return timestamp;}
     public Map<String, String> getTraining_data() {return training_data;}
     public Date getVersion() {return version;}
 
+    public void setTimestamp(Date timestamp) { this.timestamp = timestamp; }
     public void setTraining_data(Map<String, String> td){ this. training_data = td; }
 }

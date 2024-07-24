@@ -111,6 +111,7 @@ public class HuggingFace {
     public String getModel_card_authors() { return model_card_authors; }
     public String getModel_card_contact() { return model_card_contact; }
 
+    public void setModel_type(String model_type) { this.model_type = model_type; }
     public void setTraining_data(Map<String, String> td) { this.training_data = td; }
     public void setTesting_metrics(Map<String, Float> tm) { this.testing_metrics = tm; }
 }

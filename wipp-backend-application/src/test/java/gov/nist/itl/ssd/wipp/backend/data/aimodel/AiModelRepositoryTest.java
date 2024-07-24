@@ -46,7 +46,9 @@ public class AiModelRepositoryTest {
 	@Autowired
 	AiModelRepository aiModelRepository;
 
-	AiModel publicTensorflowModelA, publicTensorflowModelB, privateTensorflowModelA, privateTensorflowModelB, publicPytorchModelA;
+	AiModel publicTensorflowModelA, publicTensorflowModelB,
+			privateTensorflowModelA, privateTensorflowModelB,
+			publicPytorchModelA;
 	
 	@BeforeEach
 	public void setUp() {
@@ -55,33 +57,38 @@ public class AiModelRepositoryTest {
 		aiModelRepository.deleteAll();
 		
 		// Create and save publicTensorflowModelA (public: true, owner: user1)
-		publicTensorflowModelA = new AiModel("publicTensorflowModelA", AiModelFramework.TENSORFLOW);
+		publicTensorflowModelA = new AiModel("publicTensorflowModelA");
 		publicTensorflowModelA.setOwner("user1");
 		publicTensorflowModelA.setPubliclyShared(true);
+		publicTensorflowModelA.setFramework("tensorflow");
 		publicTensorflowModelA = aiModelRepository.save(publicTensorflowModelA);
 
 		// Create and save publicTensorflowModelB (public: true, owner: user2)
-		publicTensorflowModelB = new AiModel("publicTensorflowModelB", AiModelFramework.TENSORFLOW);
+		publicTensorflowModelB = new AiModel("publicTensorflowModelB");
 		publicTensorflowModelB.setOwner("user2");
 		publicTensorflowModelB.setPubliclyShared(true);
+		publicTensorflowModelB.setFramework("tensorflow");
 		publicTensorflowModelB = aiModelRepository.save(publicTensorflowModelB);
 
 		// Create and save privateTensorflowModelA (public: false, owner: user1)
-		privateTensorflowModelA = new AiModel("privateTensorflowModelA", AiModelFramework.TENSORFLOW);
+		privateTensorflowModelA = new AiModel("privateTensorflowModelA");
 		privateTensorflowModelA.setOwner("user1");
 		privateTensorflowModelA.setPubliclyShared(false);
+		privateTensorflowModelA.setFramework("tensorflow");
 		privateTensorflowModelA = aiModelRepository.save(privateTensorflowModelA);
 
 		// Create and save privateTensorflowModelB (public: false, owner: user2)
-		privateTensorflowModelB = new AiModel("privateTensorflowModelB", AiModelFramework.TENSORFLOW);
+		privateTensorflowModelB = new AiModel("privateTensorflowModelB");
 		privateTensorflowModelB.setOwner("user2");
 		privateTensorflowModelB.setPubliclyShared(false);
+		privateTensorflowModelB.setFramework("tensorflow");
 		privateTensorflowModelB = aiModelRepository.save(privateTensorflowModelB);
 
 		// Create and save publicPytorchModelA (public: true, owner: user1)
-		publicPytorchModelA = new AiModel("publicPytorchModelA", AiModelFramework.PYTORCH);
+		publicPytorchModelA = new AiModel("publicPytorchModelA");
 		publicPytorchModelA.setOwner("user1");
 		publicPytorchModelA.setPubliclyShared(true);
+		publicPytorchModelA.setFramework("pytorch");
 		publicPytorchModelA = aiModelRepository.save(publicPytorchModelA);
 	}
 	
@@ -214,8 +221,8 @@ public class AiModelRepositoryTest {
 	@Test
 	@WithAnonymousUser
 	public void checkFrameworkValue() throws Exception {
-		Assertions.assertEquals(publicTensorflowModelA.getFramework(), AiModelFramework.TENSORFLOW.name());
-		Assertions.assertEquals(publicPytorchModelA.getFramework(), AiModelFramework.PYTORCH.name());
+		Assertions.assertEquals(publicTensorflowModelA.getFramework(), "tensorflow");
+		Assertions.assertEquals(publicPytorchModelA.getFramework(), "pytorch");
 	}
 
 }

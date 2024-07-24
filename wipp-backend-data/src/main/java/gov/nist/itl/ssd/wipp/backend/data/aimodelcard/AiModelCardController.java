@@ -144,6 +144,7 @@ public class AiModelCardController {
                 mc.getCitation(),
                 mc.getAuthor()
         );
+        hf.setModel_type(mc.getOperationType());
         hf.setTraining_data(mc.getTrainingData());
         hf.setTesting_metrics(mc.getTesting());
 
@@ -201,6 +202,7 @@ public class AiModelCardController {
                 mc.getVersion(),
                 mc.getOperationType()
         );
+        bii.setTimestamp(mc.getDate());
         bii.setTraining_data(mc.getTrainingData());
 
         // Convert into bytes
