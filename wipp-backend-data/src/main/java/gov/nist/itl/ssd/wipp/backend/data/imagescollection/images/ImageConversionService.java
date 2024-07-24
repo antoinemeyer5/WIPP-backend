@@ -68,8 +68,7 @@ public class ImageConversionService extends FileUploadBase{
 
 	@PostConstruct
 	public void instantiateOmeConverter() {
-		omeConverterExecutor = Executors.newFixedThreadPool(
-				appConfig.getOmeConverterThreads());
+		omeConverterExecutor = Executors.newFixedThreadPool(1);
 
 		// Load security context for system operations
 		SecurityUtils.runAsSystem();
@@ -162,7 +161,7 @@ public class ImageConversionService extends FileUploadBase{
 		}
 	}
 	
-	public static void convertToTiledOmeTiff(Path inputFile, Path outputFile) throws DependencyException, FormatException,
+	public void convertToTiledOmeTiff(Path inputFile, Path outputFile) throws DependencyException, FormatException,
 			IOException, ServiceException {
 		String omeTiffOutputName = outputFile.toString();
 		String omeZarrOutputName = omeTiffOutputName.substring(0, omeTiffOutputName.lastIndexOf('.')) + ".zarr";
@@ -174,6 +173,8 @@ public class ImageConversionService extends FileUploadBase{
 	    			omeZarrOutputName,
 	    			"--tile-height", String.valueOf(CoreConfig.TILE_SIZE),
 	    			"--tile-width", String.valueOf(CoreConfig.TILE_SIZE),
+					"--max-workers", String.valueOf(appConfig.getOmeConverterThreads()),
+					"--log-level", "ERROR"
 	    	};
 	    	CommandLine.call(new Converter(), converterArgs);
 
@@ -183,6 +184,8 @@ public class ImageConversionService extends FileUploadBase{
 	    			outputFile.toString(),
 	    			"--rgb",
 	    			"--compression", "LZW",
+					"--max_workers", String.valueOf(appConfig.getOmeConverterThreads()),
+					"--log-level", "ERROR"
 	    	};
 	    	CommandLine.call(new PyramidFromDirectoryWriter(), converterPyrArgs);
 
