@@ -98,10 +98,14 @@ public class AiModelCard extends Data
         this.citation = plugin.getCitation();
         this.operationType = plugin.getOperationType();
         // WARNING!: first output architecture used to set AiModel architecture
-        Map<String, Object> outputs_options = plugin.getOutputs().getFirst().getOptions();
-        if(outputs_options!=null && !outputs_options.isEmpty()) {
-            this.architecture = outputs_options.get("architecture").toString();
-        } else {
+        try{
+            Map<String, Object> outputs_options = plugin.getOutputs().getFirst().getOptions();
+            if(outputs_options!=null && !outputs_options.isEmpty()) {
+                this.architecture = outputs_options.get("architecture").toString();
+            } else {
+                this.architecture = "N/A";
+            }
+        }catch(Exception e){
             this.architecture = "N/A";
         }
 
