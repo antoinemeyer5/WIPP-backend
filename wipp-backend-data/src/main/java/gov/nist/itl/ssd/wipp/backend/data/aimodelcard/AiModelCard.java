@@ -53,34 +53,81 @@ import org.springframework.format.annotation.DateTimeFormat;
 @Document
 public class AiModelCard extends Data
 {
-    /***************** ATTRIBUTE(S) *****************/
+    /************************ AUTOMATICALLY GENERATES ************************/
+
+    /* AiModelCard id */
     @Id
     private String id;
+
+    /* The version of the model (07/24/24: timestamp). */
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    private Date version;
+    private String version;
 
+    /*************************** FROM AIMODEL DATA ***************************/
+
+    /* AI model id corresponding to this AiModelCard object. */
     private String aiModelId;
+
+    /* Human-readable name of this model card. */
     private String name;
+
+    /* AI model creation date. */
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private Date date;
+
+    /* Platform where the model will be published. */
     private String framework;
 
+    /***************************** FROM JOB DATA *****************************/
+
+    /* Pointer to job parameters (input collection) in WIPP. */
     private Map<String, String> trainingData;
 
+    /*************************** FROM PLUGIN DATA ***************************/
+
+    /**
+     * The authors are the creators of the model and the primary points of
+     * contact.
+     */
     private String author;
+
+    /* Provide basic details about the model. */
     private String description;
+
+    /* The developers’ preferred citation for this model. */
     private String citation;
+
+    /**
+     * Specialized resource type 'model'. E.g. Convolutional Neural Network,
+     * Supervision/Learning Method, Machine Learning Type
+     */
     private String operationType;
+
+    /* Specifies the model's architecture. E.g. Unet, Resnet50 */
     private String architecture;
 
+    /***************** FROM TENSORBOARD LOGS (IF APPLICABLE) *****************/
+
+    /**
+     * Training data in order: total execution time, number of steps, maximum
+     * accuracy and minimum loss.
+     */
     private Map<String, Float> training;
+
+    /**
+     * Testing data in order: total execution time, number of steps, maximum
+     * accuracy and minimum loss.
+     */
     private Map<String, Float> testing;
 
+    /******************* FROM USER ENTRIES THROUGH THE UI *******************/
+
+    /* Name of the license being used. E.g. ['MIT', 'BSD-2-Clause'] */
     private String license;
 
-    /***************** CONSTRUCTOR(S) *****************/
+    /******************* CONSTRUCTOR(S) *******************/
     public AiModelCard(){}
 
     public AiModelCard(AiModel aiModel, Job job, Plugin plugin)
@@ -116,7 +163,7 @@ public class AiModelCard extends Data
         this.license = "Unlicense";
     }
 
-    /***************** GETTER(S) *****************/
+    /******************* GETTER(S) *******************/
     public String getId() { return id; }
     public Date getVersion() { return version; }
 
@@ -138,7 +185,7 @@ public class AiModelCard extends Data
 
     public String getLicense() {return license;}
 
-    /***************** SETTER(S) *****************/
+    /******************* SETTER(S) *******************/
     public void addTrainingEntries(String field, Float value) { this.training.put(field, value); }
     public void addTestingEntries(String field, Float value) { this.testing.put(field, value); }
 }
