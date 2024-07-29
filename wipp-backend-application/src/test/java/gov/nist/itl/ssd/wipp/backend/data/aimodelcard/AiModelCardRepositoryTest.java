@@ -1,13 +1,32 @@
-/*
- * This software was developed at the National Institute of Standards and
- * Technology by employees of the Federal Government in the course of
- * their official duties. Pursuant to title 17 Section 105 of the United
- * States Code this software is not subject to copyright protection and is
- * in the public domain. This software is an experimental system. NIST assumes
- * no responsibility whatsoever for its use by other parties, and makes no
- * guarantees, expressed or implied, about its quality, reliability, or
- * any other characteristic. We would appreciate acknowledgement if the
- * software is used.
+
+/**
+ * NIST-developed software is provided by NIST as a public service. You may
+ * use, copy, and distribute copies of the software in any medium, provided
+ * that you keep intact this entire notice. You may improve, modify, and create
+ * derivative works of the software or any portion of the software, and you may
+ * copy and distribute such modifications or works. Modified works should carry
+ * a notice stating that you changed the software and should note the date and
+ * nature of any such change. Please explicitly acknowledge the National
+ * Institute of Standards and Technology as the source of the software.
+ *
+ * NIST-developed software is expressly provided "AS IS." NIST MAKES NO
+ * WARRANTY OF ANY KIND, EXPRESS, IMPLIED, IN FACT, OR ARISING BY OPERATION OF
+ * LAW, INCLUDING, WITHOUT LIMITATION, THE IMPLIED WARRANTY OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE, NON-INFRINGEMENT, AND DATA ACCURACY. NIST
+ * NEITHER REPRESENTS NOR WARRANTS THAT THE OPERATION OF THE SOFTWARE WILL BE
+ * UNINTERRUPTED OR ERROR-FREE, OR THAT ANY DEFECTS WILL BE CORRECTED. NIST
+ * DOES NOT WARRANT OR MAKE ANY REPRESENTATIONS REGARDING THE USE OF THE
+ * SOFTWARE OR THE RESULTS THEREOF, INCLUDING BUT NOT LIMITED TO THE
+ * CORRECTNESS, ACCURACY, RELIABILITY, OR USEFULNESS OF THE SOFTWARE.
+ *
+ * You are solely responsible for determining the appropriateness of using and
+ * distributing the software and you assume all risks associated with its use,
+ * including but not limited to the risks and costs of program errors,
+ * compliance with applicable laws, damage to or loss of data, programs or
+ * equipment, and the unavailability or interruption of operation. This
+ * software is not intended to be used in any situation where a failure could
+ * cause risk of injury or damage to property. The software developed by NIST
+ * employees is not subject to copyright protection within the United States.
  */
 package gov.nist.itl.ssd.wipp.backend.data.aimodelcard;
 
@@ -50,47 +69,41 @@ public class AiModelCardRepositoryTest {
         aiModelCardRepository.deleteAll();
 
         // Setup A
-        // AI Model A
         AiModel aiModelA = new AiModel("AI Model A");
-        // Job A
         Job jobA = new Job();
-        jobA.setName("job A");
-        jobA.setOwner("user A");
-        // Plugin A
+            jobA.setName("job A");
+            jobA.setOwner("user A");
         Plugin pluginA = new Plugin();
-        pluginA.setName("org/test-plugin-A");
-        pluginA.setVersion("1.0.0");
-        // Create and save AI Model Card A
+            pluginA.setName("org/test-plugin-A");
+            pluginA.setVersion("1.0.0");
+        // Create and save aiModelCardA
         aiModelCardA = new AiModelCard(aiModelA, jobA, pluginA);
         aiModelCardA = aiModelCardRepository.save(aiModelCardA);
 
         // Setup B
-        // AI Model B
         AiModel aiModelB = new AiModel("AI Model B");
-        // Job B
         Job jobB = new Job();
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("param1", "paramValue1");
-        jobB.setParameters(params);
-        // Plugin B
+            Map<String, String> params = new HashMap<String, String>();
+            params.put("param1", "paramValue1");
+            jobB.setParameters(params);
         Plugin pluginB = new Plugin();
-        pluginB.setCitation("example-citation");
-        pluginB.setOperationType("segmentation");
-        PluginIO plugin = new PluginIO();
-        Map<String, Object> options = new HashMap<String, Object>();
-        options.put("architecture", "Unet");
-        plugin.setOptions(options);
-        List<PluginIO> list = new ArrayList<>();
-        list.add(plugin);
-        pluginB.setOutputs(list);
-        // Create and save AI Model Card B
+            pluginB.setCitation("example-citation");
+            pluginB.setOperationType("segmentation");
+            PluginIO plugin = new PluginIO();
+            Map<String, Object> options = new HashMap<String, Object>();
+            options.put("architecture", "Unet");
+            plugin.setOptions(options);
+            List<PluginIO> list = new ArrayList<>();
+            list.add(plugin);
+            pluginB.setOutputs(list);
+        // Create and save aiModelCardB
         aiModelCardB = new AiModelCard(aiModelB, jobB, pluginB);
         aiModelCardB = aiModelCardRepository.save(aiModelCardB);
 
     }
 
     @Test
-    public void check_A() {
+    public void checkSmall() {
         Assertions.assertEquals(aiModelCardA.getName(), "AI Model A");
         Assertions.assertNull(aiModelCardA.getFramework());
         Assertions.assertNull(aiModelCardA.getOperationType());
@@ -98,7 +111,7 @@ public class AiModelCardRepositoryTest {
     }
 
     @Test
-    public void check_B() {
+    public void checkComplete() {
         Assertions.assertEquals(aiModelCardB.getName(), "AI Model B");
         Assertions.assertEquals(aiModelCardB.getTrainingData().get("param1"), "paramValue1");
         Assertions.assertEquals(aiModelCardB.getCitation(), "example-citation");
