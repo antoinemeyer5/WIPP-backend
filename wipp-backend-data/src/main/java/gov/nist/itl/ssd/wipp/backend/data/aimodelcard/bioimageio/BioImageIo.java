@@ -39,7 +39,6 @@ import java.util.Map;
 public class BioImageIo {
     /***************** ATTRIBUTE(S) *****************/
     private String type;
-    // private String format_version;
     private Authors[] authors;
     private Cite[] cite;
     private String description;
@@ -49,17 +48,11 @@ public class BioImageIo {
     private String name;
     private List<Outputs> outputs;
     private Weights weights;
-    //private String attachments;
-    //private String config;
-    //private String covers;
-    //private String git_repo;
     private String id;
     private String maintainers;
     private Date timestamp;
     private Map<String, String> training_data;
-    //private String uploader;
     private Date version;
-    // more
 
     /***************** CONSTRUCTOR(S) *****************/
     public BioImageIo(Authors[] aut, Cite[] cit, String des, String lic,

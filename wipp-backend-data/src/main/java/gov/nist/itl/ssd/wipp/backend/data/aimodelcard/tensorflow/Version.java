@@ -35,9 +35,7 @@ import java.util.Date;
 
 @Document
 public class Version {
-    //private String name;
     private Date date;
-    //private String diff;
 
     public Version(Date da) { this.date = da; }
     public Date getDate() { return date; }

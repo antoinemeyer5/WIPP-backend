@@ -56,7 +56,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Model Card controller
+ * AI Model Card controller
  *
  * @author Antoine Meyer <antoine.meyer at nist.gov>
  */

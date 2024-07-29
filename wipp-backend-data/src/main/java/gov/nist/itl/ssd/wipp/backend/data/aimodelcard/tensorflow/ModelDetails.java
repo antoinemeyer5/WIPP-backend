@@ -40,7 +40,6 @@ public class ModelDetails
     private Version version;
     private Owners owners;
     private String licence;
-    //private String reference;
     private String citation;
 
     /***************** CONSTRUCTOR(S) *****************/

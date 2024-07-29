@@ -38,10 +38,6 @@ public class Tensorflow
     private ModelDetails modelDetails;
     private ModelParameters modelParameters;
     private Considerations considerations;
-    /*public class quantitativeAnalysis {
-        private String performance_metrics;
-        private String graphics;
-    }*/
 
     /***************** CONSTRUCTOR(S) *****************/
     public Tensorflow() { }

@@ -46,6 +46,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 /**
  * Web Image Processing Pipeline (WIPP) AI model card for Artificial Intelligence (AI) models.
+ *
  * @author Antoine Meyer <antoine.meyer at nist.gov>
  */
 @IdExposed
@@ -115,7 +116,7 @@ public class AiModelCard extends Data
         this.license = "Unlicense";
     }
 
-    /***************** GET *****************/
+    /***************** GETTER(S) *****************/
     public String getId() { return id; }
     public Date getVersion() { return version; }
 
@@ -137,7 +138,7 @@ public class AiModelCard extends Data
 
     public String getLicense() {return license;}
 
-    /***************** SET *****************/
+    /***************** SETTER(S) *****************/
     public void addTrainingEntries(String field, Float value) { this.training.put(field, value); }
     public void addTestingEntries(String field, Float value) { this.testing.put(field, value); }
 }

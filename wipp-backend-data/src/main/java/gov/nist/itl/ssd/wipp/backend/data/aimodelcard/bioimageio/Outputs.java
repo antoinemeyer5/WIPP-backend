@@ -34,13 +34,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Outputs {
     /***************** ATTRIBUTE(S) *****************/
-    //private String id;
     private String description;
-    /*private String axes;
-    private String test_tensor;
-    private String sample_tensor;
-    private String data;
-    private String postprocessing;*/
 
     /***************** CONSTRUCTOR(S) *****************/
     public Outputs(String des) {
