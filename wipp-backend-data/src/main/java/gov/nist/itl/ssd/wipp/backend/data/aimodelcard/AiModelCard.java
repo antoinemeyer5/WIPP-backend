@@ -62,7 +62,7 @@ public class AiModelCard extends Data
     /* The version of the model (07/24/24: timestamp). */
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
-    private String version;
+    private Date version;
 
     /*************************** FROM AIMODEL DATA ***************************/
 
