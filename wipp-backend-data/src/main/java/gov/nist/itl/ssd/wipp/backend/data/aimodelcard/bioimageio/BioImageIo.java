@@ -68,7 +68,6 @@ public class BioImageIo {
 
     /***************** METHOD(S) *****************/
     public String getType() {return type;}
-    // public String getFormat_version() {return format_version;}
     public Authors[] getAuthors() {return authors;}
     public Cite[] getCite() {return cite;}
     public String getDescription() {return description;}
