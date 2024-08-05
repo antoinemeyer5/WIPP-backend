@@ -87,13 +87,9 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
         // Set TM to private
         aiModel.setPubliclyShared(false);
         // Set framework (WARNING!: first output framework used to set AiModel framework)
-        Map<String, Object> outputs_options = plugin.getOutputs().getFirst().getOptions();
-        if(outputs_options!=null && !outputs_options.isEmpty()) {
-            aiModel.setFramework(outputs_options.get("framework").toString());
-        } else { aiModel.setFramework("N/A"); }
-        aiModelRepository.save(aiModel);
+        setFramework(plugin, aiModel);
 
-		File trainedModelFolder = new File(config.getAiModelsFolder(), aiModel.getId());
+        File trainedModelFolder = new File(config.getAiModelsFolder(), aiModel.getId());
 		trainedModelFolder.mkdirs();
 
 		File tempOutputDir = getJobOutputTempFolder(job.getId(), outputName);
@@ -115,54 +111,76 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
             Float startTime, endTime, time, epochs, maxAccuracy, minLoss;
             for(String type : new String[]{"train", "test"})
             {
-                // type & ACCURACY
-                data = tensorBoardLogsController.getCSV(id, type, "accuracy");
-                // Get time
-                startTime = Float.parseFloat(data.get(1).getFirst());
-                endTime = Float.parseFloat(data.getLast().getFirst());
-                time = endTime - startTime;
-                // Get epoch
-                epochs = Float.parseFloat(data.getLast().get(1));
-                // Find max
-                data.removeFirst();
-                maxAccuracy = -1f;
-                for(List<String> e : data){
-                    Float c = Float.parseFloat(e.getLast());
-                    if( c > maxAccuracy) { maxAccuracy = c; }
-                }
-                // Add data
-                if(type.equals("train")){
-                    mc.addTrainingEntries("time", time);
-                    mc.addTrainingEntries("epochs", epochs);
-                    mc.addTrainingEntries("maxAccuracy", maxAccuracy);
-                }else{
-                    mc.addTestingEntries("time", time);
-                    mc.addTestingEntries("epochs", epochs);
-                    mc.addTestingEntries("maxAccuracy", maxAccuracy);
-                }
-                // type & LOSS
-                data = tensorBoardLogsController.getCSV(id, type, "loss");
-                data.removeFirst();
-                // Find min
-                minLoss = 1000f;
-                for(List<String> e : data){
-                    Float c = Float.parseFloat(e.getLast());
-                    if( c < minLoss) { minLoss = c; }
-                }
-                // Add data
-                if(type.equals("train")){
-                    mc.addTrainingEntries("minLoss", minLoss);
-                } else {
-                    mc.addTestingEntries("minLoss", minLoss);
-                }
+                setAccuracy(type, id, mc);
+                setLoss(type, id, mc);
             }
         } catch (IOException e) { throw new RuntimeException(e); }
 
         // Save
         modelCardRepository.save(mc);
 	}
-	
-	@Override
+
+    private void setFramework(Plugin plugin, AiModel aiModel) {
+        Map<String, Object> outputs_options = plugin.getOutputs().getFirst().getOptions();
+        if(outputs_options!=null && !outputs_options.isEmpty()) {
+            aiModel.setFramework(outputs_options.get("framework").toString());
+        } else { aiModel.setFramework("N/A"); }
+        aiModelRepository.save(aiModel);
+    }
+
+    private void setLoss(String type, String id, AiModelCard mc) throws IOException {
+        Float minLoss;
+        List<List<String>> data;
+        data = tensorBoardLogsController.getCSV(id, type, "loss");
+        data.removeFirst();
+        // Find min
+        minLoss = 1000f;
+        for(List<String> e : data){
+            Float c = Float.parseFloat(e.getLast());
+            if( c < minLoss) { minLoss = c; }
+        }
+        // Add data
+        if(type.equals("train")){
+            mc.addTrainingEntries("minLoss", minLoss);
+        } else {
+            mc.addTestingEntries("minLoss", minLoss);
+        }
+    }
+
+    private void setAccuracy(String type, String id, AiModelCard mc) throws IOException {
+        Float startTime;
+        Float time;
+        List<List<String>> data;
+        Float epochs;
+        Float maxAccuracy;
+        Float endTime;
+        data = tensorBoardLogsController.getCSV(id, type, "accuracy");
+        // Get time
+        startTime = Float.parseFloat(data.get(1).getFirst());
+        endTime = Float.parseFloat(data.getLast().getFirst());
+        time = endTime - startTime;
+        // Get epoch
+        epochs = Float.parseFloat(data.getLast().get(1));
+        // Find max
+        data.removeFirst();
+        maxAccuracy = -1f;
+        for(List<String> e : data){
+            Float c = Float.parseFloat(e.getLast());
+            if( c > maxAccuracy) { maxAccuracy = c; }
+        }
+        // Add data
+        if(type.equals("train")){
+            mc.addTrainingEntries("time", time);
+            mc.addTrainingEntries("epochs", epochs);
+            mc.addTrainingEntries("maxAccuracy", maxAccuracy);
+        }else{
+            mc.addTestingEntries("time", time);
+            mc.addTestingEntries("epochs", epochs);
+            mc.addTestingEntries("maxAccuracy", maxAccuracy);
+        }
+    }
+
+    @Override
     public String exportDataAsParam(String value) {
         String aiModelId = value;
         String aiModelPath;
