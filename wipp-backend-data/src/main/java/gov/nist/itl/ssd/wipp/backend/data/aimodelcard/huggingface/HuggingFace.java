@@ -31,6 +31,7 @@ package gov.nist.itl.ssd.wipp.backend.data.aimodelcard.huggingface;
 
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.util.List;
 import java.util.Map;
 
 @Document
@@ -39,7 +40,7 @@ public class HuggingFace {
     private String model_summary;
     private String model_description;
     private String developers;
-    private String model_type;
+    private List<String> model_type;
     private String language;
     private String license;
     private String direct_use;
@@ -70,7 +71,7 @@ public class HuggingFace {
     public String getModel_summary() { return model_summary; }
     public String getModel_description() { return model_description; }
     public String getDevelopers() {return developers;}
-    public String getModel_type() { return model_type; }
+    public List<String> getModel_type() { return model_type; }
     public String getLanguage() { return language; }
     public String getLicense() {return license;}
     public String getDirect_use() {return direct_use;}
@@ -89,7 +90,7 @@ public class HuggingFace {
     public String getModel_card_authors() { return model_card_authors; }
     public String getModel_card_contact() { return model_card_contact; }
 
-    public void setModel_type(String model_type) { this.model_type = model_type; }
+    public void setModel_type(List<String> model_type) { this.model_type = model_type; }
     public void setTraining_data(Map<String, String> td) { this.training_data = td; }
     public void setTesting_metrics(Map<String, Float> tm) { this.testing_metrics = tm; }
 }

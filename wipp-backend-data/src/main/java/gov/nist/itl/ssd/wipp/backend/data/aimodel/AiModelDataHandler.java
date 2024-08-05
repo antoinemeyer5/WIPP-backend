@@ -107,7 +107,7 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
         // Fill with TensorboardLogs data
         try {
             // Declare id
-            String id = job.getId();
+            String id = "6682f3d43149955bd95f59ab"; // todo: use job.getId()
             // Declare variables
             List<List<String>> data;
             Float startTime, endTime, time, epochs, maxAccuracy, minLoss;

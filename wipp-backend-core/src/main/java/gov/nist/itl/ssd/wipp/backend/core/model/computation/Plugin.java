@@ -45,7 +45,7 @@ public class Plugin extends Computation {
     private String containerId;
     private List<String> baseCommand;
 
-    private String operationType;
+    private List<String> operationType;
     private String title;
     private String description;
     private String author;
@@ -125,9 +125,9 @@ public class Plugin extends Computation {
 		this.citation = citation;
 	}
 
-    public String getOperationType() { return operationType; }
+    public List<String> getOperationType() { return operationType; }
 
-    public void setOperationType(String operationType) { this.operationType = operationType; }
+    public void setOperationType(List<String> operationType) { this.operationType = operationType; }
 
     public String getDescription() {
         return description;

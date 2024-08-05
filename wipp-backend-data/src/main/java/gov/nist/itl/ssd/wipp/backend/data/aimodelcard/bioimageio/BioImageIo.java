@@ -38,7 +38,7 @@ import java.util.Map;
 @Document
 public class BioImageIo {
     /***************** ATTRIBUTE(S) *****************/
-    private String type;
+    private List<String> type;
     private Authors[] authors;
     private Cite[] cite;
     private String description;
@@ -56,7 +56,7 @@ public class BioImageIo {
 
     /***************** CONSTRUCTOR(S) *****************/
     public BioImageIo(Authors[] aut, Cite[] cit, String des, String lic,
-                      String nam, Date ver, String typ) {
+                      String nam, Date ver, List<String> typ) {
         this.authors = aut;
         this.cite = cit;
         this.description = des;
@@ -67,7 +67,7 @@ public class BioImageIo {
     }
 
     /***************** METHOD(S) *****************/
-    public String getType() {return type;}
+    public List<String> getType() {return type;}
     public Authors[] getAuthors() {return authors;}
     public Cite[] getCite() {return cite;}
     public String getDescription() {return description;}

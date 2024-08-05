@@ -29,9 +29,7 @@
  */
 package gov.nist.itl.ssd.wipp.backend.data.aimodelcard;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.data.annotation.Id;
@@ -82,8 +80,11 @@ public class AiModelCard extends Data
 
     /***************************** FROM JOB DATA *****************************/
 
-    /* Pointer to job parameters (input collection) in WIPP. */
+    /* Pointer to job parameters (input collection) about data in WIPP. */
     private Map<String, String> trainingData;
+
+    /* Pointer to job parameters (input collection) about parameters in WIPP. */
+    private Map<String, String> trainingParameters;
 
     /*************************** FROM PLUGIN DATA ***************************/
 
@@ -103,7 +104,7 @@ public class AiModelCard extends Data
      * Specialized resource type 'model'. E.g. Convolutional Neural Network,
      * Supervision/Learning Method, Machine Learning Type
      */
-    private String operationType;
+    private List<String> operationType;
 
     /* Specifies the model's architecture. E.g. Unet, Resnet50 */
     private String architecture;
@@ -139,12 +140,20 @@ public class AiModelCard extends Data
         this.date = aiModel.getCreationDate();
         this.framework = aiModel.getFramework();
 
-        this.trainingData = job.getParameters();
+        this.trainingData = new HashMap<>();
+        this.trainingParameters = new HashMap<>();
+        for (var entry : job.getParameters().entrySet()) {
+            if(entry.getKey().toUpperCase().contains("DIR".toUpperCase())){
+                this.trainingData.put(entry.getKey(), entry.getValue());
+            }else{
+                this.trainingParameters.put(entry.getKey(), entry.getValue());
+            }
+        }
 
         this.author = plugin.getAuthor();
         this.description = plugin.getDescription();
         this.citation = plugin.getCitation();
-        this.operationType = plugin.getOperationType();
+        this.operationType= plugin.getOperationType();
         // WARNING!: first output architecture used to set AiModel architecture
         try{
             Map<String, Object> outputs_options = plugin.getOutputs().getFirst().getOptions();
@@ -173,11 +182,12 @@ public class AiModelCard extends Data
     public String getFramework() { return framework; }
 
     public Map<String, String> getTrainingData() { return trainingData; }
+    public Map<String, String> getTrainingParameters() { return trainingParameters; }
 
     public String getAuthor() { return author; }
     public String getDescription() { return description; }
     public String getCitation() { return citation; }
-    public String getOperationType() { return operationType; }
+    public List<String> getOperationType() { return operationType; }
     public String getArchitecture() { return architecture; }
 
     public Map<String, Float> getTraining() { return training; }
