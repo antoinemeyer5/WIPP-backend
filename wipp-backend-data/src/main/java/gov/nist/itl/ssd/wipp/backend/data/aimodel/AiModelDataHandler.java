@@ -44,6 +44,7 @@ import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.AiModelCard;
 import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.AiModelCardRepository;
 import gov.nist.itl.ssd.wipp.backend.data.tensorboard.TensorBoardLogsController;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
@@ -56,6 +57,7 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.JobExecutionException;
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
 @Component("aiModelDataHandler")
+@Qualifier("tensorflowModelDataHandler")
 public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 
 	@Autowired
