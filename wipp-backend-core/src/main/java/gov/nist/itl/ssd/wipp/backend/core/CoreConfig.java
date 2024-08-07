@@ -101,6 +101,9 @@ public class CoreConfig {
     @Value("${storage.csvCollections.upload.tmp}")
     private String csvCollectionsUploadTmpFolder;
 
+    @Value("${storage.image.annotations}")
+    private String imageAnnotationsFolder;
+
     @Value("${storage.temp.jobs}")
     private String jobsTempFolder;
 
@@ -184,6 +187,10 @@ public class CoreConfig {
     public String getGenericDataCollectionsUploadTmpFolder() {
 		return genericDataCollectionsUploadTmpFolder;
 	}
+
+    public String getImageAnnotationsFolder() {
+        return imageAnnotationsFolder;
+    }
 
     public String getWorkflowBinary() {
         return workflowBinary;
