@@ -84,7 +84,7 @@ public class TensorBoardLogsController {
         for (String tag : tags) {
             for(String type : types) {
                 URL website = new URL(
-                        CoreConfig.TENSORBOARD_URI + "/data/plugin/scalars/scalars"
+                        config.getTensorboardUri() + "/data/plugin/scalars/scalars"
                                 + "?tag=" + tag + "&run=" + run
                                 + "/" + type + "&format=csv");
                 ReadableByteChannel rbc = Channels.newChannel(website.openStream());

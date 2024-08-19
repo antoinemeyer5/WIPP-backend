@@ -68,6 +68,16 @@ public class AiModelCardController {
     @Autowired
     AiModelCardRepository aiModelCardRepository;
 
+    private AiModelCard getAiModelCard(String id) {
+        // Get
+        Optional<AiModelCard> omc = aiModelCardRepository.findById(id);
+        if(!omc.isPresent()){
+            throw new ResourceNotFoundException("ModelCard not found.");
+        }
+        AiModelCard mc = omc.get();
+        return mc;
+    }
+
     @RequestMapping(
             value = "tensorflow",
             method = RequestMethod.GET,
@@ -75,12 +85,7 @@ public class AiModelCardController {
     )
     public ResponseEntity<byte[]> tensorflow(@PathVariable("id") String id) throws IOException
     {
-        // Get
-        Optional<AiModelCard> omc = aiModelCardRepository.findById(id);
-        if(!omc.isPresent()){
-            throw new ResourceNotFoundException("ModelCard not found.");
-        }
-        AiModelCard mc = omc.get();
+        AiModelCard mc = getAiModelCard(id);
 
         // Convert ModelCard object to Tensorflow ModelCard
         Tensorflow tf = new Tensorflow();
@@ -129,12 +134,7 @@ public class AiModelCardController {
     )
     public ResponseEntity<byte[]> huggingface(@PathVariable("id") String id) throws IOException
     {
-        // Get
-        Optional<AiModelCard> omc = aiModelCardRepository.findById(id);
-        if(!omc.isPresent()){
-            throw new ResourceNotFoundException("ModelCard not found.");
-        }
-        AiModelCard mc = omc.get();
+        AiModelCard mc = getAiModelCard(id);
 
         // Convert ModelCard object to HuggingFace ModelCard
         HuggingFace hf = new HuggingFace(
@@ -178,12 +178,7 @@ public class AiModelCardController {
     )
     public ResponseEntity<byte[]> bioimageio(@PathVariable("id") String id) throws IOException
     {
-        // Get
-        Optional<AiModelCard> omc = aiModelCardRepository.findById(id);
-        if(!omc.isPresent()){
-            throw new ResourceNotFoundException("ModelCard not found.");
-        }
-        AiModelCard mc = omc.get();
+        AiModelCard mc = getAiModelCard(id);
 
         // Fill-in
         Authors[] authors = new Authors[1];

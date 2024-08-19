@@ -32,6 +32,7 @@ package gov.nist.itl.ssd.wipp.backend.data.aimodelcard;
 import java.util.*;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginIO;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -75,7 +76,7 @@ public class AiModelCard extends Data
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
     private Date date;
 
-    /* Platform where the model will be published. */
+    /* AI framework where the model will be published. */
     private String framework;
 
     /***************************** FROM JOB DATA *****************************/
@@ -154,11 +155,17 @@ public class AiModelCard extends Data
         this.description = plugin.getDescription();
         this.citation = plugin.getCitation();
         this.operationType= plugin.getOperationType();
-        // WARNING!: first output architecture used to set AiModel architecture
         try{
-            Map<String, Object> outputs_options = plugin.getOutputs().getFirst().getOptions();
-            if(outputs_options!=null && !outputs_options.isEmpty()) {
-                this.architecture = outputs_options.get("architecture").toString();
+            // search for output where "name" == "outputDir"
+            PluginIO outputDir = null;
+            for(PluginIO output : plugin.getOutputs()){
+                if(Objects.equals(output.getName(), "outputDir")) {
+                    outputDir = output;
+                }
+            }
+            // get architecture data from this output
+            if(outputDir!=null && !outputDir.getOptions().isEmpty()) {
+                this.architecture = outputDir.getOptions().get("architecture").toString();
             } else {
                 this.architecture = "N/A";
             }

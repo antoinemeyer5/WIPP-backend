@@ -15,7 +15,6 @@ public class CoreConfig {
 
     public static final String BASE_URI = "/api";
     public static final String PYRAMIDS_BASE_URI = "/pyramid-files";
-    public static final String TENSORBOARD_URI = "http://localhost:6006";
     public static final int TILE_SIZE = 1024;
 
     @Value("${wipp.version}")
@@ -107,6 +106,9 @@ public class CoreConfig {
     
     @Value("${fetching.pixels.max}")
     private int fetchingPixelsMax;
+
+    @Value("${tensorboard.uri}")
+    private String tensorboardUri;
 
 	public String getWippVersion() {
 		return wippVersion;
@@ -227,6 +229,9 @@ public class CoreConfig {
     public int getOmeConverterThreads() {
         return omeConverterThreads;
     }
-    
-    
+
+    public String getTensorboardUri() {
+        return tensorboardUri;
+    }
+
 }

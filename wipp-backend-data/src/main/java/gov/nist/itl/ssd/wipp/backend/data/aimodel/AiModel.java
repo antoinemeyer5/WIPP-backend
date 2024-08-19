@@ -61,7 +61,7 @@ public class AiModel extends Data {
 	private Date creationDate;
 
 	@Indexed(unique = true, sparse = true)
-    @ManualRef(Job.class)
+	@ManualRef(Job.class)
     private String sourceJob;
 
 	private boolean publiclyShared;

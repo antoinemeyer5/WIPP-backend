@@ -33,11 +33,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
+import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginIO;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginRepository;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.BaseDataHandler;
 import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.AiModelCard;
@@ -55,6 +57,7 @@ import gov.nist.itl.ssd.wipp.backend.core.model.job.JobExecutionException;
 /**
  * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
+ * @author Antoine Meyer <antoine.meyer at nist.gov>
  */
 @Component("aiModelDataHandler")
 @Qualifier("tensorflowModelDataHandler")
@@ -63,8 +66,8 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 	@Autowired
 	CoreConfig config;
 
-	@Autowired
-	private AiModelRepository aiModelRepository;
+    @Autowired
+    private AiModelRepository aiModelRepository;
 
     @Autowired
     private PluginRepository wippPluginRepository;
@@ -82,23 +85,24 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
         assert plugin != null;
 
         AiModel aiModel = new AiModel(job, outputName);
-		// Set owner to job owner
+        // Set owner to job owner
         aiModel.setOwner(job.getOwner());
         // Set TM to private
         aiModel.setPubliclyShared(false);
-        // Set framework (WARNING!: first output framework used to set AiModel framework)
+        // Set framework
         setFramework(plugin, aiModel);
+        aiModelRepository.save(aiModel);
 
         File trainedModelFolder = new File(config.getAiModelsFolder(), aiModel.getId());
-		trainedModelFolder.mkdirs();
+        trainedModelFolder.mkdirs();
 
-		File tempOutputDir = getJobOutputTempFolder(job.getId(), outputName);
-		boolean success = tempOutputDir.renameTo(trainedModelFolder);
-		if (!success) {
+        File tempOutputDir = getJobOutputTempFolder(job.getId(), outputName);
+        boolean success = tempOutputDir.renameTo(trainedModelFolder);
+        if (!success) {
             aiModelRepository.delete(aiModel);
-			throw new JobExecutionException("Cannot move ai model to final destination.");
-		}
-		setOutputId(job, outputName, aiModel.getId());
+            throw new JobExecutionException("Cannot move ai model to final destination.");
+        }
+        setOutputId(job, outputName, aiModel.getId());
 
         // Create & save Model Card
         AiModelCard mc = new AiModelCard(aiModel, job, plugin);
@@ -121,11 +125,19 @@ public class AiModelDataHandler extends BaseDataHandler implements DataHandler {
 	}
 
     private void setFramework(Plugin plugin, AiModel aiModel) {
-        Map<String, Object> outputs_options = plugin.getOutputs().getFirst().getOptions();
-        if(outputs_options!=null && !outputs_options.isEmpty()) {
-            aiModel.setFramework(outputs_options.get("framework").toString());
-        } else { aiModel.setFramework("N/A"); }
-        aiModelRepository.save(aiModel);
+        // search for output where "name" == "outputDir"
+        PluginIO outputDir = null;
+        for (PluginIO output : plugin.getOutputs()) {
+            if(Objects.equals(output.getName(), "outputDir")) {
+                outputDir = output;
+            }
+        }
+        // get framework data from this output
+        if(outputDir!=null && !outputDir.getOptions().isEmpty()) {
+            aiModel.setFramework(outputDir.getOptions().get("framework").toString());
+        } else {
+            aiModel.setFramework("N/A");
+        }
     }
 
     private void setLoss(String type, String id, AiModelCard mc) throws IOException {

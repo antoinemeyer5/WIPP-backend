@@ -53,17 +53,17 @@ import gov.nist.itl.ssd.wipp.backend.data.tensorboard.TensorboardLogsRepository;
 @Component
 @RepositoryEventHandler(AiModel.class)
 public class AiModelEventHandler {
-	
-	@Autowired
+
+    @Autowired
     AiModelRepository aiModelRepository;
-	
-	@Autowired
+
+    @Autowired
     AiModelLogic aiModelLogic;
-	
-	@Autowired
-	TensorboardLogsRepository tensorboardLogsRepository;
-	
-	@Autowired
+
+    @Autowired
+    TensorboardLogsRepository tensorboardLogsRepository;
+
+    @Autowired
     CoreConfig config;
 
     @PreAuthorize("isAuthenticated()")

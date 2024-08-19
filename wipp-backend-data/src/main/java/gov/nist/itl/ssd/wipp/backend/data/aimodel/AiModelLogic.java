@@ -45,7 +45,7 @@ public class AiModelLogic {
 
     public void assertAiModelNameUnique(String name) {
         if (aiModelRepository.countByName(name) != 0) {
-            throw new ClientException("A ai model named \""
+            throw new ClientException("A AI model named \""
                     + name + "\" already exists.");
         }
     }
