@@ -42,10 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Collection of tests for {@link AiModelCardRepository} exposed methods
@@ -70,36 +67,47 @@ public class AiModelCardRepositoryTest {
 
         // Setup A
         AiModel aiModelA = new AiModel("AI Model A");
+
         Job jobA = new Job();
-            jobA.setName("job A");
-            jobA.setOwner("user A");
+        jobA.setName("job A");
+        jobA.setOwner("user A");
+        Map<String, String> paramsA = new HashMap<String, String>();
+        paramsA.put("paramA1", "paramAvalue1");
+        jobA.setParameters(paramsA);
+
         Plugin pluginA = new Plugin();
-            pluginA.setName("org/test-plugin-A");
-            pluginA.setVersion("1.0.0");
+        pluginA.setName("org/test-plugin-A");
+        pluginA.setVersion("1.0.0");
+
         // Create and save aiModelCardA
         aiModelCardA = new AiModelCard(aiModelA, jobA, pluginA);
         aiModelCardA = aiModelCardRepository.save(aiModelCardA);
 
         // Setup B
         AiModel aiModelB = new AiModel("AI Model B");
+
         Job jobB = new Job();
-            Map<String, String> params = new HashMap<String, String>();
-            params.put("param1", "paramValue1");
-            jobB.setParameters(params);
+        jobB.setName("job B");
+        Map<String, String> paramsB = new HashMap<String, String>();
+        paramsB.put("DIRparamB1", "paramBvalue1");
+        paramsB.put("paramB2", "paramBvalue2");
+        jobB.setParameters(paramsB);
+
         Plugin pluginB = new Plugin();
-            pluginB.setCitation("example-citation");
-            pluginB.setOperationType("segmentation");
-            PluginIO plugin = new PluginIO();
-            Map<String, Object> options = new HashMap<String, Object>();
-            options.put("architecture", "Unet");
-            plugin.setOptions(options);
-            List<PluginIO> list = new ArrayList<>();
-            list.add(plugin);
-            pluginB.setOutputs(list);
+        pluginB.setCitation("example-citation");
+        pluginB.setOperationType(Arrays.asList("augmentation", "segmentation"));
+        PluginIO plugin = new PluginIO();
+        plugin.setName("outputDir");
+        Map<String, Object> options = new HashMap<String, Object>();
+        options.put("architecture", "Unet");
+        plugin.setOptions(options);
+        List<PluginIO> list = new ArrayList<>();
+        list.add(plugin);
+        pluginB.setOutputs(list);
+
         // Create and save aiModelCardB
         aiModelCardB = new AiModelCard(aiModelB, jobB, pluginB);
         aiModelCardB = aiModelCardRepository.save(aiModelCardB);
-
     }
 
     @Test
@@ -113,9 +121,10 @@ public class AiModelCardRepositoryTest {
     @Test
     public void checkComplete() {
         Assertions.assertEquals(aiModelCardB.getName(), "AI Model B");
-        Assertions.assertEquals(aiModelCardB.getTrainingData().get("param1"), "paramValue1");
+        Assertions.assertEquals(aiModelCardB.getTrainingData().get("DIRparamB1"), "paramBvalue1");
+        Assertions.assertEquals(aiModelCardB.getTrainingParameters().get("paramB2"), "paramBvalue2");
         Assertions.assertEquals(aiModelCardB.getCitation(), "example-citation");
-        Assertions.assertEquals(aiModelCardB.getOperationType(), "segmentation");
+        Assertions.assertEquals(aiModelCardB.getOperationType(), Arrays.asList("augmentation", "segmentation"));
         Assertions.assertEquals(aiModelCardB.getArchitecture(), "Unet");
     }
 
