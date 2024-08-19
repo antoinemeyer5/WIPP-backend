@@ -34,6 +34,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.MediaType;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -67,6 +68,7 @@ public class TensorBoardLogsController {
      * @throws IOException
      */
     @RequestMapping(value = "export/csv", method = RequestMethod.GET)
+    @PreAuthorize("hasRole('admin') or @aiModelCardSecurity.checkAuthorize(#id, false)")
     public void exportCSV(@PathVariable("id") String id) throws IOException
     {
         // Define
@@ -109,6 +111,7 @@ public class TensorBoardLogsController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @PreAuthorize("hasRole('admin') or @aiModelCardSecurity.checkAuthorize(#id, false)")
     public List<List<String>> getCSV(@PathVariable("id") String id, String type, String tag) throws IOException
     {
         // Get file name

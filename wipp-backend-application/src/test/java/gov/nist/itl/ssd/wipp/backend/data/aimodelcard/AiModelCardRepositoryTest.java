@@ -67,10 +67,10 @@ public class AiModelCardRepositoryTest {
 
         // Setup A
         AiModel aiModelA = new AiModel("AI Model A");
+        aiModelA.setOwner("user A");
 
         Job jobA = new Job();
         jobA.setName("job A");
-        jobA.setOwner("user A");
         Map<String, String> paramsA = new HashMap<String, String>();
         paramsA.put("paramA1", "paramAvalue1");
         jobA.setParameters(paramsA);
@@ -113,6 +113,7 @@ public class AiModelCardRepositoryTest {
     @Test
     public void checkSmall() {
         Assertions.assertEquals(aiModelCardA.getName(), "AI Model A");
+        Assertions.assertEquals(aiModelCardA.getOwner(), "user A");
         Assertions.assertNull(aiModelCardA.getFramework());
         Assertions.assertNull(aiModelCardA.getOperationType());
         Assertions.assertEquals(aiModelCardA.getArchitecture(), "N/A");

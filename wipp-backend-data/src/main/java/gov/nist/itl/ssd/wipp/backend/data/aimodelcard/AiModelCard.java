@@ -58,6 +58,10 @@ public class AiModelCard extends Data
     @Id
     private String id;
 
+    private String owner;
+
+    private boolean publiclyShared;
+
     /* The version of the model (07/24/24: timestamp). */
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSXXX")
@@ -134,6 +138,8 @@ public class AiModelCard extends Data
 
     public AiModelCard(AiModel aiModel, Job job, Plugin plugin)
     {
+        this.owner = aiModel.getOwner();
+        this.publiclyShared = true;
         this.version = new Date();
 
         this.aiModelId = aiModel.getId();
@@ -181,6 +187,10 @@ public class AiModelCard extends Data
 
     /******************* GETTER(S) *******************/
     public String getId() { return id; }
+    public String getOwner() {
+        return owner;
+    }
+    public boolean isPubliclyShared() { return publiclyShared; }
     public Date getVersion() { return version; }
 
     public String getAiModelId() { return aiModelId; }
@@ -203,6 +213,12 @@ public class AiModelCard extends Data
     public String getLicense() {return license;}
 
     /******************* SETTER(S) *******************/
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
+    public void setPubliclyShared(boolean publiclyShared) {
+        this.publiclyShared = publiclyShared;
+    }
     public void addTrainingEntries(String field, Float value) { this.training.put(field, value); }
     public void addTestingEntries(String field, Float value) { this.testing.put(field, value); }
 }

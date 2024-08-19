@@ -46,6 +46,7 @@ import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -83,6 +84,7 @@ public class AiModelCardController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
+    @PreAuthorize("hasRole('admin') or @aiModelCardSecurity.checkAuthorize(#id, false)")
     public ResponseEntity<byte[]> tensorflow(@PathVariable("id") String id) throws IOException
     {
         AiModelCard mc = getAiModelCard(id);
@@ -132,6 +134,7 @@ public class AiModelCardController {
             method = RequestMethod.GET,
             produces = "application/x-yaml"
     )
+    @PreAuthorize("hasRole('admin') or @aiModelCardSecurity.checkAuthorize(#id, false)")
     public ResponseEntity<byte[]> huggingface(@PathVariable("id") String id) throws IOException
     {
         AiModelCard mc = getAiModelCard(id);
@@ -176,6 +179,7 @@ public class AiModelCardController {
             method = RequestMethod.GET,
             produces = "application/x-yaml"
     )
+    @PreAuthorize("hasRole('admin') or @aiModelCardSecurity.checkAuthorize(#id, false)")
     public ResponseEntity<byte[]> bioimageio(@PathVariable("id") String id) throws IOException
     {
         AiModelCard mc = getAiModelCard(id);
