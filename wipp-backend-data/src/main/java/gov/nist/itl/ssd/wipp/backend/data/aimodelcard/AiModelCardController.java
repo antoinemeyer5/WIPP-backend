@@ -79,6 +79,28 @@ public class AiModelCardController {
         return mc;
     }
 
+    private byte[] convertIntoBytes(Object obj) throws IOException {
+        byte[] bytes = new byte[0];
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+            bytes = mapper.writeValueAsString(obj).getBytes();
+        }
+        catch (JsonGenerationException | JsonMappingException e) { e.printStackTrace(); }
+        return bytes;
+    }
+
+    private HttpHeaders setupResponseHead(String filename) {
+        HttpHeaders head = new HttpHeaders();
+        head.add(
+                "content-disposition",
+                "attachment; filename=\"" + filename
+        );
+        List<String> exposedHead = List.of("content-disposition");
+        head.setAccessControlExposeHeaders(exposedHead);
+        return head;
+    }
+
     @RequestMapping(
             value = "tensorflow",
             method = RequestMethod.GET,
@@ -102,25 +124,10 @@ public class AiModelCardController {
         tf.setModelParameters(new ModelParameters());
         tf.setConsiderations(new Considerations());
 
-        // Convert into bytes
-        byte[] bytes = new byte[0];
-        try {
-            ObjectMapper mapper = new ObjectMapper();
-            mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-            bytes = mapper.writeValueAsString(tf).getBytes();
-        }
-        catch (JsonGenerationException | JsonMappingException e) { e.printStackTrace(); }
+        byte[] bytes = convertIntoBytes(tf);
 
-        // Setup response head
-        HttpHeaders head = new HttpHeaders();
-        head.add(
-                "content-disposition",
-                "attachment; filename=\"WIPP_ModelCard_Tensorflow.json"
-        );
-        List<String> exposedHead = List.of("content-disposition");
-        head.setAccessControlExposeHeaders(exposedHead);
+        HttpHeaders head = setupResponseHead("WIPP_AIModelCard_Tensorflow.json");
 
-        // Return response
         return ResponseEntity
                 .ok()
                 .headers(head)
@@ -151,21 +158,10 @@ public class AiModelCardController {
         hf.setTraining_data(mc.getTrainingData());
         hf.setTesting_metrics(mc.getTesting());
 
-        // Convert into bytes
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        byte[] bytes = mapper.writeValueAsString(hf).getBytes();
+        byte[] bytes = convertIntoBytes(hf);
 
-        // Setup response head
-        HttpHeaders head = new HttpHeaders();
-        head.add(
-                "content-disposition",
-                "attachment; filename=\"WIPP_ModelCard_Huggingface.yaml"
-        );
-        List<String> exposedHead = List.of("content-disposition");
-        head.setAccessControlExposeHeaders(exposedHead);
+        HttpHeaders head = setupResponseHead("WIPP_AIModelCard_Huggingface.yaml");
 
-        // Return response
         return ResponseEntity
                 .ok()
                 .headers(head)
@@ -204,25 +200,35 @@ public class AiModelCardController {
         bii.setTimestamp(mc.getDate());
         bii.setTraining_data(mc.getTrainingData());
 
-        // Convert into bytes
-        ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
-        byte[] bytes = mapper.writeValueAsString(bii).getBytes();
+        byte[] bytes = convertIntoBytes(bii);
 
-        // Setup response head
-        HttpHeaders head = new HttpHeaders();
-        head.add(
-                "content-disposition",
-                "attachment; filename=\"WIPP_ModelCard_BioImageIo.yaml"
-        );
-        List<String> exposedHead = List.of("content-disposition");
-        head.setAccessControlExposeHeaders(exposedHead);
+        HttpHeaders head = setupResponseHead("WIPP_AIModelCard_BioImageIo.yaml");
 
-        // Return response
         return ResponseEntity
                 .ok()
                 .headers(head)
                 .contentType(MediaType.valueOf("application/yaml"))
+                .contentLength(bytes.length)
+                .body(bytes);
+    }
+
+    @RequestMapping(
+            value = "cdcs",
+            method = RequestMethod.GET
+    )
+    @PreAuthorize("hasRole('admin') or @aiModelCardSecurity.checkAuthorize(#id, false)")
+    public ResponseEntity<byte[]> cdcs(@PathVariable("id") String id) throws IOException
+    {
+        AiModelCard mc = getAiModelCard(id);
+
+        byte[] bytes = convertIntoBytes(mc);
+
+        HttpHeaders head = setupResponseHead("WIPP_AIModelCard_CDCS.json");
+
+        return ResponseEntity
+                .ok()
+                .headers(head)
+                .contentType(MediaType.APPLICATION_JSON)
                 .contentLength(bytes.length)
                 .body(bytes);
     }
