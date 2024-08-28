@@ -121,6 +121,4 @@ public class AiModel extends Data {
 	public void setPubliclyShared(boolean publiclyShared) {
 		this.publiclyShared = publiclyShared;
 	}
-
-	public void setCreationDate(Date creationDate) { this.creationDate = creationDate; }
 }

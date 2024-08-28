@@ -29,7 +29,6 @@
  */
 package gov.nist.itl.ssd.wipp.backend.data.aimodel;
 
-import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -39,7 +38,6 @@ import org.springframework.data.rest.core.annotation.HandleBeforeCreate;
 import org.springframework.data.rest.core.annotation.HandleBeforeSave;
 import org.springframework.data.rest.core.annotation.RepositoryEventHandler;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
@@ -71,12 +69,7 @@ public class AiModelEventHandler {
     @PreAuthorize("isAuthenticated()")
     @HandleBeforeCreate
     public void handleBeforeCreate(AiModel aiModel) {
-        // Assert AI model name is unique
-        aiModelLogic.assertAiModelNameUnique(aiModel.getName());
-        // Set creation date to current date
-        aiModel.setCreationDate(new Date());
-        // Set the owner to the connected user
-        aiModel.setOwner(SecurityContextHolder.getContext().getAuthentication().getName());
+        throw new ClientException("Creation of AiModel via REST API is not allowed.");
     }
 
     @HandleBeforeSave
