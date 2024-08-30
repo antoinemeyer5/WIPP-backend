@@ -46,10 +46,6 @@ import org.springframework.security.access.prepost.PostAuthorize;
 @RepositoryRestResource
 public interface AiModelCardRepository extends PrincipalFilteredRepository<AiModelCard, String> {
 
-    @Override
-    @RestResource(exported = false)
-    void delete(AiModelCard mc);
-
     @Query("{aiModelId:'?0'}")
     AiModelCard findModelCardByAiModelId(String aiModelId);
 }
