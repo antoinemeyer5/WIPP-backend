@@ -28,10 +28,6 @@ import org.springframework.data.rest.core.annotation.RestResource;
 @RepositoryRestResource
 public interface AiModelRepository extends PrincipalFilteredRepository<AiModel, String> {
 
-	@Override
-	@RestResource(exported = false)
-	void delete(AiModel t);
-	
 	// not exported
 	long countByName(@Param("name") String name);
 
