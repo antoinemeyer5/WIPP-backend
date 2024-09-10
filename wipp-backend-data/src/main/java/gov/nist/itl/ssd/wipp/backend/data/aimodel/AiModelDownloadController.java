@@ -89,7 +89,7 @@ public class AiModelDownloadController {
     public DownloadUrl requestDownload(
             @PathVariable("aiModelId") String aiModelId) {
     	
-    	// Check existence of images collection
+    	// Check existence of AI model
     	Optional<AiModel> tm = aiModelRepository.findById(
 				aiModelId);
         if (!tm.isPresent()) {
