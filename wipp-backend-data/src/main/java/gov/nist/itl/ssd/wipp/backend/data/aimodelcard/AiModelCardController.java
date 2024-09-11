@@ -103,7 +103,9 @@ public class AiModelCardController {
     }
 
     private Map<String, String> addFullUrlToId(Map<String, String> map) {
-        map.replaceAll((k,v)->v="/images-collection/"+v);
+        if (map != null) {
+            map.replaceAll((k, v) -> v = "/images-collection/" + v);
+        }
         return map;
     }
 
