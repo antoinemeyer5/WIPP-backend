@@ -10,7 +10,11 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Optional;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * @author Antoine Meyer <antoine.meyer at nist.gov>
@@ -45,8 +49,20 @@ public class AiModelUploadController {
             throw new ClientException("AI model folder not created.");
         }
 
-        // (2) Move file into folder
-        file.transferTo(new File(aiModelFolder, "test.zip"));
+        // (2) Un-zip file
+        ZipInputStream zis = new ZipInputStream(file.getInputStream());
+
+        // (3) Move files into folder
+        Path path = aiModelFolder.toPath();
+        for (ZipEntry entry; (entry = zis.getNextEntry()) != null; ) {
+            Path resolvedPath = path.resolve(entry.getName());
+            if (!entry.isDirectory()) {
+                Files.createDirectories(resolvedPath.getParent());
+                Files.copy(zis, resolvedPath);
+            } else {
+                Files.createDirectories(resolvedPath);
+            }
+        }
         return model.get();
     }
 
