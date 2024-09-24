@@ -68,8 +68,8 @@ public class CoreConfig {
     @Value("${storage.pyramid.annotations}")
     private String pyramidAnnotationsFolder;
     
-    @Value("${storage.tensorflow}")
-    private String tensorflowModelsFolder;
+    @Value("${storage.aimodels}")
+    private String aiModelsFolder;
     
     @Value("${storage.tensorboard}")
     private String tensorboardLogsFolder;
@@ -106,6 +106,9 @@ public class CoreConfig {
     
     @Value("${fetching.pixels.max}")
     private int fetchingPixelsMax;
+
+    @Value("${tensorboard.uri}")
+    private String tensorboardUri;
 
 	public String getWippVersion() {
 		return wippVersion;
@@ -151,8 +154,8 @@ public class CoreConfig {
 		return pyramidAnnotationsFolder;
 	}
 
-	public String getTensorflowModelsFolder() {
-    	return tensorflowModelsFolder;
+	public String getAiModelsFolder() {
+    	return aiModelsFolder;
     }
     
    	public String getTensorboardLogsFolder() {
@@ -226,6 +229,9 @@ public class CoreConfig {
     public int getOmeConverterThreads() {
         return omeConverterThreads;
     }
-    
-    
+
+    public String getTensorboardUri() {
+        return tensorboardUri;
+    }
+
 }
