@@ -54,6 +54,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 /**
@@ -99,6 +100,13 @@ public class AiModelCardController {
         List<String> exposedHead = List.of("content-disposition");
         head.setAccessControlExposeHeaders(exposedHead);
         return head;
+    }
+
+    private Map<String, String> addFullUrlToId(Map<String, String> map) {
+        if (map != null) {
+            map.replaceAll((k, v) -> v = "/images-collection/" + v);
+        }
+        return map;
     }
 
     @RequestMapping(
@@ -155,7 +163,7 @@ public class AiModelCardController {
                 mc.getAuthor()
         );
         hf.setModel_type(mc.getOperationType());
-        hf.setTraining_data(mc.getTrainingData());
+        hf.setTraining_data(addFullUrlToId(mc.getTrainingData()));
         hf.setTesting_metrics(mc.getTesting());
 
         byte[] bytes = convertIntoBytes(hf);
@@ -198,7 +206,7 @@ public class AiModelCardController {
                 mc.getOperationType()
         );
         bii.setTimestamp(mc.getDate());
-        bii.setTraining_data(mc.getTrainingData());
+        bii.setTraining_data(addFullUrlToId(mc.getTrainingData()));
 
         byte[] bytes = convertIntoBytes(bii);
 
@@ -220,6 +228,7 @@ public class AiModelCardController {
     public ResponseEntity<byte[]> cdcs(@PathVariable("id") String id) throws IOException
     {
         AiModelCard mc = getAiModelCard(id);
+        mc.setTrainingData(addFullUrlToId(mc.getTrainingData()));
 
         byte[] bytes = convertIntoBytes(mc);
 

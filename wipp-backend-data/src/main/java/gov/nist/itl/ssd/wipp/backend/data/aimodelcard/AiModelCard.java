@@ -219,6 +219,7 @@ public class AiModelCard extends Data
     public void setPubliclyShared(boolean publiclyShared) {
         this.publiclyShared = publiclyShared;
     }
+    public void setTrainingData(Map<String, String> map) { this.trainingData = map; }
     public void addTrainingEntries(String field, Float value) { this.training.put(field, value); }
     public void addTestingEntries(String field, Float value) { this.testing.put(field, value); }
 }
