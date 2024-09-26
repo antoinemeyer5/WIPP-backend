@@ -19,6 +19,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 
 import gov.nist.itl.ssd.wipp.backend.core.model.auth.PrincipalFilteredRepository;
+import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
 *
@@ -41,6 +42,7 @@ public interface GenericDataCollectionRepository extends PrincipalFilteredReposi
     Page<GenericDataCollection> findByName(@Param("name") String name, Pageable p);
 
 	// not exported
+	@RestResource(exported = false)
 	long countByName(@Param("name") String name);
 
 }

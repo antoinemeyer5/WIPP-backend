@@ -35,6 +35,7 @@ public interface JobRepository<T extends Job> extends PrincipalFilteredRepositor
 	@Override
     void delete(T t);
 
+    @RestResource(exported = false)
     long countByName(@Param("name") String name);
 
     @RestResource(exported = false)

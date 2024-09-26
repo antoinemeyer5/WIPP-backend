@@ -11,11 +11,16 @@
  */
 package gov.nist.itl.ssd.wipp.backend.argo.workflows.workflow;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import com.fasterxml.jackson.dataformat.yaml.YAMLGenerator;
+import com.fasterxml.jackson.dataformat.yaml.YAMLMapper;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.Plugin;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginIO;
 import gov.nist.itl.ssd.wipp.backend.argo.workflows.spec.*;
+import gov.nist.itl.ssd.wipp.backend.argo.workflows.spec.slurmjob.ArgoTemplatePluginSlurmJob;
+import gov.nist.itl.ssd.wipp.backend.argo.workflows.spec.slurmjob.ArgoTemplatePluginSlurmJobSpec;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.model.computation.PluginResourceRequirements;
 import gov.nist.itl.ssd.wipp.backend.core.model.data.DataHandler;
@@ -71,6 +76,26 @@ public class WorkflowConverter {
         return argoVolumeList;
     }
 
+    private HashMap<String, List<NameValueParam>> generateTemplatePluginInputs(Plugin plugin, List<String> parameters) {
+    	// Add the plugin parameters as required by the image
+        HashMap<String, List<NameValueParam>> argoTemplateInputs = new HashMap<>();
+        List<NameValueParam> argoTemplateArgs = new ArrayList<>();
+
+        // Add the plugin's outputs to the list of parameters coming from the job's configuration
+        for (PluginIO output : plugin.getOutputs()) {
+            parameters.add(output.getName());
+        }
+
+        // Add all the parameters to the Argo plugin template
+        for (String parameter : parameters) {
+            argoTemplateArgs.add(new NameValueParam(parameter));
+        }
+
+        argoTemplateInputs.put("parameters", argoTemplateArgs);
+        
+        return argoTemplateInputs;
+    }
+    
     private ArgoTemplatePluginContainer generateTemplatePluginContainer(
             String containerId,
             List<String> command,
@@ -120,26 +145,11 @@ public class WorkflowConverter {
         return container;
     }
 
-    private ArgoTemplatePlugin generateTemplatePlugin(Plugin plugin, List<String> parameters, String jobId) {
+    private ArgoTemplatePlugin generateTemplatePluginArgo(Plugin plugin, List<String> parameters, String jobId) {
         ArgoTemplatePlugin argoTemplatePlugin = new ArgoTemplatePlugin();
         argoTemplatePlugin.setName(plugin.getIdentifier() + "-" + jobId);
 
-        // Add the plugin parameters as required by the image
-        HashMap<String, List<NameValueParam>> argoTemplateInputs = new HashMap<>();
-        List<NameValueParam> argoTemplateArgs = new ArrayList<>();
-
-        // Add the plugin's outputs to the list of parameters coming from the job's configuration
-        for (PluginIO output : plugin.getOutputs()) {
-            parameters.add(output.getName());
-        }
-
-        // Add all the parameters to the Argo plugin template
-        for (String parameter : parameters) {
-            argoTemplateArgs.add(new NameValueParam(parameter));
-        }
-
-        argoTemplateInputs.put("parameters", argoTemplateArgs);
-        argoTemplatePlugin.setInputs(argoTemplateInputs);
+        argoTemplatePlugin.setInputs(this.generateTemplatePluginInputs(plugin, parameters));
 
         // Add nodeSelector from hardware requirements
         if(coreConfig.isWorkflowPluginHardwareRequirementsEnabled()) {
@@ -157,6 +167,56 @@ public class WorkflowConverter {
                 )
         );
         return argoTemplatePlugin;
+    }
+    
+    private ArgoTemplatePluginSlurmResource generateTemplatePluginSlurmResource(
+            String containerId,
+            List<String> parameters,
+            String jobId
+    ) throws JsonProcessingException {
+    	ArgoTemplatePluginSlurmResource argoTemplatePluginSlurmResource = new ArgoTemplatePluginSlurmResource();
+    	
+    	// Generate SlurmJob spec (sbatch script)
+    	ArgoTemplatePluginSlurmJobSpec argoTemplatePluginSlurmJobSpec = new ArgoTemplatePluginSlurmJobSpec();
+    	argoTemplatePluginSlurmJobSpec.generateBatch(
+				containerId, parameters, jobId, coreConfig.getSlurmWippDataPath(), this.getSlurmOutputDataPath(jobId),
+				coreConfig.getContainerInputsMountPath(), this.getOutputMountPath(jobId));
+    	
+    	// Generate SlurmJob manifest
+    	ArgoTemplatePluginSlurmJob argoTemplatePluginSlurmJob = new ArgoTemplatePluginSlurmJob();
+    	HashMap<String, String> metadata = new HashMap<>();
+        metadata.put("name", "wipp-" + jobId);
+    	argoTemplatePluginSlurmJob.setMetadata(metadata);
+    	argoTemplatePluginSlurmJob.setSpec(argoTemplatePluginSlurmJobSpec);
+    	YAMLMapper manifestMapper = new YAMLMapper();
+    	manifestMapper.configure(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE, true);
+    	String manifest = manifestMapper.writeValueAsString(argoTemplatePluginSlurmJob);
+    	
+    	// Set manifest in SlurmResource
+    	argoTemplatePluginSlurmResource.setManifest(manifest);
+    	
+    	return argoTemplatePluginSlurmResource;
+    }
+    
+    private ArgoTemplatePluginSlurm generateTemplatePluginSlurm(Plugin plugin, List<String> parameters, String jobId) 
+    		throws JsonProcessingException {
+        ArgoTemplatePluginSlurm argoTemplatePluginSlurm = new ArgoTemplatePluginSlurm();
+        argoTemplatePluginSlurm.setName(plugin.getIdentifier() + "-" + jobId);
+        
+        argoTemplatePluginSlurm.setInputs(this.generateTemplatePluginInputs(plugin, parameters));
+
+        argoTemplatePluginSlurm.setResource(this.generateTemplatePluginSlurmResource(plugin.getContainerId(), parameters, jobId));
+        
+        return argoTemplatePluginSlurm;
+    }
+    
+    private ArgoAbstractTemplate generateTemplatePlugin(Plugin plugin, List<String> parameters, String jobId) 
+    		throws JsonProcessingException {
+        if(coreConfig.isSlurmEnabled()) {
+        	return this.generateTemplatePluginSlurm(plugin, parameters, jobId);
+        } else {
+        	return this.generateTemplatePluginArgo(plugin, parameters, jobId);
+        }
     }
 
     private ArgoTemplateWorkflowTask generateTemplateWorkflowTask(
@@ -290,8 +350,7 @@ public class WorkflowConverter {
         return tolerations;
     }
 
-
-    private List<ArgoAbstractTemplate> generateSpecTemplates() {
+    private List<ArgoAbstractTemplate> generateSpecTemplates() throws JsonProcessingException {
         List<ArgoAbstractTemplate> argoTemplates = new ArrayList<>();
         List<ArgoTemplateWorkflowTask> argoTemplateWorkflowTasks = new ArrayList<>();
 
@@ -321,13 +380,14 @@ public class WorkflowConverter {
         return argoTemplates;
     }
 
-    private ArgoWorkflowSpec generateSpec() {
+    private ArgoWorkflowSpec generateSpec() throws JsonProcessingException {
         ArgoWorkflowSpec argoWorkflowSpec = new ArgoWorkflowSpec();
 
         argoWorkflowSpec.setNodeSelector(this.generateNodeSelector());
         argoWorkflowSpec.setTolerations(this.generateTolerations());
         argoWorkflowSpec.setTemplates(this.generateSpecTemplates());
         argoWorkflowSpec.setVolumes(this.generateSpecVolumes());
+        argoWorkflowSpec.setSecurityContext(new ArgoSecurityContext());
 
         return argoWorkflowSpec;
     }
@@ -339,8 +399,8 @@ public class WorkflowConverter {
         this.jobsDependencies = jobsDependencies;
         this.jobsPlugins = jobsPlugins;
 
-        YAMLFactory yamlFactory = new YAMLFactory();
-        ObjectMapper mapper = new ObjectMapper(yamlFactory);
+        YAMLMapper mapper = new YAMLMapper();
+        mapper.configure(YAMLGenerator.Feature.LITERAL_BLOCK_STYLE, true);
 
         ArgoWorkflow argoWorkflow = new ArgoWorkflow();
 
@@ -369,5 +429,15 @@ public class WorkflowConverter {
     private String getOutputMountSubPath(String jobId){
         return new File(coreConfig.getJobsTempFolder(), jobId).getAbsolutePath()
                 .replaceFirst(coreConfig.getStorageRootFolder() + "/", "");
+    }
+    
+    /**
+     * Get output data path in Slurm cluster
+     * @param jobId
+     * @return the path of the job work folder to mount
+     */
+    private String getSlurmOutputDataPath(String jobId){
+    	return new File(coreConfig.getJobsTempFolder(), jobId).getAbsolutePath()
+                .replaceFirst(coreConfig.getStorageRootFolder(), coreConfig.getSlurmWippDataPath());
     }
 }
