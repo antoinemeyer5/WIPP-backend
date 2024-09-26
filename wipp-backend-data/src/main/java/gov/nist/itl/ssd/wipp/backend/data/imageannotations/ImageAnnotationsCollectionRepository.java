@@ -39,6 +39,15 @@ public interface ImageAnnotationsCollectionRepository extends PrincipalFilteredR
 			+ "]}")
     Page<ImageAnnotationsCollection> findByName(@Param("name") String name, Pageable p);
 
+	@Query(" { '$and' : ["
+			+ "{'$or':["
+			+ "{'owner': ?#{ hasRole('admin') ? {$exists:true} : (hasRole('ANONYMOUS') ? '':authentication.name)}},"
+			+ "{'publiclyShared':true}"
+			+ "]} , "
+			+ "{'taskId' : {$eq : ?0}}"
+			+ "]}")
+	ImageAnnotationsCollection findByTaskId(@Param("taskId") String taskId);
+
 	// not exported
 	@RestResource(exported = false)
 	long countByName(@Param("name") String name);

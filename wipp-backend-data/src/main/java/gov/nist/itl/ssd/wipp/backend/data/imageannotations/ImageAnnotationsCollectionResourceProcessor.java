@@ -26,7 +26,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 *
 * @author Mylene Simon <mylene.simon at nist.gov>
 */
-@Component
+//@Component
 public class ImageAnnotationsCollectionResourceProcessor implements RepresentationModelProcessor<EntityModel<ImageAnnotationsCollection>>{
 
 	@Autowired

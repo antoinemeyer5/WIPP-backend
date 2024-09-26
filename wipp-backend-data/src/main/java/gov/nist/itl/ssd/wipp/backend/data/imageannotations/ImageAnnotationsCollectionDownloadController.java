@@ -61,7 +61,7 @@ public class ImageAnnotationsCollectionDownloadController {
 	public DownloadUrl requestDownload(
             @PathVariable("imageAnnotationsCollectionId") String imageAnnotationsCollectionId) {
     	
-    	// Check existence of CSV collection
+    	// Check existence of image annotations collection
     	Optional<ImageAnnotationsCollection> imageAnnotationsCollection = imageAnnotationsCollectionRepository.findById(
 				imageAnnotationsCollectionId);
         if (!imageAnnotationsCollection.isPresent()) {

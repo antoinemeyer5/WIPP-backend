@@ -26,8 +26,6 @@ public class ImageAnnotation {
     @ManualRef(ImageAnnotationsCollection.class)
     private String imageAnnotationsCollection;
 
-    private String imagesCollectionId;
-
     private String imageFileName;
 
     private boolean pending;
@@ -53,14 +51,6 @@ public class ImageAnnotation {
 
     public void setImageAnnotationsCollection(String imageAnnotationsCollection) {
         this.imageAnnotationsCollection = imageAnnotationsCollection;
-    }
-
-    public String getImagesCollectionId() {
-        return imagesCollectionId;
-    }
-
-    public void setImagesCollectionId(String imagesCollectionId) {
-        this.imagesCollectionId = imagesCollectionId;
     }
 
     public String getImageFileName() {

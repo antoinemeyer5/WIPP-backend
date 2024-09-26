@@ -28,6 +28,8 @@ public class ImageAnnotationsCollection {
     @ManualRef(Job.class)
     private String sourceJob;
 
+    private String imagesCollectionId;
+
     private String taskId;
 
     private boolean publiclyShared;
@@ -69,6 +71,14 @@ public class ImageAnnotationsCollection {
 
     public void setSourceJob(String sourceJob) {
         this.sourceJob = sourceJob;
+    }
+
+    public String getImagesCollectionId() {
+        return imagesCollectionId;
+    }
+
+    public void setImagesCollectionId(String imagesCollectionId) {
+        this.imagesCollectionId = imagesCollectionId;
     }
 
     public String getTaskId() {

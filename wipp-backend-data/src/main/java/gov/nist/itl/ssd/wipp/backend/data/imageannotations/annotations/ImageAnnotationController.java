@@ -32,11 +32,9 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -67,6 +65,25 @@ public class ImageAnnotationController {
             @PathVariable("imageAnnotationsCollectionId") String imageAnnotationsCollectionId,
             @ParameterObject @PageableDefault Pageable pageable,
             @Parameter(hidden = true) PagedResourcesAssembler<ImageAnnotation> assembler) {
+        Page<ImageAnnotation> files = imageAnnotationRepository.findByImageAnnotationsCollection(
+                imageAnnotationsCollectionId, pageable);
+        PagedModel<EntityModel<ImageAnnotation>> resources
+                = assembler.toModel(files);
+        resources.forEach(
+                resource -> processResource(imageAnnotationsCollectionId, resource));
+        return new ResponseEntity<>(resources, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "", method = RequestMethod.POST)
+    @PreAuthorize("hasRole('admin') or @imageAnnotationsCollectionSecurity.checkAuthorize(#imageAnnotationsCollectionId, false)")
+    public HttpEntity<PagedModel<EntityModel<ImageAnnotation>>> addAnnotations(
+            @PathVariable("imageAnnotationsCollectionId") String imageAnnotationsCollectionId,
+            @ParameterObject @PageableDefault Pageable pageable,
+            @RequestBody List<ImageAnnotation> annotations,
+            @Parameter(hidden = true) PagedResourcesAssembler<ImageAnnotation> assembler) {
+        annotations.forEach(annotation -> {
+            imageAnnotationRepository.save(annotation);
+        });
         Page<ImageAnnotation> files = imageAnnotationRepository.findByImageAnnotationsCollection(
                 imageAnnotationsCollectionId, pageable);
         PagedModel<EntityModel<ImageAnnotation>> resources
