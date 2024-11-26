@@ -9,28 +9,20 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
+package gov.nist.itl.ssd.wipp.backend.data.imageannotations.annotations;
 
-package gov.nist.itl.ssd.wipp.backend.data.aimodel;
-
-import gov.nist.itl.ssd.wipp.backend.core.model.auth.PrincipalFilteredRepository;
-
-import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.data.repository.query.Param;
-import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
  *
- * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Tag(name="AiModel Entity")
-@RepositoryRestResource
-public interface AiModelRepository extends PrincipalFilteredRepository<AiModel, String> {
+public interface ImageAnnotationRepositoryCustom {
 
-	// not exported
-	@RestResource(exported = false)
-	long countByName(@Param("name") String name);
+	void deleteByImageAnnotationsCollection(
+            @Param("imageAnnotationsCollection") String imageAnnotationsCollection);
 
-
+    void deleteByImageAnnotationsCollectionAndImageFileName(
+            @Param("imageAnnotationsCollection") String imageAnnotationsCollection,
+            @Param("imageFileName") String imageFileName);
 }

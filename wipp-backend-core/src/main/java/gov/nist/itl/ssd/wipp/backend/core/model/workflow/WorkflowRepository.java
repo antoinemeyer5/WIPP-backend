@@ -23,5 +23,6 @@ public interface WorkflowRepository extends PrincipalFilteredRepository<Workflow
     void delete(Workflow w);
 	
 	// Not exported
+    @RestResource(exported = false)
     long countByName(@Param("name") String name);
 }

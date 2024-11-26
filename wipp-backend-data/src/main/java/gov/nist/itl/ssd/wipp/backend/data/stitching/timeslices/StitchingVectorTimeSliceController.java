@@ -135,7 +135,7 @@ public class StitchingVectorTimeSliceController {
     			timeSliceId);
         if (ts == null) {
             throw new ResourceNotFoundException(
-                    "Images collection " + stitchingVectorId + " not found.");
+                    "Stitching vector " + stitchingVectorId + " not found.");
         }
         
         // Generate download token

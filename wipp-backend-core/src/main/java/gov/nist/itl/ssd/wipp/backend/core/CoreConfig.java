@@ -55,6 +55,12 @@ public class CoreConfig {
     
     @Value("${kube.wippdata.pvc}")
     private String wippDataPVCName;
+    
+    @Value("${slurm.enabled}")
+    private boolean slurmEnabled;
+    
+    @Value("${slurm.wippdata.path}")
+    private String slurmWippDataPath;
 
     @Value("${storage.collections}")
     private String imagesCollectionsFolder;
@@ -94,6 +100,9 @@ public class CoreConfig {
 
     @Value("${storage.csvCollections.upload.tmp}")
     private String csvCollectionsUploadTmpFolder;
+
+    @Value("${storage.image.annotations}")
+    private String imageAnnotationsFolder;
 
     @Value("${storage.temp.jobs}")
     private String jobsTempFolder;
@@ -182,6 +191,10 @@ public class CoreConfig {
 		return genericDataCollectionsUploadTmpFolder;
 	}
 
+    public String getImageAnnotationsFolder() {
+        return imageAnnotationsFolder;
+    }
+
     public String getWorkflowBinary() {
         return workflowBinary;
     }
@@ -200,6 +213,14 @@ public class CoreConfig {
 
 	public String getWippDataPVCName() {
 		return wippDataPVCName;
+	}
+
+	public boolean isSlurmEnabled() {
+		return slurmEnabled;
+	}
+
+	public String getSlurmWippDataPath() {
+		return slurmWippDataPath;
 	}
 
 	public String getImagesCollectionsFolder() {

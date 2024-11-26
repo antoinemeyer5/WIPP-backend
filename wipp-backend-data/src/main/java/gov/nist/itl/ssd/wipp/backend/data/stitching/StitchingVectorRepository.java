@@ -31,6 +31,7 @@ public interface StitchingVectorRepository extends PrincipalFilteredRepository<S
 	void delete(StitchingVector s);
 
 	// not exported
+	@RestResource(exported = false)
 	long countByName(@Param("name") String name);
 
 }

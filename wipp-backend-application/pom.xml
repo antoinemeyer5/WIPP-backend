@@ -66,6 +66,7 @@
 				<workflow.binary>argo</workflow.binary>
 				<workflow.pluginHardwareRequirements.enabled>false</workflow.pluginHardwareRequirements.enabled>
 				<kube.wippdata.pvc>wippdata-pvc</kube.wippdata.pvc>
+				<slurm.wippdata.path>${user.home}/WIPP-plugins-slurm</slurm.wippdata.path>
 				<storage.root>${user.home}/WIPP-plugins</storage.root>
 				<storage.workflows>${user.home}/WIPP-plugins/workflows</storage.workflows>
 				<storage.collections>${user.home}/WIPP-plugins/images-upload</storage.collections>
@@ -81,6 +82,7 @@
 				<storage.generic.datas.upload.tmp>${user.home}/WIPP-plugins/temp/generic-data</storage.generic.datas.upload.tmp>
 				<storage.notebooks>${user.home}/WIPP-plugins/notebooks</storage.notebooks>
 				<storage.notebooks.tmp>${user.home}/WIPP-plugins/temp/notebooks</storage.notebooks.tmp>
+				<storage.image.annotations>${user.home}/WIPP-plugins/image-annotations</storage.image.annotations>
 				<storage.temp.jobs>${user.home}/WIPP-plugins/temp/jobs</storage.temp.jobs>
 				<storage.local.import>${user.home}/WIPP-plugins/local-import</storage.local.import>
 				<fetching.pixels.max>125000000</fetching.pixels.max>
@@ -98,6 +100,7 @@
 				<workflow.binary>argo</workflow.binary>
 				<workflow.pluginHardwareRequirements.enabled>false</workflow.pluginHardwareRequirements.enabled>
 				<kube.wippdata.pvc>wippdata-pvc</kube.wippdata.pvc>
+				<slurm.wippdata.path>/mnt/data/WIPP-plugins</slurm.wippdata.path>
 				<storage.root>/data/WIPP-plugins</storage.root>
 				<storage.workflows>/data/WIPP-plugins/workflows</storage.workflows>
 				<storage.collections>/data/WIPP-plugins/imagesUpload</storage.collections>
@@ -113,6 +116,7 @@
 				<storage.generic.datas.upload.tmp>/data/WIPP-plugins/temp/generic-data</storage.generic.datas.upload.tmp>
 				<storage.notebooks>/data/WIPP-plugins/notebooks</storage.notebooks>
 				<storage.notebooks.tmp>/data/WIPP-plugins/temp/notebooks</storage.notebooks.tmp>
+				<storage.image.annotations>/data/WIPP-plugins/image-annotations</storage.image.annotations>
 				<storage.temp.jobs>/data/WIPP-plugins/temp/jobs</storage.temp.jobs>
 				<storage.local.import>/data/WIPP-plugins/local-import</storage.local.import>
 				<fetching.pixels.max>125000000</fetching.pixels.max>

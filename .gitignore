@@ -21,3 +21,6 @@ wipp-backend-application/pom.xml
 # Local environment files
 .env
 
+# Local lib (mac workaround)
+wipp-backend-application/libblosc.dylib
+

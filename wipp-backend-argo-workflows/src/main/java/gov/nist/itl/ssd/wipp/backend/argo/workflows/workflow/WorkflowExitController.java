@@ -27,6 +27,7 @@ import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import gov.nist.itl.ssd.wipp.backend.core.utils.SecurityUtils;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -64,7 +65,7 @@ public class WorkflowExitController {
             method = RequestMethod.POST,
             produces = {"application/json"}
     )
-    public ResponseEntity<Workflow> exit(
+    public EntityModel<Workflow> exit(
             @PathVariable("workflowId") String workflowId,
             @RequestBody String status
     ) {
@@ -145,6 +146,6 @@ public class WorkflowExitController {
         // Clear security context after system operations
         SecurityContextHolder.clearContext();
 
-        return new ResponseEntity<>(workflow, HttpStatus.OK);
+        return EntityModel.of(workflow);
     }
 }

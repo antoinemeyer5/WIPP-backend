@@ -9,28 +9,46 @@
  * any other characteristic. We would appreciate acknowledgement if the
  * software is used.
  */
-
-package gov.nist.itl.ssd.wipp.backend.data.aimodel;
+package gov.nist.itl.ssd.wipp.backend.data.imageannotations;
 
 import gov.nist.itl.ssd.wipp.backend.core.model.auth.PrincipalFilteredRepository;
-
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
 import org.springframework.data.rest.core.annotation.RestResource;
 
 /**
- *
- * @author Mohamed Ouladi <mohamed.ouladi at nist.gov>
  * @author Mylene Simon <mylene.simon at nist.gov>
  */
-@Tag(name="AiModel Entity")
+@Tag(name="ImageAnnotations Entity")
 @RepositoryRestResource
-public interface AiModelRepository extends PrincipalFilteredRepository<AiModel, String> {
+public interface ImageAnnotationsCollectionRepository extends PrincipalFilteredRepository<ImageAnnotationsCollection, String> {
+
+	/*
+	 * Filter collection resources access by object name depending on user
+	 */
+	@Query(" { '$and' : ["
+			+ "{'$or':["
+			+ "{'owner': ?#{ hasRole('admin') ? {$exists:true} : (hasRole('ANONYMOUS') ? '':authentication.name)}},"
+			+ "{'publiclyShared':true}"
+			+ "]} , "
+			+ "{'name' : {$eq : ?0}}"
+			+ "]}")
+    Page<ImageAnnotationsCollection> findByName(@Param("name") String name, Pageable p);
+
+	@Query(" { '$and' : ["
+			+ "{'$or':["
+			+ "{'owner': ?#{ hasRole('admin') ? {$exists:true} : (hasRole('ANONYMOUS') ? '':authentication.name)}},"
+			+ "{'publiclyShared':true}"
+			+ "]} , "
+			+ "{'taskId' : {$eq : ?0}}"
+			+ "]}")
+	ImageAnnotationsCollection findByTaskId(@Param("taskId") String taskId);
 
 	// not exported
 	@RestResource(exported = false)
 	long countByName(@Param("name") String name);
-
-
 }
