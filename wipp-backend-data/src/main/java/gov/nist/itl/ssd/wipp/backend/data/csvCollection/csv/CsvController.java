@@ -11,9 +11,15 @@
  */
 package gov.nist.itl.ssd.wipp.backend.data.csvCollection.csv;
 
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import gov.nist.itl.ssd.wipp.backend.core.CoreConfig;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.ClientException;
 import gov.nist.itl.ssd.wipp.backend.core.rest.exception.NotFoundException;
+import gov.nist.itl.ssd.wipp.backend.data.aimodelcard.AiModelCard;
 import gov.nist.itl.ssd.wipp.backend.data.csvCollection.CsvCollection;
 import gov.nist.itl.ssd.wipp.backend.data.csvCollection.CsvCollectionRepository;
 
@@ -23,21 +29,29 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.*;
 import org.springframework.hateoas.server.EntityLinks;
 import org.springframework.hateoas.server.ExposesResourceFor;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+
+import static org.apache.commons.io.FileUtils.getFile;
 
 /**
  *
@@ -61,6 +75,9 @@ public class CsvController {
 
     @Autowired
     private CsvHandler csvHandler;
+
+    @Autowired
+    private CoreConfig coreConfig;
 
     @RequestMapping(value = "", method = RequestMethod.GET)
     @PreAuthorize("hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, false)")
@@ -119,6 +136,56 @@ public class CsvController {
                 .slash(file.getFileName())
                 .withSelfRel();
         resource.add(link);
+    }
+
+    @RequestMapping(
+            value="/{fileName:.+}/content",
+            method = RequestMethod.GET,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    // @PreAuthorize("isAuthenticated() and hasRole('admin')")
+    @PreAuthorize("isAuthenticated() and (hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, true))")
+    public ResponseEntity<byte[]> getContent(
+            @PathVariable("csvCollectionId") String csvCollectionId,
+            @PathVariable("fileName") String fileName) throws FileNotFoundException {
+        // (1) Get Csv
+        StringBuilder csv = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(coreConfig.getCsvCollectionsFolder() + "/" + csvCollectionId + "/" + fileName))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                //String[] values = line.split(":");
+                //csv.add(Arrays.asList(values));
+                csv.append(line);
+                csv.append(",");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        // (2) Convert Into Bytes
+        byte[] bytes = new byte[0];
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            mapper.configure(SerializationFeature.INDENT_OUTPUT, true);
+            bytes = mapper.writeValueAsString(csv.toString()).getBytes();
+        }
+        catch (JsonProcessingException e) { e.printStackTrace(); }
+
+        // (3) Setup Response Head
+        HttpHeaders head = new HttpHeaders();
+        head.add(
+                "content-disposition",
+                "attachment; filename=\"" + fileName
+        );
+        List<String> exposedHead = List.of("content-disposition");
+        head.setAccessControlExposeHeaders(exposedHead);
+
+        return ResponseEntity
+                .ok()
+                .headers(head)
+                .contentType(MediaType.APPLICATION_JSON)
+                .contentLength(bytes.length)
+                .body(bytes);
     }
 
 }
