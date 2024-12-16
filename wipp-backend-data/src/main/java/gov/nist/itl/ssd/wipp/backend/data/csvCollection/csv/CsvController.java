@@ -143,7 +143,6 @@ public class CsvController {
             method = RequestMethod.GET,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    // @PreAuthorize("isAuthenticated() and hasRole('admin')")
     @PreAuthorize("isAuthenticated() and (hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, true))")
     public ResponseEntity<byte[]> getContent(
             @PathVariable("csvCollectionId") String csvCollectionId,
@@ -153,10 +152,7 @@ public class CsvController {
         try (BufferedReader br = new BufferedReader(new FileReader(coreConfig.getCsvCollectionsFolder() + "/" + csvCollectionId + "/" + fileName))) {
             String line;
             while ((line = br.readLine()) != null) {
-                //String[] values = line.split(":");
-                //csv.add(Arrays.asList(values));
-                csv.append(line);
-                csv.append(",");
+                csv.append(line).append(",");
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
