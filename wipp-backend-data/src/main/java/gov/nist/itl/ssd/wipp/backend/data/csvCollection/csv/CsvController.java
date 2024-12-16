@@ -96,7 +96,7 @@ public class CsvController {
 
     @RequestMapping(value = "", method = RequestMethod.DELETE)
     @PreAuthorize("isAuthenticated() and "
-    		+ "(hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, true))")
+            + "(hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, true))")
     public void deleteAllFiles(
             @PathVariable("csvCollectionId") String csvCollectionId) {
         Optional<CsvCollection> tc =csvCollectionRepository.findById(
@@ -112,7 +112,7 @@ public class CsvController {
 
     @RequestMapping(value = "/{fileName:.+}", method = RequestMethod.DELETE)
     @PreAuthorize("isAuthenticated() and "
-    		+ "(hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, true))")
+            + "(hasRole('admin') or @csvCollectionSecurity.checkAuthorize(#csvCollectionId, true))")
     public void deleteFile(
             @PathVariable("csvCollectionId") String csvCollectionId,
             @PathVariable("fileName") String fileName) {
@@ -131,7 +131,7 @@ public class CsvController {
                                    EntityModel<Csv> resource) {
         Csv file = resource.getContent();
         Link link = entityLinks.linkForItemResource(
-                CsvCollection.class, csvCollectionId)
+                        CsvCollection.class, csvCollectionId)
                 .slash("csv")
                 .slash(file.getFileName())
                 .withSelfRel();
